@@ -1,4 +1,9 @@
-import { type Account, type Data, ProfileSchema } from "@monyfox/common-data";
+import {
+  type Account,
+  AccountSchema,
+  type Data,
+  ProfileSchema,
+} from "@monyfox/common-data";
 import { createContext, ReactNode } from "react";
 import { useLocalStorage } from "../hooks/use-local-storage";
 import { DestructiveAlert } from "../components/ui/alert";
@@ -62,7 +67,8 @@ export const ProfileProvider = ({
   };
   const data = profile.data.data;
 
-  function createAccount(account: Account) {
+  function createAccount(raw: Account) {
+    const account = AccountSchema.parse(raw);
     setProfile((prev) => {
       if (prev === null) {
         return prev;

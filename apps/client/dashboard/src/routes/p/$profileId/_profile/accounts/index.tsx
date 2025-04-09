@@ -7,6 +7,7 @@ import { type Account } from "@monyfox/common-data";
 import { createFileRoute } from "@tanstack/react-router";
 import { TrashIcon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/p/$profileId/_profile/accounts/")({
   component: RouteComponent,
@@ -68,12 +69,19 @@ function CreateAccountButton() {
   const [accountName, setAccountName] = useState("");
 
   function onSave() {
-    createAccount({
-      id: crypto.randomUUID(),
-      name: accountName,
-      isPersonalAsset: true,
-    });
-    closeModal();
+    try {
+      createAccount({
+        id: crypto.randomUUID(),
+        name: accountName,
+        isPersonalAsset: true,
+      });
+      toast.success("Account created successfully");
+      closeModal();
+    } catch (error) {
+      toast.error("Failed to create account", {
+        description: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
   }
 
   return (
