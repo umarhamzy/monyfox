@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 
-export function useStorage<TypeValidator extends z.Schema>(
-  storage: Storage,
+export function useLocalStorage<TypeValidator extends z.Schema>(
   key: string,
   defaultValue: z.infer<TypeValidator>,
   inputSchema: TypeValidator,
 ) {
   const [value, setValue] = useState<z.infer<TypeValidator> | null>(() => {
-    const storedValue = storage.getItem(key);
+    const storedValue = localStorage.getItem(key);
     if (storedValue) {
       try {
         const parsedValue = JSON.parse(storedValue);
@@ -24,9 +23,13 @@ export function useStorage<TypeValidator extends z.Schema>(
 
   useEffect(() => {
     if (value !== null) {
-      storage.setItem(key, JSON.stringify(value));
+      localStorage.setItem(key, JSON.stringify(value));
     }
-  }, [storage, key, value]);
+  }, [key, value]);
 
-  return [value, setValue] as const;
+  return [
+    value,
+    // Do not allow setting the value to null
+    setValue as React.Dispatch<React.SetStateAction<z.TypeOf<TypeValidator>>>,
+  ] as const;
 }
