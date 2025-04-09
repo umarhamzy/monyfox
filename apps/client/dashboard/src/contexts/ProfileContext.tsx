@@ -4,6 +4,13 @@ import { useLocalStorage } from "../hooks/use-local-storage";
 import { DestructiveAlert } from "../components/ui/alert";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface ProfileContextProps {
   user: { id: string; name: string };
@@ -30,28 +37,19 @@ export const ProfileProvider = ({
 
   if (profile === null) {
     return (
-      <div>
-        <DestructiveAlert title="Profile not found">
-          The profile you are trying to access does not exist.
-        </DestructiveAlert>
-        <Link to="/">
-          <Button>Go back</Button>
-        </Link>
-      </div>
+      <ErrorPage
+        title="Profile not found"
+        message="The profile you are trying to access does not exist."
+      />
     );
   }
 
   if (profile.data.encrypted) {
     return (
-      <div>
-        <DestructiveAlert title="Profile encrypted">
-          The profile you are trying to access is encrypted. Encrypted profiles
-          are currently not supported.
-        </DestructiveAlert>
-        <Link to="/">
-          <Button>Go back</Button>
-        </Link>
-      </div>
+      <ErrorPage
+        title="Encrypted profile"
+        message="The profile you are trying to access is encrypted. Encrypted profiles are currently not supported."
+      />
     );
   }
 
@@ -67,3 +65,25 @@ export const ProfileProvider = ({
     </ProfileContext.Provider>
   );
 };
+
+function ErrorPage({ title, message }: { title: string; message: string }) {
+  return (
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <Card>
+          <CardHeader>
+            <CardTitle>Whoops!</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DestructiveAlert title={title}>{message}</DestructiveAlert>
+          </CardContent>
+          <CardFooter className="flex justify-end">
+            <Link to="/">
+              <Button>Go back</Button>
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
+  );
+}
