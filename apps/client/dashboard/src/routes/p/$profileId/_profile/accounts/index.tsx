@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputWithLabel } from "@/components/ui/input";
 import { ConfirmationModal, Modal, useModal } from "@/components/ui/modal";
 import { useProfile } from "@/hooks/use-profile";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { type Account } from "@monyfox/common-data";
 import { createFileRoute } from "@tanstack/react-router";
 import { TrashIcon } from "lucide-react";
@@ -15,10 +16,11 @@ export const Route = createFileRoute("/p/$profileId/_profile/accounts/")({
 });
 
 function RouteComponent() {
+  const [parent] = useAutoAnimate();
   const { data } = useProfile();
 
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={parent} className="flex flex-col gap-4">
       <CreateAccountButton />
       {data.accounts.map((account) => (
         <AccountCard key={account.id} account={account} />

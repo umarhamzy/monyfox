@@ -16,11 +16,13 @@ import {
 import { TrashIcon } from "lucide-react";
 import { ulid } from "ulid";
 import { generateTestProfile } from "@/utils/data";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 export function ProfileSelection({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const [parent] = useAutoAnimate();
   const { profiles, createProfile, deleteProfile } = useProfiles();
 
   return (
@@ -32,17 +34,14 @@ export function ProfileSelection({
             Select a profile to login or create a new one.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            {profiles.map((profile) => (
-              <ProfileCard
-                key={profile.id}
-                profile={profile}
-                deleteProfile={deleteProfile}
-              />
-            ))}
-          </ul>
-          <div className="h-4" />
+        <CardContent ref={parent} className="flex flex-col gap-4">
+          {profiles.map((profile) => (
+            <ProfileCard
+              key={profile.id}
+              profile={profile}
+              deleteProfile={deleteProfile}
+            />
+          ))}
           <CreateProfile createProfile={createProfile} />
         </CardContent>
       </Card>
