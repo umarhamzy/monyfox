@@ -1,9 +1,9 @@
 import { type Data, ProfileSchema } from "@monyfox/common-data";
 import { createContext, ReactNode } from "react";
 import { useLocalStorage } from "../hooks/use-local-storage";
-import { Alert } from "../components/ui/Alert";
-import { Button } from "@nextui-org/react";
+import { DestructiveAlert } from "../components/ui/alert";
 import { Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 
 interface ProfileContextProps {
   data: Data;
@@ -30,7 +30,9 @@ export const ProfileProvider = ({
   if (profile === null) {
     return (
       <div>
-        <Alert type="error">Profile not found</Alert>
+        <DestructiveAlert title="Profile not found">
+          The profile you are trying to access does not exist.
+        </DestructiveAlert>
         <Link to="/">
           <Button>Go back</Button>
         </Link>
@@ -41,7 +43,10 @@ export const ProfileProvider = ({
   if (profile.data.encrypted) {
     return (
       <div>
-        <Alert type="error">Profile is encrypted</Alert>
+        <DestructiveAlert title="Profile encrypted">
+          The profile you are trying to access is encrypted. Encrypted profiles
+          are currently not supported.
+        </DestructiveAlert>
         <Link to="/">
           <Button>Go back</Button>
         </Link>

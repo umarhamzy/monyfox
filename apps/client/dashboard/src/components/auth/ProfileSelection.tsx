@@ -1,27 +1,49 @@
-import { Button, Card, CardHeader, Input } from "@nextui-org/react";
+import { cn } from "@/lib/utils";
 import { IconTrash } from "@tabler/icons-react";
 import { useProfiles } from "../../hooks/use-profiles";
-import { ConfirmationModal, Modal, useModal } from "../ui/Modal";
+import { ConfirmationModal, Modal, useModal } from "../ui/modal";
 import { type Profile } from "@monyfox/common-data";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { InputWithLabel } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-export function ProfileSelection() {
+export function ProfileSelection({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<"div">) {
   const { profiles, createProfile, deleteProfile } = useProfiles();
 
   return (
-    <div className="p-4">
-      <ul className="space-y-2">
-        {profiles.map((profile) => (
-          <ProfileCard
-            key={profile.id}
-            profile={profile}
-            deleteProfile={deleteProfile}
-          />
-        ))}
-      </ul>
-      <div className="h-4" />
-      <CreateProfile createProfile={createProfile} />
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardDescription>
+            Select a profile to login or create a new one.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2">
+            {profiles.map((profile) => (
+              <ProfileCard
+                key={profile.id}
+                profile={profile}
+                deleteProfile={deleteProfile}
+              />
+            ))}
+          </ul>
+          <div className="h-4" />
+          <CreateProfile createProfile={createProfile} />
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -38,19 +60,14 @@ function ProfileCard({
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center w-full">
-          <span>{profile.user}</span>
+          <CardTitle>{profile.user}</CardTitle>
           <div className="flex gap-2">
-            <Button color="primary" variant="ghost">
-              <Link to="/p/$profileId" params={{ profileId: profile.id }}>
+            <Link to="/p/$profileId" params={{ profileId: profile.id }}>
+              <Button color="primary" variant="default">
                 Open
-              </Link>
-            </Button>
-            <Button
-              onPress={openModal}
-              color="danger"
-              variant="ghost"
-              isIconOnly
-            >
+              </Button>
+            </Link>
+            <Button onClick={openModal} variant="outline">
               <IconTrash size={16} />
             </Button>
           </div>
@@ -64,7 +81,7 @@ function ProfileCard({
             }}
             confirmText="Delete"
             cancelText="Cancel"
-            actionButtonColor="danger"
+            actionButtonVariant="destructive"
           >
             Are you sure you want to delete this profile?
           </ConfirmationModal>
@@ -82,7 +99,7 @@ function CreateProfile({
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <div className="flex flex-col items-center">
-      <Button onPress={openModal}>Create Profile</Button>
+      <Button onClick={openModal}>Create Profile</Button>
       <CreateProfileModal
         isOpen={isOpen}
         onClose={closeModal}
@@ -109,9 +126,11 @@ function CreateProfileModal({
       title="Create Profile"
       footer={
         <div className="flex justify-end gap-2">
-          <Button onPress={onClose}>Cancel</Button>
+          <Button onClick={onClose} variant="ghost">
+            Cancel
+          </Button>
           <Button
-            onPress={() => {
+            onClick={() => {
               createProfile({
                 id: crypto.randomUUID(),
                 user: profileName,
@@ -129,14 +148,16 @@ function CreateProfileModal({
               onClose();
               setProfileName("");
             }}
-            color="primary"
+            variant="default"
           >
             Create
           </Button>
         </div>
       }
     >
-      <Input
+      <InputWithLabel
+        type="text"
+        id="profileName"
         label="Profile Name"
         value={profileName}
         onChange={(e) => setProfileName(e.target.value)}

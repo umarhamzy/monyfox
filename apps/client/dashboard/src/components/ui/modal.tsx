@@ -1,13 +1,12 @@
 import {
-  Modal as ModalComponent,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  type ButtonProps,
-} from "@nextui-org/react";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useState } from "react";
+import { Button } from "./button";
 
 export function Modal({
   isOpen,
@@ -23,13 +22,15 @@ export function Modal({
   footer: React.ReactNode;
 }) {
   return (
-    <ModalComponent isOpen={isOpen} onClose={onClose}>
-      <ModalContent>
-        <ModalHeader>{title}</ModalHeader>
-        <ModalBody>{children}</ModalBody>
-        <ModalFooter>{footer}</ModalFooter>
-      </ModalContent>
-    </ModalComponent>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        {children}
+        <DialogFooter>{footer}</DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -41,7 +42,7 @@ export function ConfirmationModal({
   onConfirm,
   confirmText,
   cancelText,
-  actionButtonColor,
+  actionButtonVariant,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -50,7 +51,7 @@ export function ConfirmationModal({
   onConfirm: () => void;
   confirmText: string;
   cancelText: string;
-  actionButtonColor?: ButtonProps["color"];
+  actionButtonVariant?: "default" | "destructive";
 }) {
   return (
     <Modal
@@ -59,8 +60,13 @@ export function ConfirmationModal({
       title={title}
       footer={
         <div className="flex justify-end gap-2">
-          <Button onPress={onClose}>{cancelText}</Button>
-          <Button onPress={onConfirm} color={actionButtonColor ?? "primary"}>
+          <Button onClick={onClose} variant="ghost">
+            {cancelText}
+          </Button>
+          <Button
+            onClick={onConfirm}
+            variant={actionButtonVariant ?? "default"}
+          >
             {confirmText}
           </Button>
         </div>
