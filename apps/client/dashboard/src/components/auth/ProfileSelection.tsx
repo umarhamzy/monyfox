@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { TrashIcon } from "lucide-react";
 import { ulid } from "ulid";
+import { generateTestProfile } from "@/utils/data";
 
 export function ProfileSelection({
   className,
@@ -100,12 +101,14 @@ function CreateProfile({
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <div className="flex flex-col items-center">
-      <Button onClick={openModal}>Create Profile</Button>
+      <Button onClick={openModal}>Create profile</Button>
       <CreateProfileModal
         isOpen={isOpen}
         onClose={closeModal}
         createProfile={createProfile}
       />
+      <hr className="my-4 w-full" />
+      <CreateTestProfileButton createProfile={createProfile} />
     </div>
   );
 }
@@ -124,7 +127,7 @@ function CreateProfileModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Create Profile"
+      title="Create profile"
       footer={
         <div className="flex justify-end gap-2">
           <Button onClick={onClose} variant="ghost">
@@ -164,5 +167,22 @@ function CreateProfileModal({
         onChange={(e) => setProfileName(e.target.value)}
       />
     </Modal>
+  );
+}
+
+function CreateTestProfileButton({
+  createProfile,
+}: {
+  createProfile: (profile: Profile) => void;
+}) {
+  function onClick() {
+    const profile = generateTestProfile();
+    createProfile(profile);
+  }
+
+  return (
+    <Button onClick={onClick} variant="secondary">
+      Create a test profile
+    </Button>
   );
 }
