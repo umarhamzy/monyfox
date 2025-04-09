@@ -1,0 +1,15 @@
+{
+  "name": "vitexpress",
+  "private": true,
+  "workspaces": [
+    "apps/server/*",
+    "apps/client/*",
+    "packages/server/*",
+    "packages/client/*",
+    "packages/tsconfig/*"
+  ],
+  "packageManager": "yarn@4.3.1",
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}
