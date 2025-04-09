@@ -4,6 +4,7 @@ import { useProfiles } from "../../hooks/use-profiles";
 import { ConfirmationModal, Modal, useModal } from "../ui/Modal";
 import { type Profile } from "@monyfox/common-data";
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 
 export function ProfileSelection() {
   const { profiles, createProfile, deleteProfile } = useProfiles();
@@ -38,9 +39,21 @@ function ProfileCard({
       <CardHeader>
         <div className="flex justify-between items-center w-full">
           <span>{profile.user}</span>
-          <Button onPress={openModal} color="danger" variant="ghost" isIconOnly>
-            <IconTrash size={16} />
-          </Button>
+          <div className="flex gap-2">
+            <Button color="primary" variant="ghost">
+              <Link to="/p/$profileId" params={{ profileId: profile.id }}>
+                Open
+              </Link>
+            </Button>
+            <Button
+              onPress={openModal}
+              color="danger"
+              variant="ghost"
+              isIconOnly
+            >
+              <IconTrash size={16} />
+            </Button>
+          </div>
           <ConfirmationModal
             isOpen={isOpen}
             onClose={closeModal}

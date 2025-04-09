@@ -8,19 +8,20 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as DashboardImport } from './routes/_dashboard'
 import { Route as IndexImport } from './routes/index'
-import { Route as DashboardDashboardImport } from './routes/_dashboard/dashboard'
+import { Route as PProfileIdProfileImport } from './routes/p/$profileId/_profile'
+import { Route as PProfileIdProfileIndexImport } from './routes/p/$profileId/_profile/index'
+
+// Create Virtual Routes
+
+const PProfileIdImport = createFileRoute('/p/$profileId')()
 
 // Create/Update Routes
-
-const DashboardRoute = DashboardImport.update({
-  id: '/_dashboard',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -28,10 +29,21 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DashboardDashboardRoute = DashboardDashboardImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => DashboardRoute,
+const PProfileIdRoute = PProfileIdImport.update({
+  id: '/p/$profileId',
+  path: '/p/$profileId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PProfileIdProfileRoute = PProfileIdProfileImport.update({
+  id: '/_profile',
+  getParentRoute: () => PProfileIdRoute,
+} as any)
+
+const PProfileIdProfileIndexRoute = PProfileIdProfileIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PProfileIdProfileRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -45,73 +57,96 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/_dashboard': {
-      id: '/_dashboard'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof DashboardImport
+    '/p/$profileId': {
+      id: '/p/$profileId'
+      path: '/p/$profileId'
+      fullPath: '/p/$profileId'
+      preLoaderRoute: typeof PProfileIdImport
       parentRoute: typeof rootRoute
     }
-    '/_dashboard/dashboard': {
-      id: '/_dashboard/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardDashboardImport
-      parentRoute: typeof DashboardImport
+    '/p/$profileId/_profile': {
+      id: '/p/$profileId/_profile'
+      path: '/p/$profileId'
+      fullPath: '/p/$profileId'
+      preLoaderRoute: typeof PProfileIdProfileImport
+      parentRoute: typeof PProfileIdRoute
+    }
+    '/p/$profileId/_profile/': {
+      id: '/p/$profileId/_profile/'
+      path: '/'
+      fullPath: '/p/$profileId/'
+      preLoaderRoute: typeof PProfileIdProfileIndexImport
+      parentRoute: typeof PProfileIdProfileImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface DashboardRouteChildren {
-  DashboardDashboardRoute: typeof DashboardDashboardRoute
+interface PProfileIdProfileRouteChildren {
+  PProfileIdProfileIndexRoute: typeof PProfileIdProfileIndexRoute
 }
 
-const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardDashboardRoute: DashboardDashboardRoute,
+const PProfileIdProfileRouteChildren: PProfileIdProfileRouteChildren = {
+  PProfileIdProfileIndexRoute: PProfileIdProfileIndexRoute,
 }
 
-const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
-  DashboardRouteChildren,
+const PProfileIdProfileRouteWithChildren =
+  PProfileIdProfileRoute._addFileChildren(PProfileIdProfileRouteChildren)
+
+interface PProfileIdRouteChildren {
+  PProfileIdProfileRoute: typeof PProfileIdProfileRouteWithChildren
+}
+
+const PProfileIdRouteChildren: PProfileIdRouteChildren = {
+  PProfileIdProfileRoute: PProfileIdProfileRouteWithChildren,
+}
+
+const PProfileIdRouteWithChildren = PProfileIdRoute._addFileChildren(
+  PProfileIdRouteChildren,
 )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof DashboardRouteWithChildren
-  '/dashboard': typeof DashboardDashboardRoute
+  '/p/$profileId': typeof PProfileIdProfileRouteWithChildren
+  '/p/$profileId/': typeof PProfileIdProfileIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof DashboardRouteWithChildren
-  '/dashboard': typeof DashboardDashboardRoute
+  '/p/$profileId': typeof PProfileIdProfileIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/_dashboard': typeof DashboardRouteWithChildren
-  '/_dashboard/dashboard': typeof DashboardDashboardRoute
+  '/p/$profileId': typeof PProfileIdRouteWithChildren
+  '/p/$profileId/_profile': typeof PProfileIdProfileRouteWithChildren
+  '/p/$profileId/_profile/': typeof PProfileIdProfileIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/dashboard'
+  fullPaths: '/' | '/p/$profileId' | '/p/$profileId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/dashboard'
-  id: '__root__' | '/' | '/_dashboard' | '/_dashboard/dashboard'
+  to: '/' | '/p/$profileId'
+  id:
+    | '__root__'
+    | '/'
+    | '/p/$profileId'
+    | '/p/$profileId/_profile'
+    | '/p/$profileId/_profile/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardRoute: typeof DashboardRouteWithChildren
+  PProfileIdRoute: typeof PProfileIdRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardRoute: DashboardRouteWithChildren,
+  PProfileIdRoute: PProfileIdRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -125,21 +160,28 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_dashboard"
+        "/p/$profileId"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/_dashboard": {
-      "filePath": "_dashboard.tsx",
+    "/p/$profileId": {
+      "filePath": "p/$profileId",
       "children": [
-        "/_dashboard/dashboard"
+        "/p/$profileId/_profile"
       ]
     },
-    "/_dashboard/dashboard": {
-      "filePath": "_dashboard/dashboard.tsx",
-      "parent": "/_dashboard"
+    "/p/$profileId/_profile": {
+      "filePath": "p/$profileId/_profile.tsx",
+      "parent": "/p/$profileId",
+      "children": [
+        "/p/$profileId/_profile/"
+      ]
+    },
+    "/p/$profileId/_profile/": {
+      "filePath": "p/$profileId/_profile/index.tsx",
+      "parent": "/p/$profileId/_profile"
     }
   }
 }
