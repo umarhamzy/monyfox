@@ -8,6 +8,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { TrashIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ulid } from "ulid";
 
 export const Route = createFileRoute("/p/$profileId/_profile/accounts/")({
   component: RouteComponent,
@@ -71,7 +72,7 @@ function CreateAccountButton() {
   function onSave() {
     try {
       createAccount({
-        id: crypto.randomUUID(),
+        id: ulid(),
         name: accountName,
         isPersonalAsset: true,
       });

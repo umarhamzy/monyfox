@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TrashIcon } from "lucide-react";
+import { ulid } from "ulid";
 
 export function ProfileSelection({
   className,
@@ -132,7 +133,7 @@ function CreateProfileModal({
           <Button
             onClick={() => {
               createProfile({
-                id: crypto.randomUUID(),
+                id: ulid(),
                 user: profileName,
                 data: {
                   encrypted: false,

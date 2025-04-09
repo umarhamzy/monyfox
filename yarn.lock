@@ -720,6 +720,7 @@ __metadata:
     tailwindcss: "npm:^4.1.3"
     tw-animate-css: "npm:^1.2.5"
     typescript: "npm:^5.8.3"
+    ulid: "npm:^3.0.0"
     vite: "npm:^6.2.5"
     vitest: "npm:^3.1.1"
     zod: "npm:^3.24.2"
@@ -5267,6 +5268,15 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/92ea03509e06598948559ddcdd8a4ae5a7ab475766d5589f1b796f5731b3d631a4c7ddfb86a3bd44d58d10102b132cd4b4994dda9b63e6273c66d77d6a271dbd
+  languageName: node
+  linkType: hard
+
+"ulid@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "ulid@npm:3.0.0"
+  bin:
+    ulid: dist/cli.js
+  checksum: 10c0/1e31318c645198d565384c954b84ff7b1651daba570a713064349d782f09071da727e7a36240230e8e7757655c19c72017f47d9e4ff2cf130126b88f74a46d39
   languageName: node
   linkType: hard
 
