@@ -4,6 +4,7 @@
   "workspaces": [
     "apps/server/*",
     "apps/client/*",
+    "packages/common/*",
     "packages/server/*",
     "packages/client/*",
     "packages/tsconfig/*"

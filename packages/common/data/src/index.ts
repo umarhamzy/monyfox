@@ -5,18 +5,18 @@ import { DataSchema, RawDataSchema } from "./schemas/data";
 import { ProfileSchema } from "./schemas/profile";
 import { TransactionSchema } from "./schemas/transaction";
 
-export default {
-  AccountSchema,
-  AssetSymbolSchema,
-  TransactionSchema,
-  DataSchema,
-  RawDataSchema,
-  ProfileSchema,
-};
-
+export { AccountSchema } from "./schemas/account";
 export type Account = z.infer<typeof AccountSchema>;
+
+export { AssetSymbolSchema } from "./schemas/asset-symbol";
 export type AssetSymbol = z.infer<typeof AssetSymbolSchema>;
-export type Transaction = z.infer<typeof TransactionSchema>;
+
+export { DataSchema, RawDataSchema } from "./schemas/data";
 export type Data = z.infer<typeof DataSchema>;
 export type RawData = z.infer<typeof RawDataSchema>;
+
+export { ProfileSchema } from "./schemas/profile";
 export type Profile = z.infer<typeof ProfileSchema>;
+
+export type Transaction = z.infer<typeof TransactionSchema>;
+export { TransactionSchema } from "./schemas/transaction";
