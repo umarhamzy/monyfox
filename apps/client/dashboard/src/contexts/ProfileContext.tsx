@@ -6,6 +6,7 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 
 interface ProfileContextProps {
+  user: { id: string; name: string };
   data: Data;
 }
 
@@ -54,10 +55,14 @@ export const ProfileProvider = ({
     );
   }
 
+  const user = {
+    id: profile.id,
+    name: profile.user,
+  };
   const data = profile.data.data;
 
   return (
-    <ProfileContext.Provider value={{ data }}>
+    <ProfileContext.Provider value={{ user, data }}>
       {children}
     </ProfileContext.Provider>
   );
