@@ -1,4 +1,4 @@
-import { type Data, ProfileSchema } from "@monyfox/common-data";
+import { type Account, type Data, ProfileSchema } from "@monyfox/common-data";
 import { createContext, ReactNode } from "react";
 import { useLocalStorage } from "../hooks/use-local-storage";
 import { DestructiveAlert } from "../components/ui/alert";
@@ -15,6 +15,9 @@ import {
 interface ProfileContextProps {
   user: { id: string; name: string };
   data: Data;
+
+  createAccount: (account: Account) => void;
+  deleteAccount: (accountId: string) => void;
 }
 
 export const ProfileContext = createContext<ProfileContextProps | undefined>(
@@ -29,7 +32,7 @@ export const ProfileProvider = ({
   children: ReactNode;
 }) => {
   const localStorageKey = `profile:${profileId}`;
-  const [profile] = useLocalStorage(
+  const [profile, setProfile] = useLocalStorage(
     localStorageKey,
     null,
     ProfileSchema.nullable(),
@@ -59,8 +62,54 @@ export const ProfileProvider = ({
   };
   const data = profile.data.data;
 
+  function createAccount(account: Account) {
+    setProfile((prev) => {
+      if (prev === null) {
+        return prev;
+      }
+      if (prev.data.encrypted) {
+        return prev;
+      }
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          data: {
+            ...prev.data.data,
+            accounts: [...prev.data.data.accounts, account],
+          },
+        },
+      };
+    });
+  }
+
+  function deleteAccount(accountId: string) {
+    setProfile((prev) => {
+      if (prev === null) {
+        return prev;
+      }
+      if (prev.data.encrypted) {
+        return prev;
+      }
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          data: {
+            ...prev.data.data,
+            accounts: prev.data.data.accounts.filter(
+              (account) => account.id !== accountId,
+            ),
+          },
+        },
+      };
+    });
+  }
+
   return (
-    <ProfileContext.Provider value={{ user, data }}>
+    <ProfileContext.Provider
+      value={{ user, data, createAccount, deleteAccount }}
+    >
       {children}
     </ProfileContext.Provider>
   );

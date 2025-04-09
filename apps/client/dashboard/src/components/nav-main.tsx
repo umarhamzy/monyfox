@@ -31,9 +31,11 @@ export function NavMain() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Accounts">
-              <LibraryBigIcon />
-              <span>Accounts</span>
+            <SidebarMenuButton tooltip="Accounts" asChild>
+              <Link to="/p/$profileId/accounts" params={{ profileId }}>
+                <LibraryBigIcon />
+                <span>Accounts</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>

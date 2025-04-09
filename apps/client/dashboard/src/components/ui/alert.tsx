@@ -2,7 +2,7 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
-import { IconAlertCircle } from "@tabler/icons-react";
+import { CircleAlertIcon } from "lucide-react";
 
 const alertVariants = cva(
   "relative w-full rounded-lg border px-4 py-3 text-sm grid has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current",
@@ -73,7 +73,7 @@ export function DestructiveAlert({
 }) {
   return (
     <Alert variant="destructive">
-      <IconAlertCircle className="h-4 w-4" />
+      <CircleAlertIcon className="h-4 w-4" />
       <AlertTitle>{title}</AlertTitle>
       <AlertDescription>{children}</AlertDescription>
     </Alert>

@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { IconTrash } from "@tabler/icons-react";
 import { useProfiles } from "../../hooks/use-profiles";
 import { ConfirmationModal, Modal, useModal } from "../ui/modal";
 import { type Profile } from "@monyfox/common-data";
@@ -14,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { TrashIcon } from "lucide-react";
 
 export function ProfileSelection({
   className,
@@ -67,8 +67,8 @@ function ProfileCard({
                 Open
               </Button>
             </Link>
-            <Button onClick={openModal} variant="outline">
-              <IconTrash size={16} />
+            <Button size="icon" onClick={openModal} variant="outline">
+              <TrashIcon />
             </Button>
           </div>
           <ConfirmationModal

@@ -16,6 +16,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as PProfileIdProfileImport } from './routes/p/$profileId/_profile'
 import { Route as PProfileIdProfileIndexImport } from './routes/p/$profileId/_profile/index'
+import { Route as PProfileIdProfileAccountsIndexImport } from './routes/p/$profileId/_profile/accounts/index'
 
 // Create Virtual Routes
 
@@ -45,6 +46,13 @@ const PProfileIdProfileIndexRoute = PProfileIdProfileIndexImport.update({
   path: '/',
   getParentRoute: () => PProfileIdProfileRoute,
 } as any)
+
+const PProfileIdProfileAccountsIndexRoute =
+  PProfileIdProfileAccountsIndexImport.update({
+    id: '/accounts/',
+    path: '/accounts/',
+    getParentRoute: () => PProfileIdProfileRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -78,6 +86,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PProfileIdProfileIndexImport
       parentRoute: typeof PProfileIdProfileImport
     }
+    '/p/$profileId/_profile/accounts/': {
+      id: '/p/$profileId/_profile/accounts/'
+      path: '/accounts'
+      fullPath: '/p/$profileId/accounts'
+      preLoaderRoute: typeof PProfileIdProfileAccountsIndexImport
+      parentRoute: typeof PProfileIdProfileImport
+    }
   }
 }
 
@@ -85,10 +100,12 @@ declare module '@tanstack/react-router' {
 
 interface PProfileIdProfileRouteChildren {
   PProfileIdProfileIndexRoute: typeof PProfileIdProfileIndexRoute
+  PProfileIdProfileAccountsIndexRoute: typeof PProfileIdProfileAccountsIndexRoute
 }
 
 const PProfileIdProfileRouteChildren: PProfileIdProfileRouteChildren = {
   PProfileIdProfileIndexRoute: PProfileIdProfileIndexRoute,
+  PProfileIdProfileAccountsIndexRoute: PProfileIdProfileAccountsIndexRoute,
 }
 
 const PProfileIdProfileRouteWithChildren =
@@ -110,11 +127,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/p/$profileId': typeof PProfileIdProfileRouteWithChildren
   '/p/$profileId/': typeof PProfileIdProfileIndexRoute
+  '/p/$profileId/accounts': typeof PProfileIdProfileAccountsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/p/$profileId': typeof PProfileIdProfileIndexRoute
+  '/p/$profileId/accounts': typeof PProfileIdProfileAccountsIndexRoute
 }
 
 export interface FileRoutesById {
@@ -123,19 +142,21 @@ export interface FileRoutesById {
   '/p/$profileId': typeof PProfileIdRouteWithChildren
   '/p/$profileId/_profile': typeof PProfileIdProfileRouteWithChildren
   '/p/$profileId/_profile/': typeof PProfileIdProfileIndexRoute
+  '/p/$profileId/_profile/accounts/': typeof PProfileIdProfileAccountsIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/p/$profileId' | '/p/$profileId/'
+  fullPaths: '/' | '/p/$profileId' | '/p/$profileId/' | '/p/$profileId/accounts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/p/$profileId'
+  to: '/' | '/p/$profileId' | '/p/$profileId/accounts'
   id:
     | '__root__'
     | '/'
     | '/p/$profileId'
     | '/p/$profileId/_profile'
     | '/p/$profileId/_profile/'
+    | '/p/$profileId/_profile/accounts/'
   fileRoutesById: FileRoutesById
 }
 
@@ -176,11 +197,16 @@ export const routeTree = rootRoute
       "filePath": "p/$profileId/_profile.tsx",
       "parent": "/p/$profileId",
       "children": [
-        "/p/$profileId/_profile/"
+        "/p/$profileId/_profile/",
+        "/p/$profileId/_profile/accounts/"
       ]
     },
     "/p/$profileId/_profile/": {
       "filePath": "p/$profileId/_profile/index.tsx",
+      "parent": "/p/$profileId/_profile"
+    },
+    "/p/$profileId/_profile/accounts/": {
+      "filePath": "p/$profileId/_profile/accounts/index.tsx",
       "parent": "/p/$profileId/_profile"
     }
   }
