@@ -42,7 +42,8 @@ export function ConfirmationModal({
   onConfirm,
   confirmText,
   cancelText,
-  actionButtonVariant,
+  actionButtonVariant = "default",
+  isLoading = false,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -52,6 +53,7 @@ export function ConfirmationModal({
   confirmText: string;
   cancelText: string;
   actionButtonVariant?: "default" | "destructive";
+  isLoading?: boolean;
 }) {
   return (
     <Modal
@@ -65,7 +67,8 @@ export function ConfirmationModal({
           </Button>
           <Button
             onClick={onConfirm}
-            variant={actionButtonVariant ?? "default"}
+            variant={actionButtonVariant}
+            isLoading={isLoading}
           >
             {confirmText}
           </Button>

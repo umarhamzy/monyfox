@@ -2,12 +2,9 @@ import {
   type Account,
   AccountSchema,
   type Data,
-  type Profile,
-  ProfileSchema,
   type Transaction,
 } from "@monyfox/common-data";
 import { createContext, ReactNode, useCallback, useMemo } from "react";
-import { useLocalStorage } from "../hooks/use-local-storage";
 import { DestructiveAlert } from "../components/ui/alert";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
@@ -19,14 +16,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LocalDate } from "@js-joda/core";
+import { useDatabase } from "@/hooks/use-database";
+import {
+  useMutation,
+  UseMutationResult,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 interface ProfileContextProps {
   user: { id: string; name: string };
   data: Data;
 
   getAccount: (accountId: string) => Account;
-  createAccount: (account: Account) => void;
-  deleteAccount: (accountId: string) => void;
+  createAccount: UseMutationResult<void, Error, Account, unknown>;
+  deleteAccount: UseMutationResult<void, Error, string, unknown>;
   getTransactionsBetweenDates: (
     startDate: LocalDate,
     endDate: LocalDate,
@@ -44,14 +47,11 @@ export const ProfileProvider = ({
   profileId: string;
   children: ReactNode;
 }) => {
-  const localStorageKey = `profile:${profileId}`;
-  const [profile, setProfile] = useLocalStorage(
-    localStorageKey,
-    null,
-    ProfileSchema.nullable(),
-  );
+  const { profiles } = useDatabase();
 
-  if (profile === null) {
+  const profile = profiles.find((p) => p.id === profileId);
+
+  if (profile === undefined) {
     return (
       <ErrorPage
         title="Profile not found"
@@ -76,7 +76,7 @@ export const ProfileProvider = ({
   const data = profile.data.data;
 
   return (
-    <DataProvider user={user} data={data} setProfile={setProfile}>
+    <DataProvider user={user} data={data}>
       {children}
     </DataProvider>
   );
@@ -85,14 +85,15 @@ export const ProfileProvider = ({
 function DataProvider({
   user,
   data,
-  setProfile,
   children,
 }: {
   user: { id: string; name: string };
   data: Data;
-  setProfile: React.Dispatch<React.SetStateAction<Profile | null>>;
   children: React.ReactNode;
 }) {
+  const queryClient = useQueryClient();
+  const { saveProfileAsync } = useDatabase();
+
   function getAccount(accountId: string): Account {
     return (
       data.accounts.find((account) => account.id === accountId) ?? {
@@ -103,50 +104,49 @@ function DataProvider({
     );
   }
 
-  function createAccount(raw: Account) {
+  async function createAccountAsync(raw: Account) {
     const account = AccountSchema.parse(raw);
-    setProfile((prev) => {
-      if (prev === null) {
-        return prev;
-      }
-      if (prev.data.encrypted) {
-        return prev;
-      }
-      return {
-        ...prev,
+    await saveProfileAsync({
+      id: user.id,
+      user: user.name,
+      data: {
+        encrypted: false,
         data: {
-          ...prev.data,
-          data: {
-            ...prev.data.data,
-            accounts: [...prev.data.data.accounts, account],
-          },
+          ...data,
+          accounts: [...data.accounts, account],
         },
-      };
+      },
+      schemaVersion: "1",
     });
   }
 
-  function deleteAccount(accountId: string) {
-    setProfile((prev) => {
-      if (prev === null) {
-        return prev;
-      }
-      if (prev.data.encrypted) {
-        return prev;
-      }
-      return {
-        ...prev,
+  const createAccount = useMutation({
+    mutationFn: createAccountAsync,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profiles"] });
+    },
+  });
+
+  async function deleteAccountAsync(accountId: string) {
+    await saveProfileAsync({
+      id: user.id,
+      user: user.name,
+      data: {
+        encrypted: false,
         data: {
-          ...prev.data,
-          data: {
-            ...prev.data.data,
-            accounts: prev.data.data.accounts.filter(
-              (account) => account.id !== accountId,
-            ),
-          },
+          ...data,
+          accounts: data.accounts.filter((account) => account.id !== accountId),
         },
-      };
+      },
+      schemaVersion: "1",
     });
   }
+  const deleteAccount = useMutation({
+    mutationFn: deleteAccountAsync,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profiles"] });
+    },
+  });
 
   const transactions = useMemo(() => {
     return data.transactions.sort((a, b) => a.date.localeCompare(b.date));

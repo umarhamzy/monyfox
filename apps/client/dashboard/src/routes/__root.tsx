@@ -1,15 +1,26 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-// import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { Toaster } from "sonner";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { DatabaseProvider } from "@/contexts/DatabaseContext";
 
 export const Route = createRootRoute({ component: App });
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: false,
+    },
+  },
+});
+
 function App() {
   return (
-    <>
-      <Outlet />
-      <Toaster richColors />
-      {/* <TanStackRouterDevtools /> */}
-    </>
+    <QueryClientProvider client={queryClient}>
+      <DatabaseProvider>
+        <Outlet />
+        <Toaster richColors />
+      </DatabaseProvider>
+    </QueryClientProvider>
   );
 }

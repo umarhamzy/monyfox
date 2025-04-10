@@ -48,12 +48,23 @@ function AccountCard({ account }: { account: Account }) {
             onClose={closeModal}
             title="Delete account"
             onConfirm={() => {
-              deleteAccount(account.id);
+              deleteAccount.mutate(account.id, {
+                onSuccess: () => {
+                  toast.success("Account deleted successfully");
+                  closeModal();
+                },
+                onError: (e) => {
+                  toast.error("Failed to delete account", {
+                    description: e.message,
+                  });
+                },
+              });
               closeModal();
             }}
             confirmText="Delete"
             cancelText="Cancel"
             actionButtonVariant="destructive"
+            isLoading={deleteAccount.isPending}
           >
             <span>
               Are you sure you want to delete this account? All the transactions
@@ -72,19 +83,24 @@ function CreateAccountButton() {
   const [accountName, setAccountName] = useState("");
 
   function onSave() {
-    try {
-      createAccount({
+    createAccount.mutate(
+      {
         id: ulid(),
         name: accountName,
         isPersonalAsset: true,
-      });
-      toast.success("Account created successfully");
-      closeModal();
-    } catch (error) {
-      toast.error("Failed to create account", {
-        description: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
+      },
+      {
+        onSuccess: () => {
+          toast.success("Account created successfully");
+          closeModal();
+        },
+        onError: (e) => {
+          toast.error("Failed to create account", {
+            description: e.message,
+          });
+        },
+      },
+    );
   }
 
   return (
@@ -99,7 +115,11 @@ function CreateAccountButton() {
             <Button onClick={closeModal} variant="ghost">
               Cancel
             </Button>
-            <Button onClick={onSave} variant="default">
+            <Button
+              onClick={onSave}
+              variant="default"
+              isLoading={createAccount.isPending}
+            >
               Create
             </Button>
           </div>

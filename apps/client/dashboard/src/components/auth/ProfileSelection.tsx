@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { useProfiles } from "../../hooks/use-profiles";
 import { ConfirmationModal, Modal, useModal } from "../ui/modal";
 import { type Profile } from "@monyfox/common-data";
 import { useState } from "react";
@@ -17,13 +16,15 @@ import { TrashIcon } from "lucide-react";
 import { ulid } from "ulid";
 import { generateTestProfile } from "@/utils/data";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useDatabase } from "@/hooks/use-database";
+import { toast } from "sonner";
 
 export function ProfileSelection({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [parent] = useAutoAnimate();
-  const { profiles, createProfile, deleteProfile } = useProfiles();
+  const { profiles } = useDatabase();
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -36,26 +37,17 @@ export function ProfileSelection({
         </CardHeader>
         <CardContent ref={parent} className="flex flex-col gap-4">
           {profiles.map((profile) => (
-            <ProfileCard
-              key={profile.id}
-              profile={profile}
-              deleteProfile={deleteProfile}
-            />
+            <ProfileCard key={profile.id} profile={profile} />
           ))}
-          <CreateProfile createProfile={createProfile} />
+          <CreateProfile />
         </CardContent>
       </Card>
     </div>
   );
 }
 
-function ProfileCard({
-  profile,
-  deleteProfile,
-}: {
-  profile: Profile;
-  deleteProfile: (id: string) => void;
-}) {
+function ProfileCard({ profile }: { profile: Profile }) {
+  const { deleteProfile } = useDatabase();
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <Card>
@@ -77,8 +69,17 @@ function ProfileCard({
             onClose={closeModal}
             title="Delete Profile"
             onConfirm={() => {
-              deleteProfile(profile.id);
-              closeModal();
+              deleteProfile.mutate(profile.id, {
+                onSuccess: () => {
+                  toast.success("Profile deleted successfully");
+                  closeModal();
+                },
+                onError: (e) => {
+                  toast.error("Failed to delete profile", {
+                    description: e.message,
+                  });
+                },
+              });
             }}
             confirmText="Delete"
             cancelText="Cancel"
@@ -92,22 +93,14 @@ function ProfileCard({
   );
 }
 
-function CreateProfile({
-  createProfile,
-}: {
-  createProfile: (profile: Profile) => void;
-}) {
+function CreateProfile() {
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <div className="flex flex-col items-center">
       <Button onClick={openModal}>Create profile</Button>
-      <CreateProfileModal
-        isOpen={isOpen}
-        onClose={closeModal}
-        createProfile={createProfile}
-      />
+      <CreateProfileModal isOpen={isOpen} onClose={closeModal} />
       <hr className="my-4 w-full" />
-      <CreateTestProfileButton createProfile={createProfile} />
+      <CreateTestProfileButton />
     </div>
   );
 }
@@ -115,12 +108,11 @@ function CreateProfile({
 function CreateProfileModal({
   isOpen,
   onClose,
-  createProfile,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  createProfile: (profile: Profile) => void;
 }) {
+  const { saveProfile } = useDatabase();
   const [profileName, setProfileName] = useState("");
   return (
     <Modal
@@ -134,24 +126,37 @@ function CreateProfileModal({
           </Button>
           <Button
             onClick={() => {
-              createProfile({
-                id: ulid(),
-                user: profileName,
-                data: {
-                  encrypted: false,
+              saveProfile.mutate(
+                {
+                  id: ulid(),
+                  user: profileName,
                   data: {
-                    accounts: [],
-                    assetSymbols: [],
-                    transactions: [],
-                    lastUpdated: new Date().toISOString(),
+                    encrypted: false,
+                    data: {
+                      accounts: [],
+                      assetSymbols: [],
+                      transactions: [],
+                      lastUpdated: new Date().toISOString(),
+                    },
+                  },
+                  schemaVersion: "1",
+                },
+                {
+                  onSuccess: () => {
+                    toast.success("Profile created");
+                    setProfileName("");
+                    onClose();
+                  },
+                  onError: (e) => {
+                    toast.error("Failed to create profile", {
+                      description: e.message,
+                    });
                   },
                 },
-                schemaVersion: "1",
-              });
-              onClose();
-              setProfileName("");
+              );
             }}
             variant="default"
+            isLoading={saveProfile.isPending}
           >
             Create
           </Button>
@@ -169,18 +174,20 @@ function CreateProfileModal({
   );
 }
 
-function CreateTestProfileButton({
-  createProfile,
-}: {
-  createProfile: (profile: Profile) => void;
-}) {
+function CreateTestProfileButton() {
+  const { saveProfile } = useDatabase();
+
   function onClick() {
     const profile = generateTestProfile();
-    createProfile(profile);
+    saveProfile.mutate(profile);
   }
 
   return (
-    <Button onClick={onClick} variant="secondary">
+    <Button
+      onClick={onClick}
+      variant="secondary"
+      isLoading={saveProfile.isPending}
+    >
       Create a test profile
     </Button>
   );

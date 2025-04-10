@@ -26,7 +26,8 @@ export function generateTestProfile(): Profile {
     currency: "EUR",
   };
 
-  const monthsToGenerate = 12;
+  const yearsToGenerate = 2;
+  const monthsToGenerate = 12 * yearsToGenerate;
   const daysToGenerate = 30 * monthsToGenerate;
   const transactions: Transaction[] = [];
   for (
