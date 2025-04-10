@@ -1,17 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useProfile } from "../../../../hooks/use-profile";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartFlowByMonth } from "@/components/chart-flow-by-month";
 
 export const Route = createFileRoute("/p/$profileId/_profile/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { data } = useProfile();
   return (
-    <Card>
+    <Card className="lg:w-4/6 md:w-4/6 w-full">
+      <CardHeader>
+        <CardTitle>Last 12 months</CardTitle>
+      </CardHeader>
       <CardContent>
-        <pre>{JSON.stringify(data, null, 2)}</pre>
+        <ChartFlowByMonth />
       </CardContent>
     </Card>
   );

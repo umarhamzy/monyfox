@@ -2,9 +2,11 @@ import {
   type Account,
   AccountSchema,
   type Data,
+  type Profile,
   ProfileSchema,
+  type Transaction,
 } from "@monyfox/common-data";
-import { createContext, ReactNode } from "react";
+import { createContext, ReactNode, useCallback, useMemo } from "react";
 import { useLocalStorage } from "../hooks/use-local-storage";
 import { DestructiveAlert } from "../components/ui/alert";
 import { Link } from "@tanstack/react-router";
@@ -16,13 +18,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { LocalDate } from "@js-joda/core";
 
 interface ProfileContextProps {
   user: { id: string; name: string };
   data: Data;
 
+  getAccount: (accountId: string) => Account;
   createAccount: (account: Account) => void;
   deleteAccount: (accountId: string) => void;
+  getTransactionsBetweenDates: (
+    startDate: LocalDate,
+    endDate: LocalDate,
+  ) => Transaction[];
 }
 
 export const ProfileContext = createContext<ProfileContextProps | undefined>(
@@ -66,6 +74,34 @@ export const ProfileProvider = ({
     name: profile.user,
   };
   const data = profile.data.data;
+
+  return (
+    <DataProvider user={user} data={data} setProfile={setProfile}>
+      {children}
+    </DataProvider>
+  );
+};
+
+function DataProvider({
+  user,
+  data,
+  setProfile,
+  children,
+}: {
+  user: { id: string; name: string };
+  data: Data;
+  setProfile: React.Dispatch<React.SetStateAction<Profile | null>>;
+  children: React.ReactNode;
+}) {
+  function getAccount(accountId: string): Account {
+    return (
+      data.accounts.find((account) => account.id === accountId) ?? {
+        id: accountId,
+        name: "Unknown account",
+        isPersonalAsset: false,
+      }
+    );
+  }
 
   function createAccount(raw: Account) {
     const account = AccountSchema.parse(raw);
@@ -112,14 +148,41 @@ export const ProfileProvider = ({
     });
   }
 
+  const transactions = useMemo(() => {
+    return data.transactions.sort((a, b) => a.date.localeCompare(b.date));
+  }, [data.transactions]);
+
+  const getTransactionsBetweenDates = useCallback(
+    (start: LocalDate, end: LocalDate) => {
+      // TODO: use binary search to find the first and last transaction in the range since the transactions are sorted.
+      return transactions.filter((transaction) => {
+        const date = LocalDate.parse(transaction.date);
+        return (
+          date.isAfter(start.minusDays(1)) && date.isBefore(end.plusDays(1))
+        );
+      });
+    },
+    [transactions],
+  );
+
   return (
     <ProfileContext.Provider
-      value={{ user, data, createAccount, deleteAccount }}
+      value={{
+        user,
+        data: {
+          ...data,
+          transactions,
+        },
+        getAccount,
+        createAccount,
+        deleteAccount,
+        getTransactionsBetweenDates,
+      }}
     >
       {children}
     </ProfileContext.Provider>
   );
-};
+}
 
 function ErrorPage({ title, message }: { title: string; message: string }) {
   return (
