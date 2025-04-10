@@ -8,6 +8,7 @@ import { Bar, BarChart, XAxis } from "recharts";
 import { LocalDate, YearMonth } from "@js-joda/core";
 import { useMemo } from "react";
 import { useProfile } from "@/hooks/use-profile";
+import { getTransactionType, TransactionType } from "@/utils/transaction";
 
 const chartConfig = {
   income: {
@@ -31,30 +32,14 @@ export function ChartFlowByMonth() {
     const stateByDate = new Map<string, { income: number; expense: number }>();
 
     for (const transaction of transactions) {
-      const isTransfer =
-        transaction.from.accountId !== null &&
-        transaction.to.accountId !== null;
-      if (isTransfer) {
+      const transactionType = getTransactionType(transaction, getAccount);
+
+      const isIncome = transactionType === TransactionType.Income;
+      const isExpense = transactionType === TransactionType.Expense;
+
+      if (!isIncome && !isExpense) {
         continue;
       }
-
-      const isUnknown =
-        transaction.from.accountId === null &&
-        transaction.to.accountId === null;
-      if (isUnknown) {
-        console.warn(
-          "Unknown transaction type - both fromAccount and toAccount are null",
-          transaction,
-        );
-        continue;
-      }
-
-      const isIncome =
-        transaction.to.accountId !== null &&
-        getAccount(transaction.to.accountId).isPersonalAsset;
-      const isExpense =
-        transaction.from.accountId !== null &&
-        getAccount(transaction.from.accountId).isPersonalAsset;
 
       const transactionDate = YearMonth.from(
         LocalDate.parse(transaction.date),
