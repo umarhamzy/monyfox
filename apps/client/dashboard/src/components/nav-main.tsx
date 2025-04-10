@@ -39,9 +39,11 @@ export function NavMain() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Transactions">
-              <ArrowLeftRightIcon />
-              <span>Transactions</span>
+            <SidebarMenuButton tooltip="Transactions" asChild>
+              <Link to="/p/$profileId/transactions" params={{ profileId }}>
+                <ArrowLeftRightIcon />
+                <span>Transactions</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

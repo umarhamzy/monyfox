@@ -17,11 +17,7 @@ import {
 } from "@/components/ui/card";
 import { LocalDate } from "@js-joda/core";
 import { useDatabase } from "@/hooks/use-database";
-import {
-  useMutation,
-  UseMutationResult,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, UseMutationResult } from "@tanstack/react-query";
 
 interface ProfileContextProps {
   user: { id: string; name: string };
@@ -91,8 +87,7 @@ function DataProvider({
   data: Data;
   children: React.ReactNode;
 }) {
-  const queryClient = useQueryClient();
-  const { saveProfileAsync } = useDatabase();
+  const { saveProfile } = useDatabase();
 
   function getAccount(accountId: string): Account {
     return (
@@ -106,7 +101,7 @@ function DataProvider({
 
   async function createAccountAsync(raw: Account) {
     const account = AccountSchema.parse(raw);
-    await saveProfileAsync({
+    await saveProfile.mutateAsync({
       id: user.id,
       user: user.name,
       data: {
@@ -119,16 +114,12 @@ function DataProvider({
       schemaVersion: "1",
     });
   }
-
   const createAccount = useMutation({
     mutationFn: createAccountAsync,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profiles"] });
-    },
   });
 
   async function deleteAccountAsync(accountId: string) {
-    await saveProfileAsync({
+    await saveProfile.mutateAsync({
       id: user.id,
       user: user.name,
       data: {
@@ -143,9 +134,6 @@ function DataProvider({
   }
   const deleteAccount = useMutation({
     mutationFn: deleteAccountAsync,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profiles"] });
-    },
   });
 
   const transactions = useMemo(() => {

@@ -17,15 +17,11 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { type Profile } from "@monyfox/common-data";
 import { toast } from "sonner";
-
-const DB_NAME = "monyfox";
-const DB_STORE_NAME = "profiles";
-const DB_VERSION = 1;
+import { DatabaseIDBImpl } from "@/database/database-idb-impl";
+import { type Database } from "@/database/database";
 
 interface DatabaseContextProps {
-  database: IDBDatabase;
   profiles: Profile[];
-  saveProfileAsync: (profile: Profile) => Promise<void>;
   saveProfile: UseMutationResult<void, Error, Profile, unknown>;
   deleteProfile: UseMutationResult<void, Error, string, unknown>;
 }
@@ -51,41 +47,24 @@ export const DatabaseProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <DatabaseDataProvider database={dbQuery.data}>
-      {children}
-    </DatabaseDataProvider>
+    <DatabaseDataProvider db={dbQuery.data}>{children}</DatabaseDataProvider>
   );
 };
 
 function DatabaseDataProvider({
-  database,
+  db,
   children,
 }: {
-  database: IDBDatabase;
+  db: Database;
   children: ReactNode;
 }) {
   const profilesQuery = useQuery({
     queryKey: ["profiles"],
-    queryFn: () => getProfiles(database),
+    queryFn: () => db.getProfiles(),
   });
 
-  async function saveProfile(profile: Profile) {
-    return new Promise<void>((resolve, reject) => {
-      const transaction = database.transaction(DB_STORE_NAME, "readwrite");
-      const objectStore = transaction.objectStore(DB_STORE_NAME);
-      const request = objectStore.put(profile);
-      request.onsuccess = () => {
-        resolve();
-      };
-      request.onerror = () => {
-        console.error("Error saving profile", request.error);
-        reject(request.error);
-      };
-    });
-  }
-
   const saveProfileMutation = useMutation({
-    mutationFn: (profile: Profile) => saveProfile(profile),
+    mutationFn: (profile: Profile) => db.saveProfile(profile),
     onSuccess: () => {
       profilesQuery.refetch();
     },
@@ -93,8 +72,9 @@ function DatabaseDataProvider({
       toast.error(error.message);
     },
   });
+
   const deleteProfileMutation = useMutation({
-    mutationFn: (id: string) => deleteProfile(database, id),
+    mutationFn: (id: string) => db.deleteProfile(id),
     onSuccess: () => {
       profilesQuery.refetch();
     },
@@ -119,9 +99,7 @@ function DatabaseDataProvider({
   return (
     <DatabaseContext.Provider
       value={{
-        database,
         profiles: profilesQuery.data,
-        saveProfileAsync: saveProfile,
         saveProfile: saveProfileMutation,
         deleteProfile: deleteProfileMutation,
       }}
@@ -164,48 +142,7 @@ function LoadingPage() {
 }
 
 async function getDatabase() {
-  return new Promise<IDBDatabase>((resolve, reject) => {
-    const request = window.indexedDB.open(DB_NAME, DB_VERSION);
-    request.onsuccess = () => {
-      resolve(request.result);
-    };
-    request.onerror = () => {
-      console.error("Error opening database", request.error);
-      reject(request.error);
-    };
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      db.createObjectStore(DB_STORE_NAME, { keyPath: "id" });
-    };
-  });
-}
-
-async function getProfiles(db: IDBDatabase) {
-  return new Promise<Profile[]>((resolve, reject) => {
-    const transaction = db.transaction(DB_STORE_NAME, "readonly");
-    const objectStore = transaction.objectStore(DB_STORE_NAME);
-    const request = objectStore.getAll();
-    request.onsuccess = () => {
-      resolve(request.result);
-    };
-    request.onerror = () => {
-      console.error("Error getting profiles", request.error);
-      reject(request.error);
-    };
-  });
-}
-
-async function deleteProfile(db: IDBDatabase, profileId: string) {
-  return new Promise<void>((resolve, reject) => {
-    const transaction = db.transaction(DB_STORE_NAME, "readwrite");
-    const objectStore = transaction.objectStore(DB_STORE_NAME);
-    const request = objectStore.delete(profileId);
-    request.onsuccess = () => {
-      resolve();
-    };
-    request.onerror = () => {
-      console.error("Error deleting profile", request.error);
-      reject(request.error);
-    };
-  });
+  const db = new DatabaseIDBImpl();
+  await db.init();
+  return db;
 }

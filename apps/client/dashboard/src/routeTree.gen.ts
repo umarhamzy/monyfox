@@ -16,6 +16,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as PProfileIdProfileImport } from './routes/p/$profileId/_profile'
 import { Route as PProfileIdProfileIndexImport } from './routes/p/$profileId/_profile/index'
+import { Route as PProfileIdProfileTransactionsIndexImport } from './routes/p/$profileId/_profile/transactions/index'
 import { Route as PProfileIdProfileAccountsIndexImport } from './routes/p/$profileId/_profile/accounts/index'
 
 // Create Virtual Routes
@@ -46,6 +47,13 @@ const PProfileIdProfileIndexRoute = PProfileIdProfileIndexImport.update({
   path: '/',
   getParentRoute: () => PProfileIdProfileRoute,
 } as any)
+
+const PProfileIdProfileTransactionsIndexRoute =
+  PProfileIdProfileTransactionsIndexImport.update({
+    id: '/transactions/',
+    path: '/transactions/',
+    getParentRoute: () => PProfileIdProfileRoute,
+  } as any)
 
 const PProfileIdProfileAccountsIndexRoute =
   PProfileIdProfileAccountsIndexImport.update({
@@ -93,6 +101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PProfileIdProfileAccountsIndexImport
       parentRoute: typeof PProfileIdProfileImport
     }
+    '/p/$profileId/_profile/transactions/': {
+      id: '/p/$profileId/_profile/transactions/'
+      path: '/transactions'
+      fullPath: '/p/$profileId/transactions'
+      preLoaderRoute: typeof PProfileIdProfileTransactionsIndexImport
+      parentRoute: typeof PProfileIdProfileImport
+    }
   }
 }
 
@@ -101,11 +116,14 @@ declare module '@tanstack/react-router' {
 interface PProfileIdProfileRouteChildren {
   PProfileIdProfileIndexRoute: typeof PProfileIdProfileIndexRoute
   PProfileIdProfileAccountsIndexRoute: typeof PProfileIdProfileAccountsIndexRoute
+  PProfileIdProfileTransactionsIndexRoute: typeof PProfileIdProfileTransactionsIndexRoute
 }
 
 const PProfileIdProfileRouteChildren: PProfileIdProfileRouteChildren = {
   PProfileIdProfileIndexRoute: PProfileIdProfileIndexRoute,
   PProfileIdProfileAccountsIndexRoute: PProfileIdProfileAccountsIndexRoute,
+  PProfileIdProfileTransactionsIndexRoute:
+    PProfileIdProfileTransactionsIndexRoute,
 }
 
 const PProfileIdProfileRouteWithChildren =
@@ -128,12 +146,14 @@ export interface FileRoutesByFullPath {
   '/p/$profileId': typeof PProfileIdProfileRouteWithChildren
   '/p/$profileId/': typeof PProfileIdProfileIndexRoute
   '/p/$profileId/accounts': typeof PProfileIdProfileAccountsIndexRoute
+  '/p/$profileId/transactions': typeof PProfileIdProfileTransactionsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/p/$profileId': typeof PProfileIdProfileIndexRoute
   '/p/$profileId/accounts': typeof PProfileIdProfileAccountsIndexRoute
+  '/p/$profileId/transactions': typeof PProfileIdProfileTransactionsIndexRoute
 }
 
 export interface FileRoutesById {
@@ -143,13 +163,23 @@ export interface FileRoutesById {
   '/p/$profileId/_profile': typeof PProfileIdProfileRouteWithChildren
   '/p/$profileId/_profile/': typeof PProfileIdProfileIndexRoute
   '/p/$profileId/_profile/accounts/': typeof PProfileIdProfileAccountsIndexRoute
+  '/p/$profileId/_profile/transactions/': typeof PProfileIdProfileTransactionsIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/p/$profileId' | '/p/$profileId/' | '/p/$profileId/accounts'
+  fullPaths:
+    | '/'
+    | '/p/$profileId'
+    | '/p/$profileId/'
+    | '/p/$profileId/accounts'
+    | '/p/$profileId/transactions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/p/$profileId' | '/p/$profileId/accounts'
+  to:
+    | '/'
+    | '/p/$profileId'
+    | '/p/$profileId/accounts'
+    | '/p/$profileId/transactions'
   id:
     | '__root__'
     | '/'
@@ -157,6 +187,7 @@ export interface FileRouteTypes {
     | '/p/$profileId/_profile'
     | '/p/$profileId/_profile/'
     | '/p/$profileId/_profile/accounts/'
+    | '/p/$profileId/_profile/transactions/'
   fileRoutesById: FileRoutesById
 }
 
@@ -198,7 +229,8 @@ export const routeTree = rootRoute
       "parent": "/p/$profileId",
       "children": [
         "/p/$profileId/_profile/",
-        "/p/$profileId/_profile/accounts/"
+        "/p/$profileId/_profile/accounts/",
+        "/p/$profileId/_profile/transactions/"
       ]
     },
     "/p/$profileId/_profile/": {
@@ -207,6 +239,10 @@ export const routeTree = rootRoute
     },
     "/p/$profileId/_profile/accounts/": {
       "filePath": "p/$profileId/_profile/accounts/index.tsx",
+      "parent": "/p/$profileId/_profile"
+    },
+    "/p/$profileId/_profile/transactions/": {
+      "filePath": "p/$profileId/_profile/transactions/index.tsx",
       "parent": "/p/$profileId/_profile"
     }
   }
