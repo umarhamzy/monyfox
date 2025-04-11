@@ -4,7 +4,7 @@ import { ChartFlowByMonth } from "@/components/chart-flow-by-month";
 import { AccountsBalance } from "@/components/accounts-balance";
 import { TransactionsTable } from "@/components/transaction/transactions-table";
 import { NetWorthByMonth } from "@/components/chart-net-worth-by-month";
-import { AddTransactionFloatingButton } from "@/components/transaction/add-transaction-form";
+import { AddTransactionFloatingButton } from "@/components/transaction/transaction-form";
 
 export const Route = createFileRoute("/p/$profileId/_profile/")({
   component: RouteComponent,

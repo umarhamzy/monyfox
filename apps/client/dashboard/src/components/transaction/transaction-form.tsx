@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Modal, useModal } from "@/components/ui/modal";
+import { ConfirmationModal, Modal, useModal } from "@/components/ui/modal";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProfile } from "@/hooks/use-profile";
 import {
@@ -28,6 +28,8 @@ import { LocalDate } from "@js-joda/core";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { DestructiveAlert } from "@/components/ui/alert";
+import { type Transaction } from "@monyfox/common-data";
+import { getTransactionType, TransactionType } from "@/utils/transaction";
 
 export function AddTransactionFloatingButton() {
   const { isOpen, openModal, closeModal } = useModal();
@@ -36,41 +38,76 @@ export function AddTransactionFloatingButton() {
       <Button className="fixed bottom-4 right-4" size="lg" onClick={openModal}>
         <PlusIcon className="size-7" />
       </Button>
-      <AddTransactionModal isOpen={isOpen} onClose={closeModal} />
+      <TransactionFormModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        transaction={null}
+      />
     </>
   );
 }
 
-function AddTransactionModal({
+export function TransactionFormModal({
   isOpen,
   onClose,
+  transaction,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  transaction: Transaction | null;
 }) {
-  const [type, setType] = useState<"expense" | "income" | "transfer">(
-    "expense",
-  );
+  const { getAccount } = useProfile();
+
+  const [type, setType] = useState<TransactionType>(TransactionType.Unknown);
 
   useEffect(() => {
-    setType("expense");
+    if (transaction === null) {
+      setType(TransactionType.Expense);
+      return;
+    }
+
+    setType(getTransactionType(transaction, getAccount));
   }, [isOpen]);
 
+  if (type === TransactionType.Unknown) {
+    console.error("Unknown transaction type", transaction);
+    return (
+      <DestructiveAlert title="Error">
+        Unknown transaction type
+      </DestructiveAlert>
+    );
+  }
+
+  const title = transaction === null ? "Add transaction" : "Edit transaction";
+
   return (
-    <Modal title="Add Transaction" isOpen={isOpen} onClose={onClose}>
-      <Tabs defaultValue="expense">
+    <Modal title={title} isOpen={isOpen} onClose={onClose}>
+      <Tabs defaultValue={type}>
         <TabsList>
-          <TabsTrigger value="expense" onClick={() => setType("expense")}>
+          <TabsTrigger
+            value="expense"
+            onClick={() => setType(TransactionType.Expense)}
+          >
             Expense
           </TabsTrigger>
-          <TabsTrigger value="income" onClick={() => setType("income")}>
+          <TabsTrigger
+            value="income"
+            onClick={() => setType(TransactionType.Income)}
+          >
             Income
           </TabsTrigger>
-          <TabsTrigger value="transfer" onClick={() => setType("transfer")}>
+          <TabsTrigger
+            value="transfer"
+            onClick={() => setType(TransactionType.Transfer)}
+          >
             Transfer
           </TabsTrigger>
         </TabsList>
-        <TransactionForm type={type} onClose={onClose} />
+        <TransactionForm
+          type={type}
+          onClose={onClose}
+          transaction={transaction}
+        />
       </Tabs>
     </Modal>
   );
@@ -87,24 +124,35 @@ const formSchema = z.object({
 function TransactionForm({
   type,
   onClose,
+  transaction,
 }: {
-  type: "expense" | "income" | "transfer";
+  type: TransactionType;
   onClose: () => void;
+  transaction: Transaction | null;
 }) {
   const {
     user,
     data: { accounts, assetSymbols },
     createTransaction,
+    updateTransaction,
   } = useProfile();
   const defaultAssetSymbol = assetSymbols[0];
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: "",
-      amount: 0,
-      fromAccountId: "",
-      toAccountId: "",
-      symbolId: defaultAssetSymbol ? defaultAssetSymbol.id : "",
+      description: transaction?.description ?? "",
+      // TODO: support different amounts.
+      amount: transaction?.from.amount ?? 0,
+      fromAccountId:
+        transaction !== null && "id" in transaction.from.account
+          ? transaction.from.account.id
+          : "",
+      toAccountId:
+        transaction !== null && "id" in transaction.to.account
+          ? transaction.to.account.id
+          : "",
+      // TODO: support different symbols.
+      symbolId: transaction?.from.symbolId ?? defaultAssetSymbol?.id ?? "",
     },
   });
 
@@ -131,8 +179,10 @@ function TransactionForm({
     );
   }
 
-  const needFromAccount = type === "expense" || type === "transfer";
-  const needToAccount = type === "income" || type === "transfer";
+  const needFromAccount =
+    type === TransactionType.Expense || type === TransactionType.Transfer;
+  const needToAccount =
+    type === TransactionType.Income || type === TransactionType.Transfer;
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (needFromAccount && values.fromAccountId === "") {
@@ -145,16 +195,18 @@ function TransactionForm({
     }
 
     const now = LocalDate.now();
-    createTransaction.mutate(
+
+    const fn = transaction !== null ? updateTransaction : createTransaction;
+    fn.mutate(
       {
-        id: ulid(),
+        id: transaction?.id ?? ulid(),
         description: values.description,
         transactionCategoryId: null,
         transactionDate: now.toString(),
         accountingDate: now.toString(),
         from: {
           amount: values.amount,
-          symbolId: "EUR",
+          symbolId: values.symbolId,
           account: needFromAccount
             ? {
                 id: values.fromAccountId,
@@ -165,7 +217,7 @@ function TransactionForm({
         },
         to: {
           amount: values.amount,
-          symbolId: "EUR",
+          symbolId: values.symbolId,
           account: needToAccount
             ? {
                 id: values.toAccountId,
@@ -308,12 +360,64 @@ function TransactionForm({
           />
         </div>
         <div className="flex gap-2 justify-end">
+          {transaction !== null && (
+            <DeleteTransactionButton
+              transaction={transaction}
+              onClose={onClose}
+            />
+          )}
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Save</Button>
         </div>
       </form>
     </Form>
+  );
+}
+
+function DeleteTransactionButton({
+  transaction,
+  onClose,
+}: {
+  transaction: Transaction;
+  onClose: () => void;
+}) {
+  const { deleteTransaction } = useProfile();
+  const { isOpen, openModal, closeModal } = useModal();
+  return (
+    <>
+      <Button type="button" variant="outline" onClick={openModal}>
+        <TrashIcon />
+      </Button>
+      <ConfirmationModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        title="Delete account"
+        onConfirm={() => {
+          deleteTransaction.mutate(transaction.id, {
+            onSuccess: () => {
+              toast.success("Transaction deleted successfully");
+              closeModal();
+              onClose();
+            },
+            onError: (e) => {
+              toast.error("Failed to delete transaction", {
+                description: e.message,
+              });
+            },
+          });
+        }}
+        confirmText="Delete"
+        cancelText="Cancel"
+        actionButtonVariant="destructive"
+        isLoading={deleteTransaction.isPending}
+      >
+        <span>
+          Are you sure you want to delete this transaction? This action cannot
+          be undone.
+        </span>
+      </ConfirmationModal>
+    </>
   );
 }

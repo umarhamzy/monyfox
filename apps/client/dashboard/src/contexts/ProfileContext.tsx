@@ -33,6 +33,7 @@ interface ProfileContextProps {
 
   // Transactions
   createTransaction: UseMutationResult<void, Error, Transaction, unknown>;
+  updateTransaction: UseMutationResult<void, Error, Transaction, unknown>;
   deleteTransaction: UseMutationResult<void, Error, string, unknown>;
   getTransactionsBetweenDates: (
     startDate: LocalDate,
@@ -187,6 +188,27 @@ function DataProvider({
     mutationFn: createTransactionAsync,
   });
 
+  async function updateTransactionAsync(raw: Transaction) {
+    const transaction = TransactionSchema.parse(raw);
+    await saveProfile.mutateAsync({
+      id: user.id,
+      user: user.name,
+      data: {
+        encrypted: false,
+        data: {
+          ...data,
+          transactions: data.transactions.map((t) =>
+            t.id === transaction.id ? transaction : t,
+          ),
+        },
+      },
+      schemaVersion: "1",
+    });
+  }
+  const updateTransaction = useMutation({
+    mutationFn: updateTransactionAsync,
+  });
+
   async function deleteTransactionAsync(transactionId: string) {
     await saveProfile.mutateAsync({
       id: user.id,
@@ -252,6 +274,7 @@ function DataProvider({
 
         // Transactions
         createTransaction,
+        updateTransaction,
         deleteTransaction,
         getTransactionsBetweenDates,
 

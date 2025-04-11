@@ -39,7 +39,10 @@ import {
   ChevronRightIcon,
   ChevronsLeftIcon,
   ChevronsRightIcon,
+  PencilIcon,
 } from "lucide-react";
+import { useModal } from "../ui/modal";
+import { TransactionFormModal } from "./transaction-form";
 
 export function TransactionsTable() {
   const {
@@ -234,6 +237,22 @@ function AmountText({ transaction }: { transaction: Transaction }) {
   );
 }
 
+function TransactionActions({ transaction }: { transaction: Transaction }) {
+  const { isOpen, openModal, closeModal } = useModal();
+  return (
+    <>
+      <Button variant="ghost" size="icon" onClick={openModal}>
+        <PencilIcon />
+      </Button>
+      <TransactionFormModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        transaction={transaction}
+      />
+    </>
+  );
+}
+
 function getAccountName(
   data: {
     amount: number;
@@ -304,5 +323,9 @@ const columns: ColumnDef<
     accessorKey: "amount",
     header: "Amount",
     cell: ({ row }) => <AmountText transaction={row.original} />,
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <TransactionActions transaction={row.original} />,
   },
 ];
