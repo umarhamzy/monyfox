@@ -42,6 +42,14 @@ interface ProfileContextProps {
 
   // Symbols
   getAssetSymbol: (assetSymbolId: string) => AssetSymbol;
+  convertAmount: (
+    amount: number,
+    fromAssetSymbolId: string,
+    toAssetSymbolId: string,
+  ) => number;
+  createAssetSymbol: UseMutationResult<void, Error, AssetSymbol, unknown>;
+  updateAssetSymbol: UseMutationResult<void, Error, AssetSymbol, unknown>;
+  deleteAssetSymbol: UseMutationResult<void, Error, string, unknown>;
 }
 
 export const ProfileContext = createContext<ProfileContextProps | undefined>(
@@ -258,6 +266,75 @@ function DataProvider({
     [data.assetSymbols],
   );
 
+  const convertAmount = (
+    amount: number,
+    fromSymbolId: string,
+    toSymbolId: string,
+  ) => {
+    if (fromSymbolId === toSymbolId) {
+      return amount;
+    }
+
+    // TODO: support multi-currency
+    return amount;
+  };
+
+  async function createAssetSymbolAsync(symbol: AssetSymbol) {
+    await saveProfile.mutateAsync({
+      id: user.id,
+      user: user.name,
+      data: {
+        encrypted: false,
+        data: {
+          ...data,
+          assetSymbols: [...data.assetSymbols, symbol],
+        },
+      },
+      schemaVersion: "1",
+    });
+  }
+  const createAssetSymbol = useMutation({
+    mutationFn: createAssetSymbolAsync,
+  });
+
+  async function updateAssetSymbolAsync(symbol: AssetSymbol) {
+    await saveProfile.mutateAsync({
+      id: user.id,
+      user: user.name,
+      data: {
+        encrypted: false,
+        data: {
+          ...data,
+          assetSymbols: data.assetSymbols.map((s) =>
+            s.id === symbol.id ? symbol : s,
+          ),
+        },
+      },
+      schemaVersion: "1",
+    });
+  }
+  const updateAssetSymbol = useMutation({
+    mutationFn: updateAssetSymbolAsync,
+  });
+
+  async function deleteAssetSymbolAsync(symbolId: string) {
+    await saveProfile.mutateAsync({
+      id: user.id,
+      user: user.name,
+      data: {
+        encrypted: false,
+        data: {
+          ...data,
+          assetSymbols: data.assetSymbols.filter((s) => s.id !== symbolId),
+        },
+      },
+      schemaVersion: "1",
+    });
+  }
+  const deleteAssetSymbol = useMutation({
+    mutationFn: deleteAssetSymbolAsync,
+  });
+
   return (
     <ProfileContext.Provider
       value={{
@@ -280,6 +357,10 @@ function DataProvider({
 
         // Symbols
         getAssetSymbol,
+        convertAmount,
+        createAssetSymbol,
+        updateAssetSymbol,
+        deleteAssetSymbol,
       }}
     >
       {children}

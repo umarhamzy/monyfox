@@ -17,7 +17,9 @@ import { Route as IndexImport } from './routes/index'
 import { Route as PProfileIdProfileImport } from './routes/p/$profileId/_profile'
 import { Route as PProfileIdProfileIndexImport } from './routes/p/$profileId/_profile/index'
 import { Route as PProfileIdProfileTransactionsIndexImport } from './routes/p/$profileId/_profile/transactions/index'
+import { Route as PProfileIdProfileSettingsIndexImport } from './routes/p/$profileId/_profile/settings/index'
 import { Route as PProfileIdProfileAccountsIndexImport } from './routes/p/$profileId/_profile/accounts/index'
+import { Route as PProfileIdProfileSettingsSymbolsImport } from './routes/p/$profileId/_profile/settings/symbols'
 
 // Create Virtual Routes
 
@@ -55,10 +57,24 @@ const PProfileIdProfileTransactionsIndexRoute =
     getParentRoute: () => PProfileIdProfileRoute,
   } as any)
 
+const PProfileIdProfileSettingsIndexRoute =
+  PProfileIdProfileSettingsIndexImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => PProfileIdProfileRoute,
+  } as any)
+
 const PProfileIdProfileAccountsIndexRoute =
   PProfileIdProfileAccountsIndexImport.update({
     id: '/accounts/',
     path: '/accounts/',
+    getParentRoute: () => PProfileIdProfileRoute,
+  } as any)
+
+const PProfileIdProfileSettingsSymbolsRoute =
+  PProfileIdProfileSettingsSymbolsImport.update({
+    id: '/settings/symbols',
+    path: '/settings/symbols',
     getParentRoute: () => PProfileIdProfileRoute,
   } as any)
 
@@ -94,11 +110,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PProfileIdProfileIndexImport
       parentRoute: typeof PProfileIdProfileImport
     }
+    '/p/$profileId/_profile/settings/symbols': {
+      id: '/p/$profileId/_profile/settings/symbols'
+      path: '/settings/symbols'
+      fullPath: '/p/$profileId/settings/symbols'
+      preLoaderRoute: typeof PProfileIdProfileSettingsSymbolsImport
+      parentRoute: typeof PProfileIdProfileImport
+    }
     '/p/$profileId/_profile/accounts/': {
       id: '/p/$profileId/_profile/accounts/'
       path: '/accounts'
       fullPath: '/p/$profileId/accounts'
       preLoaderRoute: typeof PProfileIdProfileAccountsIndexImport
+      parentRoute: typeof PProfileIdProfileImport
+    }
+    '/p/$profileId/_profile/settings/': {
+      id: '/p/$profileId/_profile/settings/'
+      path: '/settings'
+      fullPath: '/p/$profileId/settings'
+      preLoaderRoute: typeof PProfileIdProfileSettingsIndexImport
       parentRoute: typeof PProfileIdProfileImport
     }
     '/p/$profileId/_profile/transactions/': {
@@ -115,13 +145,17 @@ declare module '@tanstack/react-router' {
 
 interface PProfileIdProfileRouteChildren {
   PProfileIdProfileIndexRoute: typeof PProfileIdProfileIndexRoute
+  PProfileIdProfileSettingsSymbolsRoute: typeof PProfileIdProfileSettingsSymbolsRoute
   PProfileIdProfileAccountsIndexRoute: typeof PProfileIdProfileAccountsIndexRoute
+  PProfileIdProfileSettingsIndexRoute: typeof PProfileIdProfileSettingsIndexRoute
   PProfileIdProfileTransactionsIndexRoute: typeof PProfileIdProfileTransactionsIndexRoute
 }
 
 const PProfileIdProfileRouteChildren: PProfileIdProfileRouteChildren = {
   PProfileIdProfileIndexRoute: PProfileIdProfileIndexRoute,
+  PProfileIdProfileSettingsSymbolsRoute: PProfileIdProfileSettingsSymbolsRoute,
   PProfileIdProfileAccountsIndexRoute: PProfileIdProfileAccountsIndexRoute,
+  PProfileIdProfileSettingsIndexRoute: PProfileIdProfileSettingsIndexRoute,
   PProfileIdProfileTransactionsIndexRoute:
     PProfileIdProfileTransactionsIndexRoute,
 }
@@ -145,14 +179,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/p/$profileId': typeof PProfileIdProfileRouteWithChildren
   '/p/$profileId/': typeof PProfileIdProfileIndexRoute
+  '/p/$profileId/settings/symbols': typeof PProfileIdProfileSettingsSymbolsRoute
   '/p/$profileId/accounts': typeof PProfileIdProfileAccountsIndexRoute
+  '/p/$profileId/settings': typeof PProfileIdProfileSettingsIndexRoute
   '/p/$profileId/transactions': typeof PProfileIdProfileTransactionsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/p/$profileId': typeof PProfileIdProfileIndexRoute
+  '/p/$profileId/settings/symbols': typeof PProfileIdProfileSettingsSymbolsRoute
   '/p/$profileId/accounts': typeof PProfileIdProfileAccountsIndexRoute
+  '/p/$profileId/settings': typeof PProfileIdProfileSettingsIndexRoute
   '/p/$profileId/transactions': typeof PProfileIdProfileTransactionsIndexRoute
 }
 
@@ -162,7 +200,9 @@ export interface FileRoutesById {
   '/p/$profileId': typeof PProfileIdRouteWithChildren
   '/p/$profileId/_profile': typeof PProfileIdProfileRouteWithChildren
   '/p/$profileId/_profile/': typeof PProfileIdProfileIndexRoute
+  '/p/$profileId/_profile/settings/symbols': typeof PProfileIdProfileSettingsSymbolsRoute
   '/p/$profileId/_profile/accounts/': typeof PProfileIdProfileAccountsIndexRoute
+  '/p/$profileId/_profile/settings/': typeof PProfileIdProfileSettingsIndexRoute
   '/p/$profileId/_profile/transactions/': typeof PProfileIdProfileTransactionsIndexRoute
 }
 
@@ -172,13 +212,17 @@ export interface FileRouteTypes {
     | '/'
     | '/p/$profileId'
     | '/p/$profileId/'
+    | '/p/$profileId/settings/symbols'
     | '/p/$profileId/accounts'
+    | '/p/$profileId/settings'
     | '/p/$profileId/transactions'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/p/$profileId'
+    | '/p/$profileId/settings/symbols'
     | '/p/$profileId/accounts'
+    | '/p/$profileId/settings'
     | '/p/$profileId/transactions'
   id:
     | '__root__'
@@ -186,7 +230,9 @@ export interface FileRouteTypes {
     | '/p/$profileId'
     | '/p/$profileId/_profile'
     | '/p/$profileId/_profile/'
+    | '/p/$profileId/_profile/settings/symbols'
     | '/p/$profileId/_profile/accounts/'
+    | '/p/$profileId/_profile/settings/'
     | '/p/$profileId/_profile/transactions/'
   fileRoutesById: FileRoutesById
 }
@@ -229,7 +275,9 @@ export const routeTree = rootRoute
       "parent": "/p/$profileId",
       "children": [
         "/p/$profileId/_profile/",
+        "/p/$profileId/_profile/settings/symbols",
         "/p/$profileId/_profile/accounts/",
+        "/p/$profileId/_profile/settings/",
         "/p/$profileId/_profile/transactions/"
       ]
     },
@@ -237,8 +285,16 @@ export const routeTree = rootRoute
       "filePath": "p/$profileId/_profile/index.tsx",
       "parent": "/p/$profileId/_profile"
     },
+    "/p/$profileId/_profile/settings/symbols": {
+      "filePath": "p/$profileId/_profile/settings/symbols.tsx",
+      "parent": "/p/$profileId/_profile"
+    },
     "/p/$profileId/_profile/accounts/": {
       "filePath": "p/$profileId/_profile/accounts/index.tsx",
+      "parent": "/p/$profileId/_profile"
+    },
+    "/p/$profileId/_profile/settings/": {
+      "filePath": "p/$profileId/_profile/settings/index.tsx",
       "parent": "/p/$profileId/_profile"
     },
     "/p/$profileId/_profile/transactions/": {

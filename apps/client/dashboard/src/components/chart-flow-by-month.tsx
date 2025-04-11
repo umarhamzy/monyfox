@@ -9,6 +9,7 @@ import { LocalDate, YearMonth } from "@js-joda/core";
 import { useMemo } from "react";
 import { useProfile } from "@/hooks/use-profile";
 import { getTransactionType, TransactionType } from "@/utils/transaction";
+import { useSettings } from "@/hooks/use-settings";
 
 const chartConfig = {
   income: {
@@ -22,7 +23,9 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ChartFlowByMonth() {
-  const { getTransactionsBetweenDates, getAccount } = useProfile();
+  const { defaultSymbolId } = useSettings();
+  const { getTransactionsBetweenDates, getAccount, convertAmount } =
+    useProfile();
 
   const startDate = LocalDate.now().minusMonths(12).withDayOfMonth(1);
   const endDate = LocalDate.now();
@@ -50,12 +53,19 @@ export function ChartFlowByMonth() {
       }
 
       const state = stateByDate.get(transactionDate)!;
-      // TODO: account for currency.
       if (isIncome) {
-        state.income += transaction.to.amount;
+        state.income += convertAmount(
+          transaction.to.amount,
+          transaction.to.symbolId,
+          defaultSymbolId,
+        );
       }
       if (isExpense) {
-        state.expense += transaction.from.amount;
+        state.expense += convertAmount(
+          transaction.from.amount,
+          transaction.from.symbolId,
+          defaultSymbolId,
+        );
       }
       stateByDate.set(transactionDate, state);
     }

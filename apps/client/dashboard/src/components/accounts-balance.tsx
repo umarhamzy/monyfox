@@ -9,16 +9,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import { useSettings } from "@/hooks/use-settings";
 
 export function AccountsBalance() {
+  const { defaultSymbolId } = useSettings();
   const {
-    data: { transactions, assetSymbols },
+    data: { transactions },
     getAccount,
     getAssetSymbol,
+    convertAmount,
   } = useProfile();
 
-  // TODO: support multiple currencies
-  const assetSymbol = assetSymbols[0] ?? getAssetSymbol("EUR");
+  const assetSymbol = getAssetSymbol(defaultSymbolId);
 
   const balances = useMemo(() => {
     const balanceByAccount = new Map<string, number>();
@@ -28,7 +30,11 @@ export function AccountsBalance() {
         "id" in fromAccount && getAccount(fromAccount.id).isPersonalAsset;
       if (isFromPersonalAsset) {
         const accountId = fromAccount.id;
-        const amount = transaction.from.amount;
+        const amount = convertAmount(
+          transaction.from.amount,
+          transaction.from.symbolId,
+          defaultSymbolId,
+        );
         balanceByAccount.set(
           accountId,
           (balanceByAccount.get(accountId) || 0) - amount,
@@ -40,7 +46,11 @@ export function AccountsBalance() {
         "id" in toAccount && getAccount(toAccount.id).isPersonalAsset;
       if (isToPersonalAsset) {
         const accountId = toAccount.id;
-        const amount = transaction.to.amount;
+        const amount = convertAmount(
+          transaction.to.amount,
+          transaction.to.symbolId,
+          defaultSymbolId,
+        );
         balanceByAccount.set(
           accountId,
           (balanceByAccount.get(accountId) || 0) + amount,

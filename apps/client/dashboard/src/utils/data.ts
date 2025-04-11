@@ -24,7 +24,7 @@ export function generateTestProfile(): Profile {
     id: ulid(),
     type: "fiat",
     code: "EUR",
-    displayName: "€",
+    displayName: "EUR",
   };
 
   const yearsToGenerate = 2;

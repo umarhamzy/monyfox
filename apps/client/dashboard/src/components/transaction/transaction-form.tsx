@@ -185,12 +185,16 @@ function TransactionForm({
     type === TransactionType.Income || type === TransactionType.Transfer;
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    let hasErrors = false;
     if (needFromAccount && values.fromAccountId === "") {
       form.setError("fromAccountId", { message: "Please select an account" });
-      return;
+      hasErrors = true;
     }
     if (needToAccount && values.toAccountId === "") {
-      form.setError("fromAccountId", { message: "Please select an account" });
+      form.setError("toAccountId", { message: "Please select an account" });
+      hasErrors = true;
+    }
+    if (hasErrors) {
       return;
     }
 
