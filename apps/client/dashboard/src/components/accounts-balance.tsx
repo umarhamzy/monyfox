@@ -2,6 +2,13 @@ import { useProfile } from "@/hooks/use-profile";
 import { formatCurrency } from "@/utils/currency";
 import { useMemo } from "react";
 import { Table, TableBody, TableCell, TableRow } from "./ui/table";
+import { Progress } from "./ui/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 export function AccountsBalance() {
   const {
@@ -37,12 +44,14 @@ export function AccountsBalance() {
       }
     }
 
-    return Array.from(balanceByAccount.entries()).map(
-      ([accountId, balance]) => ({
+    return Array.from(balanceByAccount.entries())
+      .map(([accountId, balance]) => ({
         accountId,
         balance,
-      }),
-    );
+      }))
+      .sort((a, b) => {
+        return b.balance - a.balance;
+      });
   }, [getAccount, transactions]);
 
   const totalBalance = useMemo(() => {
@@ -54,9 +63,24 @@ export function AccountsBalance() {
       <TableBody>
         {balances.map(({ accountId, balance }) => (
           <TableRow key={accountId}>
-            <TableCell>{getAccount(accountId).name}</TableCell>
+            <TableCell className="text-truncate">
+              {getAccount(accountId).name}
+            </TableCell>
             <TableCell className="text-right">
-              {formatCurrency(balance)}
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div>
+                      {formatCurrency(balance)}
+                      <br />
+                      <Progress value={(balance / totalBalance) * 100} />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {Math.round((balance / totalBalance) * 100)}%
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </TableCell>
           </TableRow>
         ))}
