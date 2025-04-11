@@ -1,6 +1,7 @@
 import {
   type Account,
   AccountSchema,
+  type AssetSymbol,
   type Data,
   DataSchema,
   type Transaction,
@@ -37,6 +38,9 @@ interface ProfileContextProps {
     startDate: LocalDate,
     endDate: LocalDate,
   ) => Transaction[];
+
+  // Symbols
+  getAssetSymbol: (assetSymbolId: string) => AssetSymbol;
 }
 
 export const ProfileContext = createContext<ProfileContextProps | undefined>(
@@ -216,6 +220,22 @@ function DataProvider({
     [transactions],
   );
 
+  const getAssetSymbol = useCallback(
+    (symbolId: string): AssetSymbol => {
+      const symbol = data.assetSymbols.find((s) => s.id === symbolId);
+      if (!symbol) {
+        return {
+          id: "N/A",
+          type: "other",
+          code: "N/A",
+          displayName: "N/A",
+        };
+      }
+      return symbol;
+    },
+    [data.assetSymbols],
+  );
+
   return (
     <ProfileContext.Provider
       value={{
@@ -234,6 +254,9 @@ function DataProvider({
         createTransaction,
         deleteTransaction,
         getTransactionsBetweenDates,
+
+        // Symbols
+        getAssetSymbol,
       }}
     >
       {children}

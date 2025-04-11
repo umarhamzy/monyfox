@@ -23,16 +23,14 @@ export function generateTestProfile(): Profile {
   const assetEur: AssetSymbol = {
     id: ulid(),
     type: "fiat",
-    name: "EUR",
+    code: "EUR",
     displayName: "€",
   };
 
   const yearsToGenerate = 2;
-  const monthsToGenerate = 12 * yearsToGenerate;
-  const daysToGenerate = 30 * monthsToGenerate;
   const transactions: Transaction[] = [];
   for (
-    let currentDate = LocalDate.now().minusDays(daysToGenerate);
+    let currentDate = LocalDate.now().minusYears(yearsToGenerate);
     currentDate.isBefore(LocalDate.now());
     currentDate = currentDate.plusDays(1)
   ) {

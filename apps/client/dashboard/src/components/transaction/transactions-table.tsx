@@ -209,16 +209,18 @@ export function TransactionsTable() {
 }
 
 function AmountText({ transaction }: { transaction: Transaction }) {
-  const { getAccount } = useProfile();
+  const { getAccount, getAssetSymbol } = useProfile();
   const transactionType = getTransactionType(transaction, getAccount);
+  const fromSymbol = getAssetSymbol(transaction.from.symbolId);
+  const toSymbol = getAssetSymbol(transaction.to.symbolId);
   let amount: string;
   if (
-    formatCurrency(transaction.from.amount) !==
-    formatCurrency(transaction.to.amount)
+    formatCurrency(transaction.from.amount, fromSymbol) !==
+    formatCurrency(transaction.to.amount, toSymbol)
   ) {
-    amount = `${formatCurrency(transaction.from.amount)} 🡢 ${formatCurrency(transaction.to.amount)}`;
+    amount = `${formatCurrency(transaction.from.amount, fromSymbol)} 🡢 ${formatCurrency(transaction.to.amount, toSymbol)}`;
   } else {
-    amount = formatCurrency(transaction.from.amount);
+    amount = formatCurrency(transaction.from.amount, fromSymbol);
     if (transactionType === TransactionType.Expense) {
       amount = `(${amount})`;
     }
@@ -287,19 +289,16 @@ const columns: ColumnDef<
     cell: ({ row }) => row.original.accountingDate,
   },
   {
+    accessorKey: "account",
+    header: "Account",
+    cell: ({ row }) => {
+      return `${row.original.fromAccountName} → ${row.original.toAccountName}`;
+    },
+  },
+  {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => row.original.description,
-  },
-  {
-    accessorKey: "from",
-    header: "From",
-    cell: ({ row }) => row.original.fromAccountName,
-  },
-  {
-    accessorKey: "to",
-    header: "To",
-    cell: ({ row }) => row.original.toAccountName,
   },
   {
     accessorKey: "amount",

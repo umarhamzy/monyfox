@@ -12,9 +12,13 @@ import {
 
 export function AccountsBalance() {
   const {
-    data: { transactions },
+    data: { transactions, assetSymbols },
     getAccount,
+    getAssetSymbol,
   } = useProfile();
+
+  // TODO: support multiple currencies
+  const assetSymbol = assetSymbols[0] ?? getAssetSymbol("EUR");
 
   const balances = useMemo(() => {
     const balanceByAccount = new Map<string, number>();
@@ -71,7 +75,7 @@ export function AccountsBalance() {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div>
-                      {formatCurrency(balance)}
+                      {formatCurrency(balance, assetSymbol)}
                       <br />
                       <Progress value={(balance / totalBalance) * 100} />
                     </div>
@@ -87,7 +91,7 @@ export function AccountsBalance() {
         <TableRow className="font-bold">
           <TableCell>Total</TableCell>
           <TableCell className="text-right">
-            {formatCurrency(totalBalance)}
+            {formatCurrency(totalBalance, assetSymbol)}
           </TableCell>
         </TableRow>
       </TableBody>
