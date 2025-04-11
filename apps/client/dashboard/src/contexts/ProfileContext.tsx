@@ -2,6 +2,7 @@ import {
   type Account,
   AccountSchema,
   type Data,
+  DataSchema,
   type Transaction,
 } from "@monyfox/common-data";
 import { createContext, ReactNode, useCallback, useMemo } from "react";
@@ -45,7 +46,10 @@ export const ProfileProvider = ({
 }) => {
   const { profiles } = useDatabase();
 
-  const profile = profiles.find((p) => p.id === profileId);
+  const profile = useMemo(
+    () => profiles.find((p) => p.id === profileId),
+    [profileId, profiles],
+  );
 
   if (profile === undefined) {
     return (
@@ -70,6 +74,18 @@ export const ProfileProvider = ({
     name: profile.user,
   };
   const data = profile.data.data;
+
+  const validationResult = useMemo(() => DataSchema.safeParse(data), [data]);
+  if (validationResult.error) {
+    console.error("Invalid profile data", validationResult.error);
+    return (
+      <ErrorPage
+        title="Invalid profile data"
+        message="The profile you are trying to access has invalid data. Please check the
+        console logs in your browser for more details."
+      />
+    );
+  }
 
   return (
     <DataProvider user={user} data={data}>
@@ -137,14 +153,16 @@ function DataProvider({
   });
 
   const transactions = useMemo(() => {
-    return data.transactions.sort((a, b) => a.date.localeCompare(b.date));
+    return data.transactions.sort((a, b) =>
+      a.accountingDate.localeCompare(b.accountingDate),
+    );
   }, [data.transactions]);
 
   const getTransactionsBetweenDates = useCallback(
     (start: LocalDate, end: LocalDate) => {
       // TODO: use binary search to find the first and last transaction in the range since the transactions are sorted.
       return transactions.filter((transaction) => {
-        const date = LocalDate.parse(transaction.date);
+        const date = LocalDate.parse(transaction.accountingDate);
         return (
           date.isAfter(start.minusDays(1)) && date.isBefore(end.plusDays(1))
         );

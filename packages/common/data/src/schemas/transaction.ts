@@ -1,19 +1,24 @@
 import { z } from "zod";
 
+const AccountDataSchema = z.object({
+  amount: z.number().nonnegative(),
+  symbolId: z.string(),
+  account: z.union([
+    z.object({
+      id: z.string(),
+    }),
+    z.object({
+      name: z.string(),
+    }),
+  ]),
+});
+
 export const TransactionSchema = z.object({
   id: z.string(),
   description: z.string(),
-  date: z.string().date(),
-  from: z.object({
-    amount: z.number(),
-    symbolId: z.string(),
-    accountId: z.string().nullable(),
-    accountName: z.string().nullable(),
-  }),
-  to: z.object({
-    amount: z.number(),
-    symbolId: z.string(),
-    accountId: z.string().nullable(),
-    accountName: z.string().nullable(),
-  }),
+  transactionCategoryId: z.string().nullable(),
+  transactionDate: z.string().date(),
+  accountingDate: z.string().date(),
+  from: AccountDataSchema,
+  to: AccountDataSchema,
 });

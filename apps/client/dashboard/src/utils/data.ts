@@ -22,8 +22,9 @@ export function generateTestProfile(): Profile {
 
   const assetEur: AssetSymbol = {
     id: ulid(),
-    type: "currency",
-    currency: "EUR",
+    type: "fiat",
+    name: "EUR",
+    displayName: "€",
   };
 
   const yearsToGenerate = 2;
@@ -41,18 +42,18 @@ export function generateTestProfile(): Profile {
       transactions.push({
         id: ulid(),
         description: "Salary",
-        date: currentDate.toString(),
+        transactionDate: currentDate.toString(),
+        accountingDate: currentDate.toString(),
+        transactionCategoryId: null,
         from: {
-          accountId: null,
-          accountName: "My Company",
           amount: salaryAmount,
           symbolId: assetEur.id,
+          account: { name: "My Company" },
         },
         to: {
-          accountId: bankAccount.id,
-          accountName: null,
           amount: salaryAmount,
           symbolId: assetEur.id,
+          account: { id: bankAccount.id },
         },
       });
 
@@ -61,18 +62,18 @@ export function generateTestProfile(): Profile {
       transactions.push({
         id: ulid(),
         description: "Rent",
-        date: currentDate.toString(),
+        transactionDate: currentDate.toString(),
+        accountingDate: currentDate.toString(),
+        transactionCategoryId: null,
         from: {
-          accountId: bankAccount.id,
-          accountName: null,
           amount: rentAmount,
           symbolId: assetEur.id,
+          account: { id: bankAccount.id },
         },
         to: {
-          accountId: null,
-          accountName: "My Landlord",
           amount: rentAmount,
           symbolId: assetEur.id,
+          account: { name: "My Landlord" },
         },
       });
 
@@ -80,18 +81,18 @@ export function generateTestProfile(): Profile {
       transactions.push({
         id: ulid(),
         description: "Investment",
-        date: currentDate.toString(),
+        transactionDate: currentDate.toString(),
+        accountingDate: currentDate.toString(),
+        transactionCategoryId: null,
         from: {
-          accountId: bankAccount.id,
-          accountName: null,
           amount: 500,
           symbolId: assetEur.id,
+          account: { id: bankAccount.id },
         },
         to: {
-          accountId: investmentAccount.id,
-          accountName: null,
           amount: 500,
           symbolId: assetEur.id,
+          account: { id: investmentAccount.id },
         },
       });
     }
@@ -105,18 +106,18 @@ export function generateTestProfile(): Profile {
       transactions.push({
         id: ulid(),
         description: "Bonus",
-        date: currentDate.toString(),
+        transactionDate: currentDate.toString(),
+        accountingDate: currentDate.toString(),
+        transactionCategoryId: null,
         from: {
-          accountId: null,
-          accountName: "My Company",
           amount: bonusAmount,
           symbolId: assetEur.id,
+          account: { name: "My Company" },
         },
         to: {
-          accountId: bankAccount.id,
-          accountName: null,
           amount: bonusAmount,
           symbolId: assetEur.id,
+          account: { id: bankAccount.id },
         },
       });
     }
@@ -131,18 +132,18 @@ export function generateTestProfile(): Profile {
       transactions.push({
         id: ulid(),
         description: "Entertainment",
-        date: currentDate.toString(),
+        transactionDate: currentDate.toString(),
+        accountingDate: currentDate.toString(),
+        transactionCategoryId: null,
         from: {
-          accountId: bankAccount.id,
-          accountName: null,
           amount: entertainmentAmount,
           symbolId: assetEur.id,
+          account: { id: bankAccount.id },
         },
         to: {
-          accountId: null,
-          accountName: "Entertainment Shop",
           amount: entertainmentAmount,
           symbolId: assetEur.id,
+          account: { name: "Entertainment Shop" },
         },
       });
     }
@@ -150,18 +151,18 @@ export function generateTestProfile(): Profile {
     transactions.push({
       id: ulid(),
       description: "Coffee",
-      date: currentDate.toString(),
+      transactionDate: currentDate.toString(),
+      accountingDate: currentDate.toString(),
+      transactionCategoryId: null,
       from: {
-        accountId: bankAccount.id,
-        accountName: null,
         amount: 2,
         symbolId: assetEur.id,
+        account: { id: bankAccount.id },
       },
       to: {
-        accountId: null,
-        accountName: "Coffee Shop",
         amount: 2,
         symbolId: assetEur.id,
+        account: { name: "Coffee Shop" },
       },
     });
   }

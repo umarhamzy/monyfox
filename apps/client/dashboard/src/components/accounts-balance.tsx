@@ -12,11 +12,11 @@ export function AccountsBalance() {
   const balances = useMemo(() => {
     const balanceByAccount = new Map<string, number>();
     for (const transaction of transactions) {
-      const fromAccountId = transaction.from.accountId;
+      const fromAccount = transaction.from.account;
       const isFromPersonalAsset =
-        fromAccountId !== null && getAccount(fromAccountId).isPersonalAsset;
+        "id" in fromAccount && getAccount(fromAccount.id).isPersonalAsset;
       if (isFromPersonalAsset) {
-        const accountId = fromAccountId;
+        const accountId = fromAccount.id;
         const amount = transaction.from.amount;
         balanceByAccount.set(
           accountId,
@@ -24,11 +24,11 @@ export function AccountsBalance() {
         );
       }
 
-      const toAccountId = transaction.to.accountId;
+      const toAccount = transaction.to.account;
       const isToPersonalAsset =
-        toAccountId !== null && getAccount(toAccountId).isPersonalAsset;
+        "id" in toAccount && getAccount(toAccount.id).isPersonalAsset;
       if (isToPersonalAsset) {
-        const accountId = toAccountId;
+        const accountId = toAccount.id;
         const amount = transaction.to.amount;
         balanceByAccount.set(
           accountId,
@@ -62,7 +62,9 @@ export function AccountsBalance() {
         ))}
         <TableRow className="font-bold">
           <TableCell>Total</TableCell>
-          <TableCell className="text-right">{formatCurrency(totalBalance)}</TableCell>
+          <TableCell className="text-right">
+            {formatCurrency(totalBalance)}
+          </TableCell>
         </TableRow>
       </TableBody>
     </Table>

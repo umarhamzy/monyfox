@@ -12,12 +12,12 @@ export function getTransactionType(
   getAccount: (accountId: string) => Account,
 ) {
   const isFromPersonalAsset =
-    transaction.from.accountId !== null &&
-    getAccount(transaction.from.accountId).isPersonalAsset;
+    "id" in transaction.from.account &&
+    getAccount(transaction.from.account.id).isPersonalAsset;
 
   const isToPersonalAsset =
-    transaction.to.accountId !== null &&
-    getAccount(transaction.to.accountId).isPersonalAsset;
+    "id" in transaction.to.account &&
+    getAccount(transaction.to.account.id).isPersonalAsset;
 
   if (isFromPersonalAsset && isToPersonalAsset) {
     return TransactionType.Transfer;

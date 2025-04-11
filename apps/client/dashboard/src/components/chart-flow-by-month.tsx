@@ -42,7 +42,7 @@ export function ChartFlowByMonth() {
       }
 
       const transactionDate = YearMonth.from(
-        LocalDate.parse(transaction.date),
+        LocalDate.parse(transaction.accountingDate),
       ).toString();
 
       if (!stateByDate.has(transactionDate)) {

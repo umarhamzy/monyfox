@@ -1,14 +1,14 @@
 import { z } from "zod";
 
-export const AssetSymbolSchema = z.discriminatedUnion("type", [
-  z.object({
-    id: z.string(),
-    type: z.literal("currency"),
-    currency: z.string(),
-  }),
-  z.object({
-    id: z.string(),
-    type: z.literal("stock"),
-    ticker: z.string(),
-  }),
-]);
+export const AssetSymbolSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  displayName: z.string(),
+  type: z.union([
+    z.literal("fiat"),
+    z.literal("stock"),
+    z.literal("crypto"),
+    z.literal("commodity"),
+    z.literal("other"),
+  ]),
+});

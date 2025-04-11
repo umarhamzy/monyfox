@@ -55,7 +55,7 @@ export function NavUser() {
             <Link to="/">
               <DropdownMenuItem>
                 <LogOutIcon />
-                Log out
+                Switch profile
               </DropdownMenuItem>
             </Link>
           </DropdownMenuContent>

@@ -39,12 +39,12 @@ export function NetWorthByMonth() {
 
     for (const transaction of transactions) {
       const yearMonth = YearMonth.from(
-        LocalDate.parse(transaction.date),
+        LocalDate.parse(transaction.accountingDate),
       ).toString();
 
-      const fromAccountId = transaction.from.accountId;
+      const fromAccount = transaction.from.account;
       const isFromPersonalAsset =
-        fromAccountId !== null && getAccount(fromAccountId).isPersonalAsset;
+        "id" in fromAccount && getAccount(fromAccount.id).isPersonalAsset;
       if (isFromPersonalAsset) {
         const amount = transaction.from.amount;
         balanceByYearMonth.set(
@@ -53,9 +53,9 @@ export function NetWorthByMonth() {
         );
       }
 
-      const toAccountId = transaction.to.accountId;
+      const toAccount = transaction.to.account;
       const isToPersonalAsset =
-        toAccountId !== null && getAccount(toAccountId).isPersonalAsset;
+        "id" in toAccount && getAccount(toAccount.id).isPersonalAsset;
       if (isToPersonalAsset) {
         const amount = transaction.to.amount;
         balanceByYearMonth.set(
@@ -85,7 +85,7 @@ export function NetWorthByMonth() {
 
       balances.push({
         date: yearMonth.toString(),
-        balance: Math.round(cumulativeBalance)
+        balance: Math.round(cumulativeBalance),
       });
     }
 

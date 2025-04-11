@@ -236,15 +236,20 @@ function getAccountName(
   data: {
     amount: number;
     symbolId: string;
-    accountId: string | null;
-    accountName: string | null;
+    account:
+      | {
+          id: string;
+        }
+      | {
+          name: string;
+        };
   },
   getAccount: (accountId: string) => Account,
 ) {
-  if (data.accountId === null) {
-    return data.accountName ?? "Unknown";
+  if ("id" in data.account) {
+    return getAccount(data.account.id).name;
   }
-  return getAccount(data.accountId).name;
+  return data.account.name;
 }
 
 const columns: ColumnDef<
@@ -279,7 +284,7 @@ const columns: ColumnDef<
   {
     accessorKey: "date",
     header: "Date",
-    cell: ({ row }) => row.original.date,
+    cell: ({ row }) => row.original.accountingDate,
   },
   {
     accessorKey: "description",
