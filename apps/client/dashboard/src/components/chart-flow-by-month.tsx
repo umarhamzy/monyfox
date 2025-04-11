@@ -4,7 +4,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { Bar, BarChart, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { LocalDate, YearMonth } from "@js-joda/core";
 import { useMemo } from "react";
 import { useProfile } from "@/hooks/use-profile";
@@ -66,10 +66,12 @@ export function ChartFlowByMonth() {
       currentMonth.isBefore(YearMonth.from(endDate));
       currentMonth = currentMonth.plusMonths(1)
     ) {
-      if (stateByDate.has(currentMonth.toString())) {
+      const state = stateByDate.get(currentMonth.toString());
+      if (state !== undefined) {
         chartData.push({
           date: currentMonth.toString(),
-          ...stateByDate.get(currentMonth.toString())!,
+          income: Math.round(state.income),
+          expense: Math.round(state.expense),
         });
       } else {
         chartData.push({
@@ -84,7 +86,7 @@ export function ChartFlowByMonth() {
   }, [transactions, getAccount, startDate, endDate]);
 
   return (
-    <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+    <ChartContainer config={chartConfig} className="h-[300px] w-full">
       <BarChart accessibilityLayer data={incomeExpenseByMonthData}>
         <XAxis
           dataKey="date"
@@ -93,6 +95,8 @@ export function ChartFlowByMonth() {
           axisLine={false}
           tickFormatter={(value: string) => value}
         />
+        <YAxis />
+        <CartesianGrid stroke="#ccc" />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Bar dataKey="income" fill="var(--color-income)" radius={4} />
         <Bar dataKey="expense" fill="var(--color-expense)" radius={4} />

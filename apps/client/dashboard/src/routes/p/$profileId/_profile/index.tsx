@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartFlowByMonth } from "@/components/chart-flow-by-month";
 import { AccountsBalance } from "@/components/accounts-balance";
 import { TransactionsTable } from "@/components/transactions-table";
+import { NetWorthByMonth } from "@/components/chart-net-worth-by-month";
 
 export const Route = createFileRoute("/p/$profileId/_profile/")({
   component: RouteComponent,
@@ -18,6 +19,7 @@ function RouteComponent() {
           </CardHeader>
           <CardContent>
             <ChartFlowByMonth />
+            <NetWorthByMonth />
           </CardContent>
         </Card>
       </div>
