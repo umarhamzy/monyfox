@@ -19,7 +19,7 @@ export function Modal({
   onClose: () => void;
   title: string;
   children: React.ReactNode;
-  footer: React.ReactNode;
+  footer?: React.ReactNode;
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -28,7 +28,7 @@ export function Modal({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         {children}
-        <DialogFooter>{footer}</DialogFooter>
+        {footer && <DialogFooter>{footer}</DialogFooter>}
       </DialogContent>
     </Dialog>
   );

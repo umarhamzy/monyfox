@@ -1,4 +1,4 @@
-import { TransactionsTable } from "@/components/transactions-table";
+import { TransactionsTable } from "@/components/transaction/transactions-table";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/p/$profileId/_profile/transactions/")({

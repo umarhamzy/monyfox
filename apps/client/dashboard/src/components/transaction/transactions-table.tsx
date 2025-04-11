@@ -32,8 +32,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "./ui/label";
-import { Button } from "./ui/button";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,

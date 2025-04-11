@@ -4,6 +4,7 @@ import {
   type Data,
   DataSchema,
   type Transaction,
+  TransactionSchema,
 } from "@monyfox/common-data";
 import { createContext, ReactNode, useCallback, useMemo } from "react";
 import { DestructiveAlert } from "../components/ui/alert";
@@ -24,9 +25,14 @@ interface ProfileContextProps {
   user: { id: string; name: string };
   data: Data;
 
+  // Accounts
   getAccount: (accountId: string) => Account;
   createAccount: UseMutationResult<void, Error, Account, unknown>;
   deleteAccount: UseMutationResult<void, Error, string, unknown>;
+
+  // Transactions
+  createTransaction: UseMutationResult<void, Error, Transaction, unknown>;
+  deleteTransaction: UseMutationResult<void, Error, string, unknown>;
   getTransactionsBetweenDates: (
     startDate: LocalDate,
     endDate: LocalDate,
@@ -158,6 +164,45 @@ function DataProvider({
     );
   }, [data.transactions]);
 
+  async function createTransactionAsync(raw: Transaction) {
+    const transaction = TransactionSchema.parse(raw);
+    await saveProfile.mutateAsync({
+      id: user.id,
+      user: user.name,
+      data: {
+        encrypted: false,
+        data: {
+          ...data,
+          transactions: [...data.transactions, transaction],
+        },
+      },
+      schemaVersion: "1",
+    });
+  }
+  const createTransaction = useMutation({
+    mutationFn: createTransactionAsync,
+  });
+
+  async function deleteTransactionAsync(transactionId: string) {
+    await saveProfile.mutateAsync({
+      id: user.id,
+      user: user.name,
+      data: {
+        encrypted: false,
+        data: {
+          ...data,
+          transactions: data.transactions.filter(
+            (transaction) => transaction.id !== transactionId,
+          ),
+        },
+      },
+      schemaVersion: "1",
+    });
+  }
+  const deleteTransaction = useMutation({
+    mutationFn: deleteTransactionAsync,
+  });
+
   const getTransactionsBetweenDates = useCallback(
     (start: LocalDate, end: LocalDate) => {
       // TODO: use binary search to find the first and last transaction in the range since the transactions are sorted.
@@ -179,9 +224,15 @@ function DataProvider({
           ...data,
           transactions,
         },
+
+        // Accounts
         getAccount,
         createAccount,
         deleteAccount,
+
+        // Transactions
+        createTransaction,
+        deleteTransaction,
         getTransactionsBetweenDates,
       }}
     >

@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartFlowByMonth } from "@/components/chart-flow-by-month";
 import { AccountsBalance } from "@/components/accounts-balance";
-import { TransactionsTable } from "@/components/transactions-table";
+import { TransactionsTable } from "@/components/transaction/transactions-table";
 import { NetWorthByMonth } from "@/components/chart-net-worth-by-month";
+import { AddTransactionFloatingButton } from "@/components/transaction/add-transaction-form";
 
 export const Route = createFileRoute("/p/$profileId/_profile/")({
   component: RouteComponent,
@@ -11,7 +12,7 @@ export const Route = createFileRoute("/p/$profileId/_profile/")({
 
 function RouteComponent() {
   return (
-    <div className="flex flex-wrap -mx-2 gap-y-4">
+    <div className="flex flex-wrap -mx-2 gap-y-4 pb-12">
       <div className="md:w-4/6 w-full px-2">
         <Card>
           <CardHeader>
@@ -43,6 +44,7 @@ function RouteComponent() {
           </CardContent>
         </Card>
       </div>
+      <AddTransactionFloatingButton />
     </div>
   );
 }
