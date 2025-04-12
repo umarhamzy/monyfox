@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from "vitest";
-import { MemoryStorage } from "../memory-storage";
+import { MemoryStorage } from "./memory-storage";
 
 describe("memoryStorage", () => {
   let memoryStorage: MemoryStorage;

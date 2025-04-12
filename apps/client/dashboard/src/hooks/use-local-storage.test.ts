@@ -7,9 +7,9 @@ import {
   beforeAll,
   afterAll,
 } from "vitest";
-import { useLocalStorage } from "../use-local-storage";
+import { useLocalStorage } from "./use-local-storage";
 import { z } from "zod";
-import { MemoryStorage } from "../../utils/tests/memory-storage";
+import { MemoryStorage } from "../utils/tests/memory-storage";
 
 const originalLocalStorage = window.localStorage;
 const memoryStorage = new MemoryStorage();

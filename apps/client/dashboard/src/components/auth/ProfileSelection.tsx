@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/style";
 import { ConfirmationModal, Modal, useModal } from "../ui/modal";
 import { type Profile } from "@monyfox/common-data";
 import { useState } from "react";

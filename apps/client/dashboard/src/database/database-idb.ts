@@ -8,16 +8,18 @@ const DB_VERSION = 1;
 export class DatabaseIDBImpl implements Database {
   private db: IDBDatabase | null = null;
 
-  async init(): Promise<void> {
+  async init(dbName: string = DB_NAME): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+      const request = indexedDB.open(dbName, DB_VERSION);
       request.onsuccess = () => {
         this.db = request.result;
         resolve();
       };
-      request.onerror = () => {
-        reject(request.error);
-      };
+      request.onerror = this.logAndReject(
+        "Error opening database",
+        reject,
+        request,
+      );
       request.onupgradeneeded = () => {
         const db = request.result;
         db.createObjectStore(DB_STORE_NAME, { keyPath: "id" });
@@ -38,10 +40,11 @@ export class DatabaseIDBImpl implements Database {
       request.onsuccess = () => {
         resolve(request.result);
       };
-      request.onerror = () => {
-        console.error("Error getting profiles", request.error);
-        reject(request.error);
-      };
+      request.onerror = this.logAndReject(
+        "Error getting profile",
+        reject,
+        request,
+      );
     });
   }
 
@@ -58,10 +61,11 @@ export class DatabaseIDBImpl implements Database {
       request.onsuccess = () => {
         resolve();
       };
-      request.onerror = () => {
-        console.error("Error saving profile", request.error);
-        reject(request.error);
-      };
+      request.onerror = this.logAndReject(
+        "Error saving profile",
+        reject,
+        request,
+      );
     });
   }
 
@@ -78,10 +82,18 @@ export class DatabaseIDBImpl implements Database {
       request.onsuccess = () => {
         resolve();
       };
-      request.onerror = () => {
-        console.error("Error deleting profile", request.error);
-        reject(request.error);
-      };
+      request.onerror = this.logAndReject(
+        "Error deleting profile",
+        reject,
+        request,
+      );
     });
   }
+
+  private logAndReject =
+    (message: string, reject: (reason?: any) => void, request: IDBRequest) =>
+    () => {
+      console.error(message, request.error);
+      reject(request.error);
+    };
 }

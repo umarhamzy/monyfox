@@ -17,7 +17,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { type Profile } from "@monyfox/common-data";
 import { toast } from "sonner";
-import { DatabaseIDBImpl } from "@/database/database-idb-impl";
+import { DatabaseIDBImpl } from "@/database/database-idb";
 import { type Database } from "@/database/database";
 
 interface DatabaseContextProps {

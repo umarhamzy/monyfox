@@ -30,7 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DefaultSymbolSelect } from "@/components/DefaultSymbolSelect";
+import { DefaultSymbolSelect } from "@/components/default-symbol-select";
 
 export const Route = createFileRoute("/p/$profileId/_profile/settings/symbols")(
   {
