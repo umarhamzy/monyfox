@@ -1,0 +1,20 @@
+{
+  "name": "@monyfox/common-symbol",
+  "type": "module",
+  "private": true,
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "msw": "^2.7.4",
+    "typescript": "^5.8.2",
+    "vitest": "^3.1.1"
+  },
+  "packageManager": "yarn@4.3.1"
+}

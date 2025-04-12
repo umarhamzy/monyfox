@@ -1,15 +1,13 @@
-import { z } from "zod";
+import { CurrencySchema } from ".";
 
-const CurrencySchema = z.record(z.string(), z.string());
-
-export class CurrencyClient {
+export class FrankfurterCurrencyClient {
   private static readonly baseUrl = "https://api.frankfurter.dev";
 
   static async getCurrencies() {
     const response = await fetch(`${this.baseUrl}/v1/currencies`);
-    const data = await response.json();
-    const parsedData = CurrencySchema.parse(data);
-    return Object.entries(parsedData)
+    const rawData = await response.json();
+    const data = CurrencySchema.parse(rawData);
+    return Object.entries(data)
       .map(([code, name]) => ({ code, name }))
       .sort((a, b) => a.code.localeCompare(b.code));
   }

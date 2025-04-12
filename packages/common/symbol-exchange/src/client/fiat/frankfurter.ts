@@ -32,7 +32,7 @@ const RatesSchema = z.object({
   rates: z.record(z.string(), z.record(z.string(), z.number())),
 });
 
-export class FrankfurterClient implements SymbolExchangeClient {
+export class FrankfurterSymbolExchangeClient implements SymbolExchangeClient {
   private readonly baseUrl = "https://api.frankfurter.dev";
 
   async getExchangeRates(

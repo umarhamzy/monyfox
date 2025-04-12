@@ -1,9 +1,9 @@
-import { CurrencyClient } from "@/clients/currency";
+import { FrankfurterCurrencyClient } from "@monyfox/common-symbol";
 import { useQuery } from "@tanstack/react-query";
 
 export const useCurrency = () => {
   return useQuery({
     queryKey: ["currencies"],
-    queryFn: () => CurrencyClient.getCurrencies(),
+    queryFn: () => FrankfurterCurrencyClient.getCurrencies(),
   });
 };

@@ -1,7 +1,7 @@
-import { afterAll, afterEach, expect, test } from "vitest";
+import { afterAll, afterEach, beforeAll, expect, test } from "vitest";
 import { setupServer } from "msw/node";
 import { http, HttpResponse } from "msw";
-import { FrankfurterClient } from "./frankfurter";
+import { FrankfurterSymbolExchangeClient } from "./frankfurter";
 
 export const restHandlers = [
   http.get(
@@ -58,11 +58,12 @@ export const restHandlers = [
 ];
 
 const server = setupServer(...restHandlers);
+beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 test("should return exchange rates", async () => {
-  const client = new FrankfurterClient();
+  const client = new FrankfurterSymbolExchangeClient();
   const rates = await client.getExchangeRates({
     from: "EUR",
     to: "USD",
