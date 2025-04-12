@@ -5,10 +5,12 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { LocalDate, YearMonth } from "@js-joda/core";
+import { LocalDate } from "@js-joda/core";
 import { useMemo } from "react";
 import { useProfile } from "@/hooks/use-profile";
-import { getTransactionType, TransactionType } from "@/utils/transaction";
+import {
+  getIncomeExpenseByMonthData,
+} from "@/utils/transaction";
 import { useSettings } from "@/hooks/use-settings";
 
 const chartConfig = {
@@ -32,68 +34,22 @@ export function ChartFlowByMonth() {
   const transactions = getTransactionsBetweenDates(startDate, endDate);
 
   const incomeExpenseByMonthData = useMemo(() => {
-    const stateByDate = new Map<string, { income: number; expense: number }>();
-
-    for (const transaction of transactions) {
-      const transactionType = getTransactionType(transaction, getAccount);
-
-      const isIncome = transactionType === TransactionType.Income;
-      const isExpense = transactionType === TransactionType.Expense;
-
-      if (!isIncome && !isExpense) {
-        continue;
-      }
-
-      const transactionDate = YearMonth.from(
-        LocalDate.parse(transaction.accountingDate),
-      ).toString();
-
-      if (!stateByDate.has(transactionDate)) {
-        stateByDate.set(transactionDate, { income: 0, expense: 0 });
-      }
-
-      const state = stateByDate.get(transactionDate)!;
-      if (isIncome) {
-        state.income += convertAmount(
-          transaction.to.amount,
-          transaction.to.symbolId,
-          defaultSymbolId,
-        );
-      }
-      if (isExpense) {
-        state.expense += convertAmount(
-          transaction.from.amount,
-          transaction.from.symbolId,
-          defaultSymbolId,
-        );
-      }
-      stateByDate.set(transactionDate, state);
-    }
-
-    const chartData: { date: string; income: number; expense: number }[] = [];
-    for (
-      let currentMonth = YearMonth.from(startDate);
-      currentMonth.isBefore(YearMonth.from(endDate));
-      currentMonth = currentMonth.plusMonths(1)
-    ) {
-      const state = stateByDate.get(currentMonth.toString());
-      if (state !== undefined) {
-        chartData.push({
-          date: currentMonth.toString(),
-          income: Math.round(state.income),
-          expense: Math.round(state.expense),
-        });
-      } else {
-        chartData.push({
-          date: currentMonth.toString(),
-          income: 0,
-          expense: 0,
-        });
-      }
-    }
-
-    return chartData;
-  }, [transactions, getAccount, startDate, endDate]);
+    return getIncomeExpenseByMonthData({
+      transactions,
+      startDate,
+      endDate,
+      getAccount,
+      convertAmount,
+      defaultSymbolId,
+    });
+  }, [
+    transactions,
+    startDate,
+    endDate,
+    getAccount,
+    convertAmount,
+    defaultSymbolId,
+  ]);
 
   return (
     <ChartContainer config={chartConfig} className="h-[300px] w-full">
