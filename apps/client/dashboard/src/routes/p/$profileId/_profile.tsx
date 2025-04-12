@@ -1,9 +1,9 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { ProfileProvider } from "../../../contexts/ProfileContext";
+import { ProfileProvider } from "../../../contexts/profile-context";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/ui/site-header";
-import { SettingsProvider } from "@/contexts/SettingsContext";
+import { SettingsProvider } from "@/contexts/settings-context";
 
 export const Route = createFileRoute("/p/$profileId/_profile")({
   component: RouteComponent,

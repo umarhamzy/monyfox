@@ -34,12 +34,15 @@ export const SettingsProvider = ({
   if (defaultSymbolId === null) {
     return (
       <DestructiveAlert title="Error">
-        An error occured while trying to load the default symbol
+        An error occured while trying to load the default symbol.
       </DestructiveAlert>
     );
   }
 
-  if (!assetSymbols.find((symbol) => symbol.id === defaultSymbolId)) {
+  if (
+    defaultSymbolId !== fallbackSymbolId &&
+    !assetSymbols.find((symbol) => symbol.id === defaultSymbolId)
+  ) {
     setDefaultSymbolId(fallbackSymbolId);
   }
 

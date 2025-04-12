@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProfileSelection } from "../components/auth/ProfileSelection";
+import { ProfileSelection } from "../components/auth/profile-selection";
 
 export const Route = createFileRoute("/")({
   component: Index,

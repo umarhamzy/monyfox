@@ -3,6 +3,7 @@ import { resolve } from "path";
 
 export default defineProject({
   test: {
+    globals: true,
     environment: "jsdom",
     setupFiles: [resolve(__dirname, "./src/utils/tests/setup.ts")],
   },

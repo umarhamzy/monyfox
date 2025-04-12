@@ -1,15 +1,23 @@
 import { type AssetSymbol } from "@monyfox/common-data";
 
-const userLocale = "language" in navigator ? navigator.language : "en-GB";
+function getUserLocale(locale?: string) {
+  if (locale) {
+    return locale;
+  }
+
+  return "language" in navigator ? navigator.language : "en-GB";
+}
 
 export function formatCurrency(
   amount: number,
   symbol: AssetSymbol,
-  locale: string = userLocale,
+  locale?: string,
 ) {
+  let userLocale = getUserLocale(locale);
+
   try {
     if (symbol.type === "fiat") {
-      return new Intl.NumberFormat(locale, {
+      return new Intl.NumberFormat(userLocale, {
         style: "currency",
         currency: symbol.code,
       }).format(amount);
@@ -18,7 +26,7 @@ export function formatCurrency(
     // Fails if the symbol is not a fiat currency in Intl.NumberFormat.
   }
 
-  const formatted = new Intl.NumberFormat(locale, {
+  const formatted = new Intl.NumberFormat(userLocale, {
     style: "decimal",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
