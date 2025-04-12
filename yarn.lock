@@ -781,6 +781,7 @@ __metadata:
   resolution: "@monyfox/common-data@workspace:packages/common/data"
   dependencies:
     typescript: "npm:^5.8.2"
+    vitest: "npm:^3.1.1"
     zod: "npm:^3.24.2"
   languageName: unknown
   linkType: soft
@@ -796,11 +797,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@monyfox/common-symbol@workspace:packages/common/symbol":
+"@monyfox/common-symbol@workspace:*, @monyfox/common-symbol@workspace:packages/common/symbol":
   version: 0.0.0-use.local
   resolution: "@monyfox/common-symbol@workspace:packages/common/symbol"
   dependencies:
-    "@monyfox/common-data": "workspace:*"
     msw: "npm:^2.7.4"
     typescript: "npm:^5.8.2"
     vitest: "npm:^3.1.1"
@@ -816,6 +816,7 @@ __metadata:
     "@hookform/resolvers": "npm:^5.0.1"
     "@js-joda/core": "npm:^5.6.5"
     "@monyfox/common-data": "workspace:*"
+    "@monyfox/common-symbol": "workspace:*"
     "@radix-ui/react-avatar": "npm:^1.1.4"
     "@radix-ui/react-checkbox": "npm:^1.1.5"
     "@radix-ui/react-dialog": "npm:^1.1.7"
