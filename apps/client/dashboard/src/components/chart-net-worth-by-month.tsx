@@ -5,9 +5,10 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
-import { LocalDate, YearMonth } from "@js-joda/core";
+import { LocalDate } from "@js-joda/core";
 import { useMemo } from "react";
 import { useProfile } from "@/hooks/use-profile";
+import { getBalancesByMonth } from "@/utils/transaction";
 
 const chartConfig = {
   balance: {
@@ -26,71 +27,8 @@ export function NetWorthByMonth() {
   const endDate = LocalDate.now();
 
   const balances = useMemo(() => {
-    const balanceByYearMonth = new Map<string, number>();
-
-    // Ensure all months that we need to display are present in the map.
-    for (
-      let currentMonth = YearMonth.from(startDate);
-      currentMonth.isBefore(YearMonth.from(endDate));
-      currentMonth = currentMonth.plusMonths(1)
-    ) {
-      balanceByYearMonth.set(currentMonth.toString(), 0);
-    }
-
-    for (const transaction of transactions) {
-      const yearMonth = YearMonth.from(
-        LocalDate.parse(transaction.accountingDate),
-      ).toString();
-
-      const fromAccount = transaction.from.account;
-      const isFromPersonalAsset =
-        "id" in fromAccount && getAccount(fromAccount.id).isPersonalAsset;
-      if (isFromPersonalAsset) {
-        const amount = transaction.from.amount;
-        balanceByYearMonth.set(
-          yearMonth,
-          (balanceByYearMonth.get(yearMonth) || 0) - amount,
-        );
-      }
-
-      const toAccount = transaction.to.account;
-      const isToPersonalAsset =
-        "id" in toAccount && getAccount(toAccount.id).isPersonalAsset;
-      if (isToPersonalAsset) {
-        const amount = transaction.to.amount;
-        balanceByYearMonth.set(
-          yearMonth,
-          (balanceByYearMonth.get(yearMonth) || 0) + amount,
-        );
-      }
-    }
-
-    const sortedEntries = Array.from(balanceByYearMonth.entries()).sort(
-      ([a], [b]) => a.localeCompare(b),
-    );
-
-    const balances: { date: string; balance: number }[] = [];
-
-    let cumulativeBalance = 0;
-    for (const [yearMonthString, balance] of sortedEntries) {
-      cumulativeBalance += balance;
-      const yearMonth = YearMonth.parse(yearMonthString);
-
-      if (yearMonth.isBefore(YearMonth.from(startDate))) {
-        continue;
-      }
-      if (yearMonth.isAfter(YearMonth.from(endDate))) {
-        break;
-      }
-
-      balances.push({
-        date: yearMonth.toString(),
-        balance: Math.round(cumulativeBalance),
-      });
-    }
-
-    return balances;
-  }, [getAccount, transactions]);
+    return getBalancesByMonth(transactions, startDate, endDate, getAccount);
+  }, [transactions, startDate, endDate, getAccount]);
 
   return (
     <ChartContainer config={chartConfig} className="h-[300px] w-full">
