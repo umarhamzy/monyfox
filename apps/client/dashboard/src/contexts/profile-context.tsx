@@ -8,19 +8,10 @@ import {
   TransactionSchema,
 } from "@monyfox/common-data";
 import { createContext, ReactNode, useCallback, useMemo } from "react";
-import { DestructiveAlert } from "../components/ui/alert";
-import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { LocalDate } from "@js-joda/core";
 import { useDatabase } from "@/hooks/use-database";
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
+import { ErrorPage } from "@/components/error-page";
 
 interface ProfileContextProps {
   user: { id: string; name: string };
@@ -365,27 +356,5 @@ function DataProvider({
     >
       {children}
     </ProfileContext.Provider>
-  );
-}
-
-function ErrorPage({ title, message }: { title: string; message: string }) {
-  return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <Card>
-          <CardHeader>
-            <CardTitle>Whoops!</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DestructiveAlert title={title}>{message}</DestructiveAlert>
-          </CardContent>
-          <CardFooter className="flex justify-end">
-            <Link to="/">
-              <Button>Go back</Button>
-            </Link>
-          </CardFooter>
-        </Card>
-      </div>
-    </div>
   );
 }
