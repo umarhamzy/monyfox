@@ -7,6 +7,13 @@ import {
   QueryClientProvider,
   useMutation,
 } from "@tanstack/react-query";
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  Outlet,
+  RouterProvider,
+} from "@tanstack/react-router";
 import { ReactNode, useState } from "react";
 
 export function TestDatabaseProvider({ children }: { children: ReactNode }) {
@@ -115,7 +122,7 @@ export function TestQueryClientProvider({ children }: { children: ReactNode }) {
 }
 
 export function TestContextProvider({ children }: { children: ReactNode }) {
-  return (
+  const router = getTestRouter(() => (
     <TestQueryClientProvider>
       <TestDatabaseProvider>
         <ProfileProvider profileId="TEST_PROFILE_ID">
@@ -123,5 +130,22 @@ export function TestContextProvider({ children }: { children: ReactNode }) {
         </ProfileProvider>
       </TestDatabaseProvider>
     </TestQueryClientProvider>
-  );
+  ));
+
+  return <RouterProvider router={router} />;
+}
+
+function getTestRouter(component: () => React.JSX.Element) {
+  const rootRoute = createRootRoute({
+    component: Outlet,
+  });
+
+  const indexRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/",
+    component,
+  });
+
+  const routeTree = rootRoute.addChildren([indexRoute]);
+  return createRouter({ routeTree });
 }
