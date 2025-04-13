@@ -10,12 +10,15 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { SettingsIcon } from "lucide-react";
-import { Link, useParams } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { useProfile } from "@/hooks/use-profile";
 
 export function NavSecondary(
   props: React.ComponentPropsWithoutRef<typeof SidebarGroup>,
 ) {
-  const { profileId } = useParams({ from: "/p/$profileId" });
+  const {
+    user: { id: profileId },
+  } = useProfile();
 
   return (
     <SidebarGroup {...props}>

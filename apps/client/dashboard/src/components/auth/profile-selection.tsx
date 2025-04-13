@@ -60,7 +60,12 @@ function ProfileCard({ profile }: { profile: Profile }) {
                 Open
               </Button>
             </Link>
-            <Button size="icon" onClick={openModal} variant="outline">
+            <Button
+              size="icon"
+              onClick={openModal}
+              variant="outline"
+              title="Delete Profile"
+            >
               <TrashIcon />
             </Button>
           </div>

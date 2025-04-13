@@ -61,6 +61,11 @@ export const ProfileProvider = ({
     [profileId, profiles],
   );
 
+  const validationResult = useMemo(
+    () => DataSchema.safeParse(profile?.data.data),
+    [profile],
+  );
+
   if (profile === undefined) {
     return (
       <ErrorPage
@@ -83,9 +88,7 @@ export const ProfileProvider = ({
     id: profile.id,
     name: profile.user,
   };
-  const data = profile.data.data;
 
-  const validationResult = useMemo(() => DataSchema.safeParse(data), [data]);
   if (validationResult.error) {
     console.error("Invalid profile data", validationResult.error);
     return (
@@ -98,7 +101,7 @@ export const ProfileProvider = ({
   }
 
   return (
-    <DataProvider user={user} data={data}>
+    <DataProvider user={user} data={profile.data.data}>
       {children}
     </DataProvider>
   );

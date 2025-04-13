@@ -1,3 +1,4 @@
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { DatabaseContext } from "@/contexts/database-context";
 import { ProfileProvider } from "@/contexts/profile-context";
 import { SettingsProvider } from "@/contexts/settings-context";
@@ -126,7 +127,9 @@ export function TestContextProvider({ children }: { children: ReactNode }) {
     <TestQueryClientProvider>
       <TestDatabaseProvider>
         <ProfileProvider profileId="TEST_PROFILE_ID">
-          <SettingsProvider>{children}</SettingsProvider>
+          <SettingsProvider>
+            <SidebarProvider>{children}</SidebarProvider>
+          </SettingsProvider>
         </ProfileProvider>
       </TestDatabaseProvider>
     </TestQueryClientProvider>
@@ -135,17 +138,22 @@ export function TestContextProvider({ children }: { children: ReactNode }) {
   return <RouterProvider router={router} />;
 }
 
-function getTestRouter(component: () => React.JSX.Element) {
+export function getTestRouter(component: () => React.JSX.Element) {
   const rootRoute = createRootRoute({
     component: Outlet,
   });
 
-  const indexRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/",
-    component,
-  });
-
-  const routeTree = rootRoute.addChildren([indexRoute]);
+  const routeTree = rootRoute.addChildren([
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/",
+      component,
+    }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/p/$profileId",
+      component,
+    }),
+  ]);
   return createRouter({ routeTree });
 }
