@@ -51,11 +51,11 @@ function DatabaseDataProvider({
 }) {
   const profilesQuery = useQuery({
     queryKey: ["profiles"],
-    queryFn: () => db.getProfiles(),
+    queryFn: () => db.profiles.getAll(),
   });
 
   const saveProfileMutation = useMutation({
-    mutationFn: (profile: Profile) => db.saveProfile(profile),
+    mutationFn: (profile: Profile) => db.profiles.upsert(profile),
     onSuccess: () => {
       profilesQuery.refetch();
     },
@@ -65,7 +65,7 @@ function DatabaseDataProvider({
   });
 
   const deleteProfileMutation = useMutation({
-    mutationFn: (id: string) => db.deleteProfile(id),
+    mutationFn: (id: string) => db.profiles.delete(id),
     onSuccess: () => {
       profilesQuery.refetch();
     },

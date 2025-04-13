@@ -34,38 +34,40 @@ describe("initialized", () => {
     expect(client).toBeDefined();
   });
 
-  test("should get profiles", async () => {
-    const profiles = await client.getProfiles();
-    expect(profiles).toEqual([]);
-  });
+  describe("profiles", () => {
+    test("should get profiles", async () => {
+      const profiles = await client.profiles.getAll();
+      expect(profiles).toEqual([]);
+    });
 
-  test("should add a profile", async () => {
-    await client.saveProfile(testProfile);
-    const profiles = await client.getProfiles();
-    expect(profiles).toEqual([testProfile]);
-  });
+    test("should add a profile", async () => {
+      await client.profiles.upsert(testProfile);
+      const profiles = await client.profiles.getAll();
+      expect(profiles).toEqual([testProfile]);
+    });
 
-  test("should update a profile", async () => {
-    await client.saveProfile(testProfile);
-    const updatedProfile: Profile = {
-      ...testProfile,
-      user: "Updated User",
-    };
-    await client.saveProfile(updatedProfile);
-    const profiles = await client.getProfiles();
-    expect(profiles).toEqual([updatedProfile]);
-  });
+    test("should update a profile", async () => {
+      await client.profiles.upsert(testProfile);
+      const updatedProfile: Profile = {
+        ...testProfile,
+        user: "Updated User",
+      };
+      await client.profiles.upsert(updatedProfile);
+      const profiles = await client.profiles.getAll();
+      expect(profiles).toEqual([updatedProfile]);
+    });
 
-  test("should delete a profile", async () => {
-    await client.saveProfile(testProfile);
+    test("should delete a profile", async () => {
+      await client.profiles.upsert(testProfile);
 
-    let profiles = await client.getProfiles();
-    expect(profiles).toEqual([testProfile]);
+      let profiles = await client.profiles.getAll();
+      expect(profiles).toEqual([testProfile]);
 
-    await client.deleteProfile(testProfile.id);
+      await client.profiles.delete(testProfile.id);
 
-    profiles = await client.getProfiles();
-    expect(profiles).toEqual([]);
+      profiles = await client.profiles.getAll();
+      expect(profiles).toEqual([]);
+    });
   });
 });
 
@@ -73,19 +75,19 @@ describe("uninitialized", () => {
   const client = new DatabaseIDBImpl();
 
   test("should throw an error when getting profiles", async () => {
-    await expect(client.getProfiles()).rejects.toThrow(
+    await expect(client.profiles.getAll()).rejects.toThrow(
       "Database not initialized",
     );
   });
 
   test("should throw an error when saving a profile", async () => {
-    await expect(client.saveProfile(testProfile)).rejects.toThrow(
+    await expect(client.profiles.upsert(testProfile)).rejects.toThrow(
       "Database not initialized",
     );
   });
 
   test("should throw an error when deleting a profile", async () => {
-    await expect(client.deleteProfile(testProfile.id)).rejects.toThrow(
+    await expect(client.profiles.delete(testProfile.id)).rejects.toThrow(
       "Database not initialized",
     );
   });
