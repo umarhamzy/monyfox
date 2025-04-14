@@ -1,7 +1,7 @@
 import { DestructiveAlert } from "@/components/ui/alert";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useProfile } from "@/hooks/use-profile";
-import { createContext } from "react";
+import { createContext, useEffect } from "react";
 import { z } from "zod";
 
 type SettingContextProps = {
@@ -31,6 +31,16 @@ export const SettingsProvider = ({
     z.string(),
   );
 
+  useEffect(() => {
+    if (
+      defaultSymbolId !== null &&
+      defaultSymbolId !== fallbackSymbolId &&
+      !assetSymbols.find((symbol) => symbol.id === defaultSymbolId)
+    ) {
+      setDefaultSymbolId(fallbackSymbolId);
+    }
+  }, [defaultSymbolId, fallbackSymbolId, assetSymbols, setDefaultSymbolId]);
+
   if (defaultSymbolId === null) {
     return (
       <DestructiveAlert title="Error">
@@ -39,23 +49,8 @@ export const SettingsProvider = ({
     );
   }
 
-  if (
-    defaultSymbolId !== fallbackSymbolId &&
-    !assetSymbols.find((symbol) => symbol.id === defaultSymbolId)
-  ) {
-    setDefaultSymbolId(fallbackSymbolId);
-  }
-
   return (
-    <SettingsContext.Provider
-      value={{
-        defaultSymbolId,
-        setDefaultSymbolId: (a) => {
-          console.log(a);
-          setDefaultSymbolId(a);
-        },
-      }}
-    >
+    <SettingsContext.Provider value={{ defaultSymbolId, setDefaultSymbolId }}>
       {children}
     </SettingsContext.Provider>
   );

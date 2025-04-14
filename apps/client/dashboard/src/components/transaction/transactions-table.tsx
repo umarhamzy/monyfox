@@ -40,6 +40,7 @@ import {
   ChevronsLeftIcon,
   ChevronsRightIcon,
   PencilIcon,
+  TriangleAlert,
 } from "lucide-react";
 import { useModal } from "../ui/modal";
 import { TransactionFormModal } from "./transaction-form";
@@ -238,18 +239,25 @@ function AmountText({ transaction }: { transaction: Transaction }) {
 }
 
 function TransactionActions({ transaction }: { transaction: Transaction }) {
+  const { getAccount } = useProfile();
   const { isOpen, openModal, closeModal } = useModal();
+  const isUnknown =
+    getTransactionType(transaction, getAccount) === TransactionType.Unknown;
   return (
-    <>
-      <Button variant="ghost" size="icon" onClick={openModal}>
-        <PencilIcon />
+    <div className="flex items-center justify-end gap-2">
+      <Button
+        variant={isUnknown ? "destructive" : "ghost"}
+        size="icon"
+        onClick={openModal}
+      >
+        {isUnknown ? <TriangleAlert /> : <PencilIcon />}
       </Button>
       <TransactionFormModal
         isOpen={isOpen}
         onClose={closeModal}
         transaction={transaction}
       />
-    </>
+    </div>
   );
 }
 

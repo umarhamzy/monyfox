@@ -69,16 +69,35 @@ export function TransactionFormModal({
     setType(getTransactionType(transaction, getAccount));
   }, [isOpen]);
 
+  const title = transaction === null ? "Add transaction" : "Edit transaction";
+
   if (type === TransactionType.Unknown) {
     console.error("Unknown transaction type", transaction);
     return (
-      <DestructiveAlert title="Error">
-        Unknown transaction type
-      </DestructiveAlert>
+      <Modal
+        title={title}
+        isOpen={isOpen}
+        onClose={onClose}
+        footer={
+          <>
+            {transaction !== null && (
+              <DeleteTransactionButton
+                transaction={transaction}
+                onClose={onClose}
+              />
+            )}
+            <Button type="button" variant="ghost" onClick={onClose}>
+              Close
+            </Button>
+          </>
+        }
+      >
+        <DestructiveAlert title="Error">
+          Unknown transaction type
+        </DestructiveAlert>
+      </Modal>
     );
   }
-
-  const title = transaction === null ? "Add transaction" : "Edit transaction";
 
   return (
     <Modal title={title} isOpen={isOpen} onClose={onClose}>
@@ -397,7 +416,7 @@ function DeleteTransactionButton({
       <ConfirmationModal
         isOpen={isOpen}
         onClose={closeModal}
-        title="Delete account"
+        title="Delete transaction"
         onConfirm={() => {
           deleteTransaction.mutate(transaction.id, {
             onSuccess: () => {
