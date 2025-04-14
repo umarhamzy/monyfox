@@ -3,6 +3,8 @@ import {
   AccountSchema,
   type AssetSymbol,
   AssetSymbolSchema,
+  type AssetSymbolExchange,
+  AssetSymbolExchangeSchema,
   type Data,
   DataSchema,
   type Transaction,
@@ -42,8 +44,9 @@ interface ProfileContextProps {
     toAssetSymbolId: string,
   ) => number;
   createAssetSymbol: MutationResult<AssetSymbol>;
-  updateAssetSymbol: MutationResult<AssetSymbol>;
   deleteAssetSymbol: MutationResult<string>;
+  createAssetSymbolExchange: MutationResult<AssetSymbolExchange>;
+  deleteAssetSymbolExchange: MutationResult<string>;
 }
 
 export const ProfileContext = createContext<ProfileContextProps | undefined>(
@@ -264,13 +267,20 @@ function DataProvider({
       createEntityAsync("assetSymbols", AssetSymbolSchema.parse(as)),
   });
 
-  const updateAssetSymbol = useMutation({
-    mutationFn: (as: AssetSymbol) =>
-      updateEntityAsync("assetSymbols", AssetSymbolSchema.parse(as)),
-  });
-
   const deleteAssetSymbol = useMutation({
     mutationFn: (id: string) => deleteEntityAsync("assetSymbols", id),
+  });
+
+  const createAssetSymbolExchange = useMutation({
+    mutationFn: (as: AssetSymbolExchange) =>
+      createEntityAsync(
+        "assetSymbolExchanges",
+        AssetSymbolExchangeSchema.parse(as),
+      ),
+  });
+
+  const deleteAssetSymbolExchange = useMutation({
+    mutationFn: (id: string) => deleteEntityAsync("assetSymbolExchanges", id),
   });
 
   return (
@@ -297,8 +307,9 @@ function DataProvider({
         getAssetSymbol,
         convertAmount,
         createAssetSymbol,
-        updateAssetSymbol,
         deleteAssetSymbol,
+        createAssetSymbolExchange,
+        deleteAssetSymbolExchange,
       }}
     >
       {children}
