@@ -12,3 +12,18 @@ export const AssetSymbolSchema = z.object({
     z.literal("other"),
   ]),
 });
+
+export const ExchangerSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("frankfurter"),
+    base: z.string(),
+    target: z.string(),
+  }),
+]);
+
+export const AssetSymbolExchangeSchema = z.object({
+  id: z.string(),
+  fromAssetSymbolId: z.string(),
+  toAssetSymbolId: z.string(),
+  exchanger: ExchangerSchema,
+});
