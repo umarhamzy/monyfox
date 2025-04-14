@@ -41,6 +41,7 @@ export function TestDatabaseProvider({ children }: { children: ReactNode }) {
             { id: "EUR", code: "EUR", displayName: "EUR", type: "fiat" },
             { id: "USD", code: "USD", displayName: "USD", type: "fiat" },
           ],
+          assetSymbolExchanges: [],
           transactions: [
             {
               id: "TRANSACTION_1",

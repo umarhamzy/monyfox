@@ -11,6 +11,7 @@ const testProfile: Profile = {
     data: {
       accounts: [],
       assetSymbols: [],
+      assetSymbolExchanges: [],
       transactions: [],
       lastUpdated: "",
     },

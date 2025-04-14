@@ -175,6 +175,7 @@ export function generateTestProfile(): Profile {
         accounts: [bankAccount, investmentAccount],
         transactions,
         assetSymbols: [assetEur],
+        assetSymbolExchanges: [],
         lastUpdated: new Date().toISOString(),
       },
     },

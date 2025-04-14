@@ -138,8 +138,22 @@ function CreateProfileModal({
                   data: {
                     encrypted: false,
                     data: {
-                      accounts: [],
-                      assetSymbols: [],
+                      accounts: [
+                        {
+                          id: ulid(),
+                          name: "My Account",
+                          isPersonalAsset: true,
+                        },
+                      ],
+                      assetSymbols: [
+                        {
+                          id: ulid(),
+                          code: "EUR",
+                          displayName: "EUR",
+                          type: "fiat",
+                        },
+                      ],
+                      assetSymbolExchanges: [],
                       transactions: [],
                       lastUpdated: new Date().toISOString(),
                     },
