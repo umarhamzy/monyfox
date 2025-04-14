@@ -2,6 +2,7 @@ import {
   type Account,
   AccountSchema,
   type AssetSymbol,
+  AssetSymbolSchema,
   type Data,
   DataSchema,
   type Transaction,
@@ -13,19 +14,21 @@ import { useDatabase } from "@/hooks/use-database";
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
 import { ErrorPage } from "@/components/error-page";
 
+type MutationResult<T> = UseMutationResult<void, Error, T, unknown>;
+
 interface ProfileContextProps {
   user: { id: string; name: string };
   data: Data;
 
   // Accounts
   getAccount: (accountId: string) => Account;
-  createAccount: UseMutationResult<void, Error, Account, unknown>;
-  deleteAccount: UseMutationResult<void, Error, string, unknown>;
+  createAccount: MutationResult<Account>;
+  deleteAccount: MutationResult<string>;
 
   // Transactions
-  createTransaction: UseMutationResult<void, Error, Transaction, unknown>;
-  updateTransaction: UseMutationResult<void, Error, Transaction, unknown>;
-  deleteTransaction: UseMutationResult<void, Error, string, unknown>;
+  createTransaction: MutationResult<Transaction>;
+  updateTransaction: MutationResult<Transaction>;
+  deleteTransaction: MutationResult<string>;
   getTransactionsBetweenDates: (
     startDate: LocalDate,
     endDate: LocalDate,
@@ -38,9 +41,9 @@ interface ProfileContextProps {
     fromAssetSymbolId: string,
     toAssetSymbolId: string,
   ) => number;
-  createAssetSymbol: UseMutationResult<void, Error, AssetSymbol, unknown>;
-  updateAssetSymbol: UseMutationResult<void, Error, AssetSymbol, unknown>;
-  deleteAssetSymbol: UseMutationResult<void, Error, string, unknown>;
+  createAssetSymbol: MutationResult<AssetSymbol>;
+  updateAssetSymbol: MutationResult<AssetSymbol>;
+  deleteAssetSymbol: MutationResult<string>;
 }
 
 export const ProfileContext = createContext<ProfileContextProps | undefined>(
@@ -128,8 +131,10 @@ function DataProvider({
     );
   }
 
-  async function createAccountAsync(raw: Account) {
-    const account = AccountSchema.parse(raw);
+  async function createEntityAsync<T>(
+    key: Exclude<keyof Data, "lastUpdated">,
+    entity: T & { id: string },
+  ) {
     await saveProfile.mutateAsync({
       id: user.id,
       user: user.name,
@@ -137,98 +142,78 @@ function DataProvider({
         encrypted: false,
         data: {
           ...data,
-          accounts: [...data.accounts, account],
+          [key]: [...data[key], entity],
         },
       },
       schemaVersion: "1",
     });
   }
+
+  async function updateEntityAsync<T>(
+    key: Exclude<keyof Data, "lastUpdated">,
+    entity: T & { id: string },
+  ) {
+    await saveProfile.mutateAsync({
+      id: user.id,
+      user: user.name,
+      data: {
+        encrypted: false,
+        data: {
+          ...data,
+          [key]: data[key].map((e) => (e.id === entity.id ? entity : e)),
+        },
+      },
+      schemaVersion: "1",
+    });
+  }
+
+  async function deleteEntityAsync(
+    key: Exclude<keyof Data, "lastUpdated">,
+    entityId: string,
+  ) {
+    await saveProfile.mutateAsync({
+      id: user.id,
+      user: user.name,
+      data: {
+        encrypted: false,
+        data: {
+          ...data,
+          [key]: data[key].filter((e) => e.id !== entityId),
+        },
+      },
+      schemaVersion: "1",
+    });
+  }
+
+  // Accounts
   const createAccount = useMutation({
-    mutationFn: createAccountAsync,
+    mutationFn: (a: Account) =>
+      createEntityAsync("accounts", AccountSchema.parse(a)),
   });
 
-  async function deleteAccountAsync(accountId: string) {
-    await saveProfile.mutateAsync({
-      id: user.id,
-      user: user.name,
-      data: {
-        encrypted: false,
-        data: {
-          ...data,
-          accounts: data.accounts.filter((account) => account.id !== accountId),
-        },
-      },
-      schemaVersion: "1",
-    });
-  }
   const deleteAccount = useMutation({
-    mutationFn: deleteAccountAsync,
+    mutationFn: (id: string) => deleteEntityAsync("accounts", id),
   });
 
+  // Transactions
   const transactions = useMemo(() => {
     return data.transactions.sort((a, b) =>
       a.accountingDate.localeCompare(b.accountingDate),
     );
   }, [data.transactions]);
 
-  async function createTransactionAsync(raw: Transaction) {
-    const transaction = TransactionSchema.parse(raw);
-    await saveProfile.mutateAsync({
-      id: user.id,
-      user: user.name,
-      data: {
-        encrypted: false,
-        data: {
-          ...data,
-          transactions: [...data.transactions, transaction],
-        },
-      },
-      schemaVersion: "1",
-    });
-  }
   const createTransaction = useMutation({
-    mutationFn: createTransactionAsync,
+    mutationFn: (t: Transaction) =>
+      createEntityAsync("transactions", TransactionSchema.parse(t)),
   });
 
-  async function updateTransactionAsync(raw: Transaction) {
-    const transaction = TransactionSchema.parse(raw);
-    await saveProfile.mutateAsync({
-      id: user.id,
-      user: user.name,
-      data: {
-        encrypted: false,
-        data: {
-          ...data,
-          transactions: data.transactions.map((t) =>
-            t.id === transaction.id ? transaction : t,
-          ),
-        },
-      },
-      schemaVersion: "1",
-    });
-  }
   const updateTransaction = useMutation({
-    mutationFn: updateTransactionAsync,
+    mutationFn: (t: Transaction) =>
+      updateEntityAsync("transactions", TransactionSchema.parse(t)),
   });
 
-  async function deleteTransactionAsync(transactionId: string) {
-    await saveProfile.mutateAsync({
-      id: user.id,
-      user: user.name,
-      data: {
-        encrypted: false,
-        data: {
-          ...data,
-          transactions: data.transactions.filter(
-            (transaction) => transaction.id !== transactionId,
-          ),
-        },
-      },
-      schemaVersion: "1",
-    });
-  }
   const deleteTransaction = useMutation({
-    mutationFn: deleteTransactionAsync,
+    mutationFn: (id: string) => deleteEntityAsync("transactions", id),
   });
 
   const getTransactionsBetweenDates = useCallback(
@@ -244,6 +229,7 @@ function DataProvider({
     [transactions],
   );
 
+  // Asset symbols
   const getAssetSymbol = useCallback(
     (symbolId: string): AssetSymbol => {
       const symbol = data.assetSymbols.find((s) => s.id === symbolId);
@@ -273,60 +259,18 @@ function DataProvider({
     return amount;
   };
 
-  async function createAssetSymbolAsync(symbol: AssetSymbol) {
-    await saveProfile.mutateAsync({
-      id: user.id,
-      user: user.name,
-      data: {
-        encrypted: false,
-        data: {
-          ...data,
-          assetSymbols: [...data.assetSymbols, symbol],
-        },
-      },
-      schemaVersion: "1",
-    });
-  }
   const createAssetSymbol = useMutation({
-    mutationFn: createAssetSymbolAsync,
+    mutationFn: (as: AssetSymbol) =>
+      createEntityAsync("assetSymbols", AssetSymbolSchema.parse(as)),
   });
 
-  async function updateAssetSymbolAsync(symbol: AssetSymbol) {
-    await saveProfile.mutateAsync({
-      id: user.id,
-      user: user.name,
-      data: {
-        encrypted: false,
-        data: {
-          ...data,
-          assetSymbols: data.assetSymbols.map((s) =>
-            s.id === symbol.id ? symbol : s,
-          ),
-        },
-      },
-      schemaVersion: "1",
-    });
-  }
   const updateAssetSymbol = useMutation({
-    mutationFn: updateAssetSymbolAsync,
+    mutationFn: (as: AssetSymbol) =>
+      updateEntityAsync("assetSymbols", AssetSymbolSchema.parse(as)),
   });
 
-  async function deleteAssetSymbolAsync(symbolId: string) {
-    await saveProfile.mutateAsync({
-      id: user.id,
-      user: user.name,
-      data: {
-        encrypted: false,
-        data: {
-          ...data,
-          assetSymbols: data.assetSymbols.filter((s) => s.id !== symbolId),
-        },
-      },
-      schemaVersion: "1",
-    });
-  }
   const deleteAssetSymbol = useMutation({
-    mutationFn: deleteAssetSymbolAsync,
+    mutationFn: (id: string) => deleteEntityAsync("assetSymbols", id),
   });
 
   return (

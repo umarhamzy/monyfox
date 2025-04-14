@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { AccountSchema } from "./schemas/account";
-import { AssetSymbolSchema } from "./schemas/asset-symbol";
+import {
+  AssetSymbolSchema,
+  AssetSymbolExchangeSchema,
+} from "./schemas/asset-symbol";
 import { DataSchema, RawDataSchema } from "./schemas/data";
 import { ProfileSchema } from "./schemas/profile";
 import { TransactionSchema } from "./schemas/transaction";
@@ -8,8 +11,12 @@ import { TransactionSchema } from "./schemas/transaction";
 export { AccountSchema } from "./schemas/account";
 export type Account = z.infer<typeof AccountSchema>;
 
-export { AssetSymbolSchema } from "./schemas/asset-symbol";
+export {
+  AssetSymbolSchema,
+  AssetSymbolExchangeSchema,
+} from "./schemas/asset-symbol";
 export type AssetSymbol = z.infer<typeof AssetSymbolSchema>;
+export type AssetSymbolExchange = z.infer<typeof AssetSymbolExchangeSchema>;
 
 export { DataSchema, RawDataSchema } from "./schemas/data";
 export type Data = z.infer<typeof DataSchema>;

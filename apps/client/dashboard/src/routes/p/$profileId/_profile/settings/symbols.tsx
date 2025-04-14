@@ -218,7 +218,7 @@ function AddCurrencyModalButton() {
     <div className="flex gap-2">
       <Select value={selectedCurrency} onValueChange={setSelectedCurrency}>
         <SelectTrigger>
-          <SelectValue placeholder="Select a currency" />
+          <SelectValue placeholder="Add a new currency" />
         </SelectTrigger>
         <SelectContent className="h-96 overflow-y-auto">
           <SelectGroup>

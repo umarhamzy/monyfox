@@ -87,9 +87,10 @@ export function TestDatabaseProvider({ children }: { children: ReactNode }) {
 
   const saveProfile = useMutation({
     mutationFn: async (profile: Profile) => {
-      setProfiles([...profiles, profile]);
+      setProfiles((p) => [...p, profile]);
     },
   });
+
   const deleteProfile = useMutation({
     mutationFn: async (id: string) => {
       setProfiles((p) => p.filter((profile) => profile.id !== id));
@@ -123,11 +124,17 @@ export function TestQueryClientProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function TestContextProvider({ children }: { children: ReactNode }) {
+export function TestContextProvider({
+  children,
+  profileId = "TEST_PROFILE_ID",
+}: {
+  children: ReactNode;
+  profileId?: string;
+}) {
   const router = getTestRouter(() => (
     <TestQueryClientProvider>
       <TestDatabaseProvider>
-        <ProfileProvider profileId="TEST_PROFILE_ID">
+        <ProfileProvider profileId={profileId}>
           <SettingsProvider>
             <SidebarProvider>{children}</SidebarProvider>
           </SettingsProvider>

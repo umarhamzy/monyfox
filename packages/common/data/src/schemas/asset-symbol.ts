@@ -13,7 +13,7 @@ export const AssetSymbolSchema = z.object({
   ]),
 });
 
-export const ExchangerSchema = z.discriminatedUnion("type", [
+const ExchangerSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("frankfurter"),
     base: z.string(),
