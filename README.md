@@ -9,20 +9,19 @@ Welcome to Monyfox, your comprehensive open-source solution for managing your fi
 - 💰 **Track Your Money:** Easily record and monitor your income, expenses, savings, investments, and transfers.
 - 📊 **Visualize Your Finances:** Utilize charts and graphs to gain a clear understanding of your financial situation.
 - 💻 **User-Friendly Interface:** Intuitive design for seamless navigation and usage.
+- 💶💵 **Multi-Currency Support:** Manage your finances in multiple currencies with ease.
 - 🌐 **100% Open Source:** Fully open-source, ensuring transparency and customization options.
 - 🏠 **100% Local:** All data is stored locally on your device, ensuring privacy and security.
 
 ### Upcoming Features
 
-- 📈 **Stock Tracking:** Monitor your investments and track stock performance.
 - 💳 **Budgeting Tools:** Set budgets and track your spending to stay on target.
+- 📈 **Stock Tracking:** Monitor your investments and track stock performance.
+- 💾 **Backup and Restore:** Easily backup and restore your financial data.
 - 📂 **Data Import:** Import financial data from various sources for a unified view.
 - 📤 **Data Export:** Export your financial data for backup or analysis.
-- 💾 **Backup and Restore:** Easily backup and restore your financial data.
-- 💶💵 **Multi-Currency Support:** Manage your finances in multiple currencies with ease.
-
-* 📱 **Mobile App:** Access Monyfox on the go with a dedicated PWA.
-* 🌐 **Sync Across Devices:** Sync your financial data across multiple devices for seamless access. The data will be encrypted and stored in a secure cloud service.
+- 📱 **Mobile App:** Access Monyfox on the go with a dedicated PWA.
+- 🌐 **Sync Across Devices:** Sync your financial data across multiple devices for seamless access. The data will be encrypted and stored in a secure cloud service.
 
 ## Getting Started
 
@@ -58,7 +57,7 @@ We welcome contributions from the community!
 
 ## License
 
-Monyfox is licensed under the EUPL-1.2 License. See the [LICENSE](LICENSE) file for more details.
+Monyfox is licensed under the EUPL-1.2 License. See the [LICENSE](LICENSE.md) file for more details.
 
 ## Contact
 

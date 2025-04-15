@@ -8,10 +8,9 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { LocalDate } from "@js-joda/core";
 import { useMemo } from "react";
 import { useProfile } from "@/hooks/use-profile";
-import {
-  getIncomeExpenseByMonthData,
-} from "@/utils/transaction";
+import { getIncomeExpenseByMonthData } from "@/utils/transaction";
 import { useSettings } from "@/hooks/use-settings";
+import { useAssetSymbolExchangeRate } from "@/hooks/use-asset-symbol-exchange-rate";
 
 const chartConfig = {
   income: {
@@ -26,8 +25,8 @@ const chartConfig = {
 
 export function ChartFlowByMonth() {
   const { defaultSymbolId } = useSettings();
-  const { getTransactionsBetweenDates, getAccount, convertAmount } =
-    useProfile();
+  const { getTransactionsBetweenDates, getAccount } = useProfile();
+  const { convertAmount } = useAssetSymbolExchangeRate();
 
   const startDate = LocalDate.now().minusMonths(12).withDayOfMonth(1);
   const endDate = LocalDate.now();

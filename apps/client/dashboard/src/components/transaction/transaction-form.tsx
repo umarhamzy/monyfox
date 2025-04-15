@@ -58,7 +58,7 @@ export function TransactionFormModal({
 }) {
   const { getAccount } = useProfile();
 
-  const [type, setType] = useState<TransactionType>(TransactionType.Unknown);
+  const [type, setType] = useState<TransactionType>(TransactionType.Expense);
 
   useEffect(() => {
     if (transaction === null) {

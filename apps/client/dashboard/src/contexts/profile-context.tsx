@@ -38,11 +38,6 @@ interface ProfileContextProps {
 
   // Symbols
   getAssetSymbol: (assetSymbolId: string) => AssetSymbol;
-  convertAmount: (
-    amount: number,
-    fromAssetSymbolId: string,
-    toAssetSymbolId: string,
-  ) => number;
   createAssetSymbol: MutationResult<AssetSymbol>;
   deleteAssetSymbol: MutationResult<string>;
   createAssetSymbolExchange: MutationResult<AssetSymbolExchange>;
@@ -249,19 +244,6 @@ function DataProvider({
     [data.assetSymbols],
   );
 
-  const convertAmount = (
-    amount: number,
-    fromSymbolId: string,
-    toSymbolId: string,
-  ) => {
-    if (fromSymbolId === toSymbolId) {
-      return amount;
-    }
-
-    // TODO: support multi-currency
-    return amount;
-  };
-
   const createAssetSymbol = useMutation({
     mutationFn: (as: AssetSymbol) =>
       createEntityAsync("assetSymbols", AssetSymbolSchema.parse(as)),
@@ -305,7 +287,6 @@ function DataProvider({
 
         // Symbols
         getAssetSymbol,
-        convertAmount,
         createAssetSymbol,
         deleteAssetSymbol,
         createAssetSymbolExchange,

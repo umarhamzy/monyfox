@@ -19,7 +19,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <DatabaseProvider>
         <Outlet />
-        <Toaster richColors />
+        <Toaster richColors position="bottom-center" />
       </DatabaseProvider>
     </QueryClientProvider>
   );

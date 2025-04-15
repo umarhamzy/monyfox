@@ -48,11 +48,12 @@ export function getIncomeExpenseByMonthData({
   startDate: LocalDate;
   endDate: LocalDate;
   getAccount: (accountId: string) => Account;
-  convertAmount: (
-    amount: number,
-    fromAssetSymbolId: string,
-    toAssetSymbolId: string,
-  ) => number;
+  convertAmount: (args: {
+    amount: number;
+    date: string;
+    fromAssetSymbolId: string;
+    toAssetSymbolId: string;
+  }) => number;
   defaultSymbolId: string;
 }) {
   const stateByDate = new Map<string, { income: number; expense: number }>();
@@ -77,18 +78,20 @@ export function getIncomeExpenseByMonthData({
 
     const state = stateByDate.get(transactionDate)!;
     if (isIncome) {
-      state.income += convertAmount(
-        transaction.to.amount,
-        transaction.to.symbolId,
-        defaultSymbolId,
-      );
+      state.income += convertAmount({
+        amount: transaction.to.amount,
+        date: transaction.accountingDate,
+        fromAssetSymbolId: transaction.to.symbolId,
+        toAssetSymbolId: defaultSymbolId,
+      });
     }
     if (isExpense) {
-      state.expense += convertAmount(
-        transaction.from.amount,
-        transaction.from.symbolId,
-        defaultSymbolId,
-      );
+      state.expense += convertAmount({
+        amount: transaction.from.amount,
+        date: transaction.accountingDate,
+        fromAssetSymbolId: transaction.from.symbolId,
+        toAssetSymbolId: defaultSymbolId,
+      });
     }
     stateByDate.set(transactionDate, state);
   }
@@ -118,12 +121,26 @@ export function getIncomeExpenseByMonthData({
   return chartData;
 }
 
-export function getBalancesByMonth(
-  transactions: Transaction[],
-  startDate: LocalDate,
-  endDate: LocalDate,
-  getAccount: (accountId: string) => Account,
-) {
+export function getBalancesByMonth({
+  transactions,
+  startDate,
+  endDate,
+  getAccount,
+  convertAmount,
+  defaultSymbolId,
+}: {
+  transactions: Transaction[];
+  startDate: LocalDate;
+  endDate: LocalDate;
+  getAccount: (accountId: string) => Account;
+  convertAmount: (args: {
+    amount: number;
+    date: string;
+    fromAssetSymbolId: string;
+    toAssetSymbolId: string;
+  }) => number;
+  defaultSymbolId: string;
+}) {
   const balanceByYearMonth = new Map<string, number>();
 
   // Ensure all months that we need to display are present in the map.
@@ -144,7 +161,12 @@ export function getBalancesByMonth(
     const isFromPersonalAsset =
       "id" in fromAccount && getAccount(fromAccount.id).isPersonalAsset;
     if (isFromPersonalAsset) {
-      const amount = transaction.from.amount;
+      const amount = convertAmount({
+        amount: transaction.from.amount,
+        date: transaction.accountingDate,
+        fromAssetSymbolId: transaction.from.symbolId,
+        toAssetSymbolId: defaultSymbolId,
+      });
       balanceByYearMonth.set(
         yearMonth,
         (balanceByYearMonth.get(yearMonth) || 0) - amount,
@@ -155,7 +177,12 @@ export function getBalancesByMonth(
     const isToPersonalAsset =
       "id" in toAccount && getAccount(toAccount.id).isPersonalAsset;
     if (isToPersonalAsset) {
-      const amount = transaction.to.amount;
+      const amount = convertAmount({
+        amount: transaction.to.amount,
+        date: transaction.accountingDate,
+        fromAssetSymbolId: transaction.to.symbolId,
+        toAssetSymbolId: defaultSymbolId,
+      });
       balanceByYearMonth.set(
         yearMonth,
         (balanceByYearMonth.get(yearMonth) || 0) + amount,
@@ -188,4 +215,22 @@ export function getBalancesByMonth(
   }
 
   return balances;
+}
+
+export function getStartAndEndDate(transactions: Array<Transaction>) {
+  if (transactions.length === 0) {
+    const today = LocalDate.now();
+    return {
+      startDate: today.toString(),
+      endDate: today.toString(),
+    };
+  }
+
+  // Transactions are sorted by accounting date
+  const startDate = transactions[0].accountingDate;
+  const endDate = transactions[transactions.length - 1].accountingDate;
+  return {
+    startDate,
+    endDate,
+  };
 }

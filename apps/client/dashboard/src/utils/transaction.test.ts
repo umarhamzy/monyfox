@@ -3,6 +3,7 @@ import {
   getIncomeExpenseByMonthData,
   getTransactionType,
   getBalancesByMonth,
+  getStartAndEndDate,
 } from "./transaction";
 import { LocalDate } from "@js-joda/core";
 import { type Transaction } from "@monyfox/common-data";
@@ -215,7 +216,7 @@ describe("getIncomeExpenseByMonthData", () => {
       isPersonalAsset: true,
     });
 
-    const convertAmount = (amount: number) => amount;
+    const convertAmount = ({ amount }: { amount: number }) => amount;
 
     const defaultSymbolId = "EUR";
     const startDate = LocalDate.parse("2025-01-01");
@@ -335,16 +336,19 @@ describe("getBalancesByMonth", () => {
       name: "test",
       isPersonalAsset: true,
     });
+    const convertAmount = ({ amount }: { amount: number }) => amount;
 
     const startDate = LocalDate.parse("2025-01-01");
     const endDate = LocalDate.parse("2025-04-30");
 
-    const result = getBalancesByMonth(
+    const result = getBalancesByMonth({
       transactions,
       startDate,
       endDate,
       getAccount,
-    );
+      convertAmount,
+      defaultSymbolId: "EUR",
+    });
 
     expect(result).toEqual([
       { date: "2025-01", balance: 100 },
@@ -362,16 +366,19 @@ describe("getBalancesByMonth", () => {
       name: "test",
       isPersonalAsset: true,
     });
+    const convertAmount = ({ amount }: { amount: number }) => amount;
 
     const startDate = LocalDate.parse("2025-01-01");
     const endDate = LocalDate.parse("2025-03-01");
 
-    const result = getBalancesByMonth(
+    const result = getBalancesByMonth({
       transactions,
       startDate,
       endDate,
       getAccount,
-    );
+      convertAmount,
+      defaultSymbolId: "EUR",
+    });
 
     expect(result).toEqual([
       { date: "2025-01", balance: 0 },
@@ -379,5 +386,94 @@ describe("getBalancesByMonth", () => {
       // TODO: Fix this test
       // { date: "2025-03", balance: 0 },
     ]);
+  });
+});
+
+describe("getStartAndEndDate", () => {
+  test("should return correct start and end dates for transactions", () => {
+    const transactions = [
+      {
+        id: "1",
+        description: "Income",
+        accountingDate: "2025-01-01",
+        transactionDate: "2025-01-01",
+        transactionCategoryId: null,
+        from: {
+          amount: 100,
+          symbolId: "EUR",
+          account: {
+            name: "Person",
+          },
+        },
+        to: {
+          amount: 100,
+          symbolId: "EUR",
+          account: {
+            id: "1",
+          },
+        },
+      },
+      {
+        id: "2",
+        description: "Transfer",
+        accountingDate: "2025-02-02",
+        transactionDate: "2025-02-02",
+        transactionCategoryId: null,
+        from: {
+          amount: 200,
+          symbolId: "EUR",
+          account: {
+            id: "2",
+          },
+        },
+        to: {
+          amount: 200,
+          symbolId: "EUR",
+          account: {
+            id: "1",
+          },
+        },
+      },
+      {
+        id: "3",
+        description: "Expense",
+        accountingDate: "2025-04-01",
+        transactionDate: "2025-04-01",
+        transactionCategoryId: null,
+        from: {
+          amount: 300,
+          symbolId: "EUR",
+          account: {
+            id: "1",
+          },
+        },
+        to: {
+          amount: 300,
+          symbolId: "EUR",
+          account: {
+            name: "Person",
+          },
+        },
+      },
+    ];
+
+    const result = getStartAndEndDate(transactions);
+
+    expect(result).toEqual({
+      startDate: "2025-01-01",
+      endDate: "2025-04-01",
+    });
+  });
+
+  test("should return today's date for no transactions", () => {
+    const transactions: Transaction[] = [];
+
+    const result = getStartAndEndDate(transactions);
+
+    const today = LocalDate.now().toString();
+    expect(result).toEqual({
+      startDate: today,
+      endDate: today,
+    });
   });
 });

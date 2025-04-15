@@ -117,7 +117,10 @@ export function TransactionsTable() {
           </TableHeader>
           <TableBody className="**:data-[slot=table-cell]:first:w-8">
             {table.getRowModel().rows.map((row) => (
-              <TableRow data-state={row.getIsSelected() && "selected"}>
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
                     key={cell.id}

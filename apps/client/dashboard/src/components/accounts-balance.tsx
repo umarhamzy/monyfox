@@ -10,6 +10,8 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { useSettings } from "@/hooks/use-settings";
+import { useAssetSymbolExchangeRate } from "@/hooks/use-asset-symbol-exchange-rate";
+import { LocalDate } from "@js-joda/core";
 
 export function AccountsBalance() {
   const { defaultSymbolId } = useSettings();
@@ -17,10 +19,11 @@ export function AccountsBalance() {
     data: { transactions },
     getAccount,
     getAssetSymbol,
-    convertAmount,
   } = useProfile();
+  const { convertAmount } = useAssetSymbolExchangeRate();
 
   const assetSymbol = getAssetSymbol(defaultSymbolId);
+  const today = LocalDate.now().toString();
 
   const balances = useMemo(() => {
     const balanceByAccount = new Map<string, number>();
@@ -30,11 +33,12 @@ export function AccountsBalance() {
         "id" in fromAccount && getAccount(fromAccount.id).isPersonalAsset;
       if (isFromPersonalAsset) {
         const accountId = fromAccount.id;
-        const amount = convertAmount(
-          transaction.from.amount,
-          transaction.from.symbolId,
-          defaultSymbolId,
-        );
+        const amount = convertAmount({
+          amount: transaction.from.amount,
+          date: today,
+          fromAssetSymbolId: transaction.from.symbolId,
+          toAssetSymbolId: defaultSymbolId,
+        });
         balanceByAccount.set(
           accountId,
           (balanceByAccount.get(accountId) || 0) - amount,
@@ -46,11 +50,12 @@ export function AccountsBalance() {
         "id" in toAccount && getAccount(toAccount.id).isPersonalAsset;
       if (isToPersonalAsset) {
         const accountId = toAccount.id;
-        const amount = convertAmount(
-          transaction.to.amount,
-          transaction.to.symbolId,
-          defaultSymbolId,
-        );
+        const amount = convertAmount({
+          amount: transaction.to.amount,
+          date: today,
+          fromAssetSymbolId: transaction.to.symbolId,
+          toAssetSymbolId: defaultSymbolId,
+        });
         balanceByAccount.set(
           accountId,
           (balanceByAccount.get(accountId) || 0) + amount,
@@ -66,7 +71,7 @@ export function AccountsBalance() {
       .sort((a, b) => {
         return b.balance - a.balance;
       });
-  }, [getAccount, transactions]);
+  }, [getAccount, defaultSymbolId, convertAmount, transactions]);
 
   const totalBalance = useMemo(() => {
     return balances.reduce((acc, { balance }) => acc + balance, 0);

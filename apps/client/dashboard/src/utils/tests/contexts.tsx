@@ -1,4 +1,5 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { AssetSymbolExchangeRateProvider } from "@/contexts/asset-symbol-exchange-rate-context";
 import { DatabaseContext } from "@/contexts/database-context";
 import { ProfileProvider } from "@/contexts/profile-context";
 import { SettingsProvider } from "@/contexts/settings-context";
@@ -135,9 +136,11 @@ export function TestContextProvider({
     <TestQueryClientProvider>
       <TestDatabaseProvider>
         <ProfileProvider profileId={profileId}>
-          <SettingsProvider>
-            <SidebarProvider>{children}</SidebarProvider>
-          </SettingsProvider>
+          <AssetSymbolExchangeRateProvider>
+            <SettingsProvider>
+              <SidebarProvider>{children}</SidebarProvider>
+            </SettingsProvider>
+          </AssetSymbolExchangeRateProvider>
         </ProfileProvider>
       </TestDatabaseProvider>
     </TestQueryClientProvider>
