@@ -12,6 +12,7 @@
   "scripts": {
     "dashboard:dev": "yarn workspace @monyfox/dashboard dev",
     "dashboard:build": "yarn workspaces foreach -Rt --from @monyfox/dashboard run build",
+    "build": "yarn workspaces foreach -A run build",
     "lint": "yarn workspaces foreach -A run lint",
     "test": "yarn workspaces foreach -A run test",
     "coverage": "npx vitest run --coverage"
