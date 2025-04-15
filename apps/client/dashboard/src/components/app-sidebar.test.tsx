@@ -10,7 +10,7 @@ test("AppSidebar", () => {
     </TestContextProvider>,
   );
 
-  expect(getByText("Monyfox")).toBeDefined();
+  expect(getByText("MonyFox")).toBeDefined();
   expect(getByText("Dashboard")).toBeDefined();
   expect(getByText("Accounts")).toBeDefined();
   expect(getByText("Transactions")).toBeDefined();

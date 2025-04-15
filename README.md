@@ -1,8 +1,8 @@
-# Monyfox
+# MonyFox
 
-Welcome to Monyfox, your comprehensive open-source solution for managing your finances efficiently. Monyfox is a web app that works 100% locally. It is designed to help you keep track of your money, visualize your financial data with insightful charts, and plan for a better financial future.
+Welcome to MonyFox, your comprehensive open-source solution for managing your finances efficiently. MonyFox is a web app that works 100% locally. It is designed to help you keep track of your money, visualize your financial data with insightful charts, and plan for a better financial future.
 
-![Monyfox dashboard screenshot](./images/dashboard.png)
+![MonyFox dashboard screenshot](./images/dashboard.png)
 
 ## Features
 
@@ -20,7 +20,7 @@ Welcome to Monyfox, your comprehensive open-source solution for managing your fi
 - 💾 **Backup and Restore:** Easily backup and restore your financial data.
 - 📂 **Data Import:** Import financial data from various sources for a unified view.
 - 📤 **Data Export:** Export your financial data for backup or analysis.
-- 📱 **Mobile App:** Access Monyfox on the go with a dedicated PWA.
+- 📱 **Mobile App:** Access MonyFox on the go with a dedicated PWA.
 - 🌐 **Sync Across Devices:** Sync your financial data across multiple devices for seamless access. The data will be encrypted and stored in a secure cloud service.
 
 ## Getting Started
@@ -57,7 +57,7 @@ We welcome contributions from the community!
 
 ## License
 
-Monyfox is licensed under the EUPL-1.2 License. See the [LICENSE](LICENSE.md) file for more details.
+MonyFox is licensed under the EUPL-1.2 License. See the [LICENSE](LICENSE.md) file for more details.
 
 ## Contact
 
@@ -65,4 +65,4 @@ For any questions or support, please open an issue in the GitHub repository.
 
 ---
 
-Thank you for choosing Monyfox! We hope it helps you manage your finances more effectively. Happy saving! 🎉
+Thank you for choosing MonyFox! We hope it helps you manage your finances more effectively. Happy saving! 🎉
