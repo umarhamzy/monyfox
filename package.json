@@ -9,11 +9,8 @@
     "packages/client/*",
     "packages/tsconfig/*"
   ],
-  "scripts": {
-    "build": "yarn workspaces run build"
-  },
-  "packageManager": "yarn@4.3.1",
   "devDependencies": {
     "typescript": "^5.8.2"
-  }
+  },
+  "packageManager": "yarn@4.3.1"
 }
