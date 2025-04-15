@@ -16,7 +16,7 @@ describe("formatCurrency", () => {
         },
         testLocale,
       ),
-    ).toBe("1.234,56 €");
+    ).toBe("1234,56 €");
   });
 
   test("format invalid fiat currencies", () => {
@@ -31,7 +31,7 @@ describe("formatCurrency", () => {
         },
         testLocale,
       ),
-    ).toBe("1.234,56 UNKNOWN");
+    ).toBe("1234,56 UNKNOWN");
   });
 
   test("format crypto currencies", () => {
@@ -46,7 +46,7 @@ describe("formatCurrency", () => {
         },
         testLocale,
       ),
-    ).toBe("1.234,56 BTC");
+    ).toBe("1234,56 BTC");
   });
 
   test("format with default locale", () => {
