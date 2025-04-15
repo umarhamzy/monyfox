@@ -1,1 +1,0 @@
-{"version":3,"file":"frankfurter.d.ts","sourceRoot":"","sources":["../../../src/client/fiat/frankfurter.ts"],"names":[],"mappings":"AACA,OAAO,EACL,sBAAsB,EACtB,uBAAuB,EACvB,oBAAoB,EACrB,MAAM,IAAI,CAAC;AA6BZ,qBAAa,+BAAgC,YAAW,oBAAoB;IAC1E,OAAO,CAAC,QAAQ,CAAC,OAAO,CAAiC;IAEnD,gBAAgB,CACpB,MAAM,EAAE,sBAAsB,GAC7B,OAAO,CAAC,uBAAuB,CAAC;CAapC"}

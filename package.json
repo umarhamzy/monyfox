@@ -9,6 +9,10 @@
     "packages/client/*",
     "packages/tsconfig/*"
   ],
+  "scripts": {
+    "dashboard:dev": "yarn workspace @monyfox/dashboard dev",
+    "dashboard:build": "yarn workspaces foreach -Rt --from @monyfox/dashboard run build"
+  },
   "devDependencies": {
     "typescript": "^5.8.2"
   },
