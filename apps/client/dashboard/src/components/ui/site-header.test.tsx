@@ -1,9 +1,9 @@
 import { render } from "@testing-library/react";
-import { describe, expect } from "vitest";
+import { test, expect } from "vitest";
 import { SiteHeader } from "./site-header";
 import { TestContextProvider } from "@/utils/tests/contexts";
 
-describe("SiteHeader", () => {
+test("SiteHeader", () => {
   const { getByText } = render(
     <TestContextProvider>
       <SiteHeader />
