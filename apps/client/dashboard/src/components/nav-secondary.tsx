@@ -8,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { SettingsIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
@@ -19,6 +20,7 @@ export function NavSecondary(
   const {
     user: { id: profileId },
   } = useProfile();
+  const { onSidebarLinkClick } = useSidebar();
 
   return (
     <SidebarGroup {...props}>
@@ -26,7 +28,11 @@ export function NavSecondary(
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip="Accounts" asChild>
-              <Link to="/p/$profileId/settings" params={{ profileId }}>
+              <Link
+                to="/p/$profileId/settings"
+                params={{ profileId }}
+                onClick={onSidebarLinkClick}
+              >
                 <SettingsIcon />
                 <span>Settings</span>
               </Link>

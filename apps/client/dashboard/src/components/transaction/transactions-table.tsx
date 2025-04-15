@@ -35,6 +35,7 @@ import {
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import {
+  ArrowRightIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronsLeftIcon,
@@ -322,7 +323,13 @@ const columns: ColumnDef<
     accessorKey: "account",
     header: "Account",
     cell: ({ row }) => {
-      return `${row.original.fromAccountName} → ${row.original.toAccountName}`;
+      return (
+        <span className="flex items-center gap-2">
+          {row.original.fromAccountName}
+          <ArrowRightIcon size="1em" />
+          {row.original.toAccountName}
+        </span>
+      );
     },
   },
   {

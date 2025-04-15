@@ -35,7 +35,11 @@ export function AddTransactionFloatingButton() {
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <>
-      <Button className="fixed bottom-4 right-4" size="lg" onClick={openModal}>
+      <Button
+        className="fixed bottom-4 right-4 z-10"
+        size="lg"
+        onClick={openModal}
+      >
         <PlusIcon className="size-7" />
       </Button>
       <TransactionFormModal
@@ -67,7 +71,7 @@ export function TransactionFormModal({
     }
 
     setType(getTransactionType(transaction, getAccount));
-  }, [isOpen]);
+  }, [isOpen, transaction, getAccount]);
 
   const title = transaction === null ? "Add transaction" : "Edit transaction";
 

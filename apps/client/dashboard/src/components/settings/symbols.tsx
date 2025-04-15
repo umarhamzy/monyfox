@@ -10,7 +10,7 @@ import { useProfile } from "@/hooks/use-profile";
 import { AssetSymbol } from "@monyfox/common-data";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { TrashIcon } from "lucide-react";
+import { ArrowRightIcon, TrashIcon } from "lucide-react";
 import { useState } from "react";
 import { ulid } from "ulid";
 import { useCurrency } from "@/hooks/use-currency";
@@ -258,7 +258,8 @@ function FiatCurrencyExchanges() {
           <div className="flex flex-wrap gap-2 mt-2">
             {assetSymbolExchanges.map((exchange) => (
               <Badge variant="outline" key={exchange.id}>
-                {getAssetSymbol(exchange.fromAssetSymbolId).code} 🡢{" "}
+                {getAssetSymbol(exchange.fromAssetSymbolId).code}
+                <ArrowRightIcon />
                 {getAssetSymbol(exchange.toAssetSymbolId).code}
               </Badge>
             ))}
@@ -319,7 +320,7 @@ function AddFiatCurrencyExchange() {
         },
       });
     }
-  }, [missingExchanges]);
+  }, [missingExchanges, createAssetSymbolExchange]);
 
   useEffect(() => {
     const existingSymbolIds = new Set(assetSymbols.map((s) => s.id));
@@ -331,7 +332,7 @@ function AddFiatCurrencyExchange() {
         deleteAssetSymbolExchange.mutate(exchange.id);
       }
     }
-  }, [assetSymbols, assetSymbolExchanges]);
+  }, [assetSymbols, assetSymbolExchanges, deleteAssetSymbolExchange]);
 
   return null;
 }
