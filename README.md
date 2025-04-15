@@ -1,5 +1,7 @@
 # MonyFox
 
+[![codecov](https://codecov.io/gh/LucaDiba/monyfox/graph/badge.svg?token=1PDRWAPU6X)](https://codecov.io/gh/LucaDiba/monyfox)
+
 Welcome to MonyFox, your comprehensive open-source solution for managing your finances efficiently. MonyFox is a web app that works 100% locally. It is designed to help you keep track of your money, visualize your financial data with insightful charts, and plan for a better financial future.
 
 ![MonyFox dashboard screenshot](./images/dashboard.png)
