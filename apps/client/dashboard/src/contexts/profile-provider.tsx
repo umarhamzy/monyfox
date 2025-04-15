@@ -10,43 +10,14 @@ import {
   type Transaction,
   TransactionSchema,
 } from "@monyfox/common-data";
-import { createContext, ReactNode, useCallback, useMemo } from "react";
+import { ReactNode, useCallback, useMemo } from "react";
 import { LocalDate } from "@js-joda/core";
-import { useDatabase } from "@/hooks/use-database";
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
 import { ErrorPage } from "@/components/error-page";
+import { ProfileContext } from "./profile-context";
+import { useDatabase } from "@/hooks/use-database";
 
-type MutationResult<T> = UseMutationResult<void, Error, T, unknown>;
-
-interface ProfileContextProps {
-  user: { id: string; name: string };
-  data: Data;
-
-  // Accounts
-  getAccount: (accountId: string) => Account;
-  createAccount: MutationResult<Account>;
-  deleteAccount: MutationResult<string>;
-
-  // Transactions
-  createTransaction: MutationResult<Transaction>;
-  updateTransaction: MutationResult<Transaction>;
-  deleteTransaction: MutationResult<string>;
-  getTransactionsBetweenDates: (
-    startDate: LocalDate,
-    endDate: LocalDate,
-  ) => Transaction[];
-
-  // Symbols
-  getAssetSymbol: (assetSymbolId: string) => AssetSymbol;
-  createAssetSymbol: MutationResult<AssetSymbol>;
-  deleteAssetSymbol: MutationResult<string>;
-  createAssetSymbolExchange: MutationResult<AssetSymbolExchange>;
-  deleteAssetSymbolExchange: MutationResult<string>;
-}
-
-export const ProfileContext = createContext<ProfileContextProps | undefined>(
-  undefined,
-);
+export type MutationResult<T> = UseMutationResult<void, Error, T, unknown>;
 
 export const ProfileProvider = ({
   profileId,

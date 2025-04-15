@@ -71,7 +71,7 @@ export function AccountsBalance() {
       .sort((a, b) => {
         return b.balance - a.balance;
       });
-  }, [getAccount, defaultSymbolId, convertAmount, transactions]);
+  }, [getAccount, defaultSymbolId, convertAmount, transactions, today]);
 
   const totalBalance = useMemo(() => {
     return balances.reduce((acc, { balance }) => acc + balance, 0);

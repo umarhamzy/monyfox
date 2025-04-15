@@ -156,7 +156,7 @@ function DeleteSymbolButton({
   }
 
   return (
-    <Button variant="ghost" size="icon" onClick={handleDelete}>
+    <Button variant="ghost" size="icon" onClick={handleDelete} title="Delete">
       <TrashIcon />
     </Button>
   );
@@ -236,11 +236,13 @@ function AddCurrencyButton() {
   );
 }
 
-function FiatCurrencyExchanges() {
+export function FiatCurrencyExchanges() {
   const {
     data: { assetSymbols, assetSymbolExchanges },
     getAssetSymbol,
   } = useProfile();
+
+  useFiatCurrencyExchangeUpdate();
 
   if (assetSymbols.length <= 1) {
     return null;
@@ -266,16 +268,15 @@ function FiatCurrencyExchanges() {
           </div>
         </AlertDescription>
       </Alert>
-      <AddFiatCurrencyExchange />
     </div>
   );
 }
 
-function AddFiatCurrencyExchange() {
+function useFiatCurrencyExchangeUpdate() {
   const {
     data: { assetSymbols, assetSymbolExchanges },
-    createAssetSymbolExchange,
-    deleteAssetSymbolExchange,
+    createAssetSymbolExchange: { mutate: createAssetSymbolExchange },
+    deleteAssetSymbolExchange: { mutate: deleteAssetSymbolExchange },
   } = useProfile();
 
   const missingExchanges = useMemo(() => {
@@ -306,10 +307,24 @@ function AddFiatCurrencyExchange() {
     });
   }, [assetSymbols, assetSymbolExchanges]);
 
+  const existingSymbolIds = useMemo(
+    () => new Set(assetSymbols.map((s) => s.id)),
+    [assetSymbols],
+  );
+  const assetSymbolExchangesWithoutSymbols = useMemo(
+    () =>
+      assetSymbolExchanges.filter(
+        (exchange) =>
+          !existingSymbolIds.has(exchange.fromAssetSymbolId) ||
+          !existingSymbolIds.has(exchange.toAssetSymbolId),
+      ),
+    [assetSymbolExchanges, existingSymbolIds],
+  );
+
   useEffect(() => {
     if (missingExchanges.length > 0) {
       const exchange = missingExchanges[0];
-      createAssetSymbolExchange.mutate({
+      createAssetSymbolExchange({
         id: ulid(),
         fromAssetSymbolId: exchange.from.id,
         toAssetSymbolId: exchange.to.id,
@@ -323,16 +338,8 @@ function AddFiatCurrencyExchange() {
   }, [missingExchanges, createAssetSymbolExchange]);
 
   useEffect(() => {
-    const existingSymbolIds = new Set(assetSymbols.map((s) => s.id));
-    for (const exchange of assetSymbolExchanges) {
-      if (
-        !existingSymbolIds.has(exchange.fromAssetSymbolId) ||
-        !existingSymbolIds.has(exchange.toAssetSymbolId)
-      ) {
-        deleteAssetSymbolExchange.mutate(exchange.id);
-      }
+    if (assetSymbolExchangesWithoutSymbols.length > 0) {
+      deleteAssetSymbolExchange(assetSymbolExchangesWithoutSymbols[0].id);
     }
-  }, [assetSymbols, assetSymbolExchanges, deleteAssetSymbolExchange]);
-
-  return null;
+  }, [assetSymbolExchangesWithoutSymbols, deleteAssetSymbolExchange]);
 }

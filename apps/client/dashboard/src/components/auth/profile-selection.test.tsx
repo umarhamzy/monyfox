@@ -1,16 +1,12 @@
 import { describe, expect, test } from "vitest";
-import {
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { ProfileSelection } from "./profile-selection";
 import {
-  getTestRouter,
   TestDatabaseProvider,
   TestQueryClientProvider,
 } from "@/utils/tests/contexts";
 import { ReactNode, RouterProvider } from "@tanstack/react-router";
+import { getTestRouter } from "@/utils/tests/router";
 
 export function ProfileSelectionTestContextProvider({
   children,
@@ -34,10 +30,7 @@ describe("ProfileSelection", () => {
       </ProfileSelectionTestContextProvider>,
     );
 
-    expect(
-      getByText("Select a profile to login or create a new one."),
-    ).toBeDefined();
-
+    expect(getByText("MonyFox")).toBeDefined();
     expect(getByText("TEST_USER")).toBeDefined();
   });
 

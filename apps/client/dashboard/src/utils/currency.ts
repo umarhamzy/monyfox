@@ -13,7 +13,7 @@ export function formatCurrency(
   symbol: AssetSymbol,
   locale?: string,
 ) {
-  let userLocale = getUserLocale(locale);
+  const userLocale = getUserLocale(locale);
 
   try {
     if (symbol.type === "fiat") {

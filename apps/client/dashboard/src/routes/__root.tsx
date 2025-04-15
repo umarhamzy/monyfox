@@ -1,7 +1,7 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { DatabaseProvider } from "@/contexts/database-context";
+import { DatabaseProvider } from "@/contexts/database-provider";
 
 export const Route = createRootRoute({ component: App });
 

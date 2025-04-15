@@ -1,17 +1,9 @@
 import { DestructiveAlert } from "@/components/ui/alert";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useProfile } from "@/hooks/use-profile";
-import { createContext, useEffect } from "react";
+import { useEffect } from "react";
 import { z } from "zod";
-
-type SettingContextProps = {
-  defaultSymbolId: string;
-  setDefaultSymbolId: React.Dispatch<React.SetStateAction<string>>;
-};
-
-export const SettingsContext = createContext<SettingContextProps | undefined>(
-  undefined,
-);
+import { SettingsContext } from "./settings-context";
 
 export const SettingsProvider = ({
   children,
@@ -23,7 +15,7 @@ export const SettingsProvider = ({
     user,
   } = useProfile();
   const defaultSymbolIdKey = `settings-defaultSymbolId-${user.id}`;
-  let fallbackSymbolId = assetSymbols.length > 0 ? assetSymbols[0].id : "";
+  const fallbackSymbolId = assetSymbols.length > 0 ? assetSymbols[0].id : "";
 
   const [defaultSymbolId, setDefaultSymbolId] = useLocalStorage(
     defaultSymbolIdKey,

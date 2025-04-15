@@ -1,22 +1,17 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AssetSymbolExchangeRateProvider } from "@/contexts/asset-symbol-exchange-rate-context";
-import { DatabaseContext } from "@/contexts/database-context";
-import { ProfileProvider } from "@/contexts/profile-context";
-import { SettingsProvider } from "@/contexts/settings-context";
+import { AssetSymbolExchangeRateProvider } from "@/contexts/asset-symbol-exchange-rate-provider";
+import { ProfileProvider } from "@/contexts/profile-provider";
+import { SettingsProvider } from "@/contexts/settings-provider";
 import { type Profile } from "@monyfox/common-data";
 import {
   QueryClient,
   QueryClientProvider,
   useMutation,
 } from "@tanstack/react-query";
-import {
-  createRootRoute,
-  createRoute,
-  createRouter,
-  Outlet,
-  RouterProvider,
-} from "@tanstack/react-router";
+import { RouterProvider } from "@tanstack/react-router";
 import { ReactNode, useState } from "react";
+import { getTestRouter } from "./router";
+import { DatabaseContext } from "@/contexts/database-context";
 
 export function TestDatabaseProvider({ children }: { children: ReactNode }) {
   const [profiles, setProfiles] = useState<Profile[]>([
@@ -88,7 +83,13 @@ export function TestDatabaseProvider({ children }: { children: ReactNode }) {
 
   const saveProfile = useMutation({
     mutationFn: async (profile: Profile) => {
-      setProfiles((p) => [...p, profile]);
+      setProfiles((p) => {
+        const index = p.findIndex((p) => p.id === profile.id);
+        if (index === -1) {
+          return [...p, profile];
+        }
+        return p.map((p, i) => (i === index ? profile : p));
+      });
     },
   });
 
@@ -147,24 +148,4 @@ export function TestContextProvider({
   ));
 
   return <RouterProvider router={router} />;
-}
-
-export function getTestRouter(component: () => React.JSX.Element) {
-  const rootRoute = createRootRoute({
-    component: Outlet,
-  });
-
-  const routeTree = rootRoute.addChildren([
-    createRoute({
-      getParentRoute: () => rootRoute,
-      path: "/",
-      component,
-    }),
-    createRoute({
-      getParentRoute: () => rootRoute,
-      path: "/p/$profileId",
-      component,
-    }),
-  ]);
-  return createRouter({ routeTree });
 }

@@ -1,5 +1,5 @@
-import { useContext } from "react";
 import { DatabaseContext } from "@/contexts/database-context";
+import { useContext } from "react";
 
 export const useDatabase = () => {
   const context = useContext(DatabaseContext);

@@ -1,25 +1,12 @@
-import { createContext, ReactNode } from "react";
-import {
-  useMutation,
-  UseMutationResult,
-  useQuery,
-} from "@tanstack/react-query";
+import { ReactNode } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/spinner";
 import { type Profile } from "@monyfox/common-data";
 import { toast } from "sonner";
 import { DatabaseIDBImpl } from "@/database/database-idb";
 import { type Database } from "@/database/database";
 import { ErrorPage } from "@/components/error-page";
-
-interface DatabaseContextProps {
-  profiles: Profile[];
-  saveProfile: UseMutationResult<void, Error, Profile, unknown>;
-  deleteProfile: UseMutationResult<void, Error, string, unknown>;
-}
-
-export const DatabaseContext = createContext<DatabaseContextProps | undefined>(
-  undefined,
-);
+import { DatabaseContext } from "./database-context";
 
 export const DatabaseProvider = ({ children }: { children: ReactNode }) => {
   const dbQuery = useQuery({ queryKey: ["database"], queryFn: getDatabase });

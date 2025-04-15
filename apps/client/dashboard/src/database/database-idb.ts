@@ -107,7 +107,7 @@ class DatabaseStoreIDBImpl<T> implements DatabaseStore<T> {
 }
 
 const logAndReject =
-  (message: string, reject: (reason?: any) => void, request: IDBRequest) =>
+  (message: string, reject: (reason?: unknown) => void, request: IDBRequest) =>
   () => {
     console.error(message, request.error);
     reject(request.error);

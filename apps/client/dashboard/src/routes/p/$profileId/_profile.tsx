@@ -1,10 +1,10 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { ProfileProvider } from "../../../contexts/profile-context";
+import { ProfileProvider } from "../../../contexts/profile-provider";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/ui/site-header";
-import { SettingsProvider } from "@/contexts/settings-context";
-import { AssetSymbolExchangeRateProvider } from "@/contexts/asset-symbol-exchange-rate-context";
+import { SettingsProvider } from "@/contexts/settings-provider";
+import { AssetSymbolExchangeRateProvider } from "@/contexts/asset-symbol-exchange-rate-provider";
 
 export const Route = createFileRoute("/p/$profileId/_profile")({
   component: RouteComponent,
