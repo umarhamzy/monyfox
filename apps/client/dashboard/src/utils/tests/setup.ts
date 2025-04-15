@@ -1,6 +1,9 @@
 import { vi } from "vitest";
 import "@testing-library/jest-dom";
 
+// https://stackoverflow.com/questions/53271193/typeerror-scrollintoview-is-not-a-function
+window.HTMLElement.prototype.scrollIntoView = function () {};
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({

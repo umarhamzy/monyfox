@@ -1,4 +1,5 @@
 import "fake-indexeddb/auto";
+
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { DatabaseIDBImpl } from "./database-idb";
 import { type Profile } from "@monyfox/common-data";

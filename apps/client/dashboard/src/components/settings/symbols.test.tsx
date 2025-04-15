@@ -8,9 +8,6 @@ import {
 } from "./symbols";
 import { useProfile } from "@/hooks/use-profile";
 
-// https://stackoverflow.com/questions/53271193/typeerror-scrollintoview-is-not-a-function
-window.HTMLElement.prototype.scrollIntoView = function () {};
-
 test("SettingsSymbolsPage", async () => {
   const { getByText } = render(
     <TestContextProvider>
