@@ -43,11 +43,9 @@ export class FrankfurterSymbolExchangeClient implements SymbolExchangeClient {
     const response = await fetch(url);
     const rawData = await response.json();
     const data = RatesSchema.parse(rawData);
-    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
     return Object.entries(data.rates).map(([date, rates]) => ({
       date,
       rate: rates[to],
-      isFinal: new Date(date) < yesterday,
     }));
   }
 }

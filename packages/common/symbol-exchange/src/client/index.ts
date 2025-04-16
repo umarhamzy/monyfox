@@ -29,11 +29,6 @@ export type GetExchangeRateResponse = Array<{
    * The exchange rate.
    */
   rate: number;
-  /**
-   * Whether the exchange rate is final. If false, the exchange rate may change
-   * in the future for the given date.
-   */
-  isFinal: boolean;
 }>;
 
 export interface SymbolExchangeClient {
