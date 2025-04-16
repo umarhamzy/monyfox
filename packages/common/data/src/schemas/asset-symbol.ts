@@ -1,5 +1,23 @@
 import { z } from "zod";
 
+export const ASSET_SYMBOL_TYPES = {
+  fiat: {
+    label: "Currency",
+  },
+  stock: {
+    label: "Stock",
+  },
+  crypto: {
+    label: "Crypto",
+  },
+  commodity: {
+    label: "Commodity",
+  },
+  other: {
+    label: "Other",
+  },
+} as const;
+
 export const AssetSymbolSchema = z.object({
   id: z.string(),
   code: z.string(),

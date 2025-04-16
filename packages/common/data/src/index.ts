@@ -14,6 +14,7 @@ export type Account = z.infer<typeof AccountSchema>;
 export {
   AssetSymbolSchema,
   AssetSymbolExchangeSchema,
+  ASSET_SYMBOL_TYPES,
 } from "./schemas/asset-symbol";
 export type AssetSymbol = z.infer<typeof AssetSymbolSchema>;
 export type AssetSymbolExchange = z.infer<typeof AssetSymbolExchangeSchema>;

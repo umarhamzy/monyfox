@@ -1,12 +1,9 @@
 import { TestContextProvider } from "@/utils/tests/contexts";
 import { describe, expect, test } from "vitest";
 import { fireEvent, render, waitFor } from "@testing-library/react";
-import {
-  FiatCurrencyExchanges,
-  SettingsSymbolsPage,
-  SymbolsTypeTable,
-} from "./symbols";
+import { SettingsSymbolsPage } from "./page";
 import { useProfile } from "@/hooks/use-profile";
+import { FiatCurrenciesCard, FiatCurrencyExchanges } from "./fiat";
 
 test("SettingsSymbolsPage", async () => {
   const { getByText } = render(
@@ -16,21 +13,14 @@ test("SettingsSymbolsPage", async () => {
   );
 
   expect(getByText("Default currency")).toBeInTheDocument();
-  expect(getByText("FIAT currencies")).toBeInTheDocument();
+  expect(getByText("Fiat currencies")).toBeInTheDocument();
 });
 
 describe("create symbol", async () => {
   test("success", async () => {
-    const transactionCountBySymbol = new Map<string, number>();
-    transactionCountBySymbol.set("EUR", 2);
-    transactionCountBySymbol.set("USD", 1);
-
     const { getByText, getAllByTitle, queryByText } = render(
       <TestContextProvider>
-        <SymbolsTypeTable
-          type="fiat"
-          transactionCountBySymbol={transactionCountBySymbol}
-        />
+        <FiatCurrenciesCard />
       </TestContextProvider>,
     );
 
@@ -52,16 +42,9 @@ describe("create symbol", async () => {
   });
 
   test("failure - no symbol selected", async () => {
-    const transactionCountBySymbol = new Map<string, number>();
-    transactionCountBySymbol.set("EUR", 2);
-    transactionCountBySymbol.set("USD", 1);
-
     const { getByText, getAllByTitle, queryByText } = render(
       <TestContextProvider>
-        <SymbolsTypeTable
-          type="fiat"
-          transactionCountBySymbol={transactionCountBySymbol}
-        />
+        <FiatCurrenciesCard />
       </TestContextProvider>,
     );
 
@@ -81,16 +64,9 @@ describe("create symbol", async () => {
 
 describe("delete symbol", async () => {
   test("success", async () => {
-    const transactionCountBySymbol = new Map<string, number>();
-    transactionCountBySymbol.set("EUR", 2);
-    transactionCountBySymbol.set("USD", 0);
-
     const { getByText, getAllByTitle, queryByText } = render(
       <TestContextProvider>
-        <SymbolsTypeTable
-          type="fiat"
-          transactionCountBySymbol={transactionCountBySymbol}
-        />
+        <FiatCurrenciesCard />
       </TestContextProvider>,
     );
 
@@ -102,25 +78,18 @@ describe("delete symbol", async () => {
   });
 
   test("failure - symbol with transactions", async () => {
-    const transactionCountBySymbol = new Map<string, number>();
-    transactionCountBySymbol.set("EUR", 2);
-    transactionCountBySymbol.set("USD", 1);
-
     const { getByText, getAllByTitle, queryByText } = render(
       <TestContextProvider>
-        <SymbolsTypeTable
-          type="fiat"
-          transactionCountBySymbol={transactionCountBySymbol}
-        />
+        <FiatCurrenciesCard />
       </TestContextProvider>,
     );
 
     expect(getByText("EUR")).toBeInTheDocument();
     expect(getByText("USD")).toBeInTheDocument();
 
-    fireEvent.click(getAllByTitle("Delete")[1]);
+    fireEvent.click(getAllByTitle("Delete")[0]);
     await new Promise((resolve) => setTimeout(resolve, 100));
-    expect(queryByText("USD")).toBeInTheDocument();
+    expect(queryByText("EUR")).toBeInTheDocument();
   });
 });
 

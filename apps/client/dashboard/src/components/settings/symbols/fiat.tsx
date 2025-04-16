@@ -7,10 +7,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useProfile } from "@/hooks/use-profile";
-import { AssetSymbol } from "@monyfox/common-data";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ArrowRightIcon, TrashIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { useState } from "react";
 import { ulid } from "ulid";
 import { useCurrency } from "@/hooks/use-currency";
@@ -25,18 +24,26 @@ import {
 import { useEffect, useMemo } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { DefaultSymbolSelect } from "@/components/default-symbol-select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DeleteSymbolButton } from "./common";
 
-export function SettingsSymbolsPage() {
+export function FiatCurrenciesCard() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Fiat currencies</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <FiatCurrenciesTable />
+        <FiatCurrencyExchanges />
+      </CardContent>
+    </Card>
+  );
+}
+
+function FiatCurrenciesTable() {
   const {
-    data: { transactions },
+    data: { assetSymbols, transactions },
   } = useProfile();
 
   const transactionCountBySymbol = useMemo(() => {
@@ -55,53 +62,10 @@ export function SettingsSymbolsPage() {
     return map;
   }, [transactions]);
 
-  return (
-    <div className="flex flex-col gap-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Default currency</CardTitle>
-        </CardHeader>
-        <CardContent>
-          While transactions are shown in their original currency, account
-          balances are summed up to a single currency. You can use select the
-          default currency to use here.
-          <br />
-          Note: for this to work properly, you need to set up the exchange rates
-          correctly. If an exchange rate is missing, a 1x conversion rate will
-          be used.
-        </CardContent>
-        <CardFooter>
-          <DefaultSymbolSelect />
-        </CardFooter>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>FIAT currencies</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SymbolsTypeTable
-            type="fiat"
-            transactionCountBySymbol={transactionCountBySymbol}
-          />
-          <FiatCurrencyExchanges />
-        </CardContent>
-      </Card>
-    </div>
+  const symbols = useMemo(
+    () => assetSymbols.filter(({ type }) => type === "fiat"),
+    [assetSymbols],
   );
-}
-
-export function SymbolsTypeTable({
-  type,
-  transactionCountBySymbol,
-}: {
-  type: AssetSymbol["type"];
-  transactionCountBySymbol: Map<string, number>;
-}) {
-  const {
-    data: { assetSymbols },
-  } = useProfile();
-
-  const symbols = assetSymbols.filter((symbol) => symbol.type === type);
 
   return (
     <Table>
@@ -129,7 +93,7 @@ export function SymbolsTypeTable({
         ))}
         <TableRow>
           <TableCell colSpan={4}>
-            <AddCurrencyButton />
+            <AddFiatCurrencyButton />
           </TableCell>
         </TableRow>
       </TableBody>
@@ -137,32 +101,7 @@ export function SymbolsTypeTable({
   );
 }
 
-function DeleteSymbolButton({
-  symbolId,
-  transactionCountBySymbol,
-}: {
-  symbolId: string;
-  transactionCountBySymbol: Map<string, number>;
-}) {
-  const { deleteAssetSymbol } = useProfile();
-
-  function handleDelete() {
-    if (transactionCountBySymbol.get(symbolId) ?? 0 > 0) {
-      toast.error("Cannot delete symbol with transactions");
-      return;
-    }
-
-    deleteAssetSymbol.mutate(symbolId);
-  }
-
-  return (
-    <Button variant="ghost" size="icon" onClick={handleDelete} title="Delete">
-      <TrashIcon />
-    </Button>
-  );
-}
-
-function AddCurrencyButton() {
+function AddFiatCurrencyButton() {
   const {
     createAssetSymbol,
     data: { assetSymbols },
@@ -274,15 +213,20 @@ export function FiatCurrencyExchanges() {
 
 function useFiatCurrencyExchangeUpdate() {
   const {
-    data: { assetSymbols, assetSymbolExchanges },
+    data: { assetSymbols: allSymbols, assetSymbolExchanges },
     createAssetSymbolExchange: { mutate: createAssetSymbolExchange },
     deleteAssetSymbolExchange: { mutate: deleteAssetSymbolExchange },
   } = useProfile();
 
+  const fiatSymbols = useMemo(
+    () => allSymbols.filter((s) => s.type === "fiat"),
+    [allSymbols],
+  );
+
   const missingExchanges = useMemo(() => {
     const neededExchanges = new Set<string>();
-    for (const from of assetSymbols) {
-      for (const to of assetSymbols) {
+    for (const from of fiatSymbols) {
+      for (const to of fiatSymbols) {
         if (from.id !== to.id) {
           neededExchanges.add(`${from.id}-${to.id}`);
         }
@@ -301,15 +245,15 @@ function useFiatCurrencyExchangeUpdate() {
     return Array.from(neededExchanges).map((exchange) => {
       const [fromId, toId] = exchange.split("-");
       return {
-        from: assetSymbols.find((s) => s.id === fromId)!,
-        to: assetSymbols.find((s) => s.id === toId)!,
+        from: fiatSymbols.find((s) => s.id === fromId)!,
+        to: fiatSymbols.find((s) => s.id === toId)!,
       };
     });
-  }, [assetSymbols, assetSymbolExchanges]);
+  }, [fiatSymbols, assetSymbolExchanges]);
 
   const existingSymbolIds = useMemo(
-    () => new Set(assetSymbols.map((s) => s.id)),
-    [assetSymbols],
+    () => new Set(fiatSymbols.map((s) => s.id)),
+    [fiatSymbols],
   );
   const assetSymbolExchangesWithoutSymbols = useMemo(
     () =>
