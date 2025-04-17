@@ -33,17 +33,12 @@ export function DefaultSymbolCard() {
   );
 }
 
-export function DeleteSymbolButton({
-  symbolId,
-  transactionCountBySymbol,
-}: {
-  symbolId: string;
-  transactionCountBySymbol: Map<string, number>;
-}) {
+export function DeleteSymbolButton({ symbolId }: { symbolId: string }) {
   const { deleteAssetSymbol } = useProfile();
+  const { getTransactionCountBySymbol } = useProfile();
 
   function handleDelete() {
-    if (transactionCountBySymbol.get(symbolId) ?? 0 > 0) {
+    if (getTransactionCountBySymbol(symbolId) > 0) {
       toast.error("Cannot delete symbol with transactions");
       return;
     }

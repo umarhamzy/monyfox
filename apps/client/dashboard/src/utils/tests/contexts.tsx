@@ -38,6 +38,7 @@ export function TestDatabaseProvider({ children }: { children: ReactNode }) {
             { id: "USD", code: "USD", displayName: "USD", type: "fiat" },
           ],
           assetSymbolExchanges: [],
+          assetSymbolExchangersMetadata: { alphavantage: null },
           transactions: [
             {
               id: "TRANSACTION_1",

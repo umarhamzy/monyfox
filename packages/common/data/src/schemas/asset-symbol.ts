@@ -37,6 +37,10 @@ const ExchangerSchema = z.discriminatedUnion("type", [
     base: z.string(),
     target: z.string(),
   }),
+  z.object({
+    type: z.literal("alphavantage-stock"),
+    symbol: z.string(),
+  }),
 ]);
 
 export const AssetSymbolExchangeSchema = z.object({
@@ -44,4 +48,12 @@ export const AssetSymbolExchangeSchema = z.object({
   fromAssetSymbolId: z.string(),
   toAssetSymbolId: z.string(),
   exchanger: ExchangerSchema,
+});
+
+export const AssetSymbolExchangersMetadataSchema = z.object({
+  alphavantage: z
+    .object({
+      apiKey: z.string(),
+    })
+    .nullable(),
 });

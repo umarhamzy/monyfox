@@ -29,10 +29,16 @@ interface ProfileContextProps {
 
   // Symbols
   getAssetSymbol: (assetSymbolId: string) => AssetSymbol;
+  getTransactionCountBySymbol: (symbolId: string) => number;
   createAssetSymbol: MutationResult<AssetSymbol>;
   deleteAssetSymbol: MutationResult<string>;
+  createAssetSymbolWithExchange: MutationResult<{
+    assetSymbol: AssetSymbol;
+    assetSymbolExchange: AssetSymbolExchange;
+  }>;
   createAssetSymbolExchange: MutationResult<AssetSymbolExchange>;
   deleteAssetSymbolExchange: MutationResult<string>;
+  updateAlphaVantageApiKey: MutationResult<string | null>;
 }
 
 export const ProfileContext = createContext<ProfileContextProps | undefined>(

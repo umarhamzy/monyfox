@@ -176,6 +176,7 @@ export function generateTestProfile(): Profile {
         transactions,
         assetSymbols: [assetEur],
         assetSymbolExchanges: [],
+        assetSymbolExchangersMetadata: { alphavantage: null },
         lastUpdated: new Date().toISOString(),
       },
     },

@@ -12,6 +12,12 @@ export const restHandlers = [
       const symbol = url.searchParams.get("symbol");
       const apikey = url.searchParams.get("apikey");
 
+      if (apikey === "limited-api-key") {
+        return HttpResponse.json({
+          Information: `We have detected your API key as ${apikey} and our standard API rate limit is 25 requests per day. Please subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantly remove all daily rate limits.`,
+        });
+      }
+
       if (symbol !== "IBM" || apikey !== "test-api-key") {
         return HttpResponse.json({
           "Error Message": "Error message for invalid request",
@@ -76,6 +82,12 @@ export const restHandlers = [
     if (functionParam === "SYMBOL_SEARCH") {
       const keywords = url.searchParams.get("keywords");
       const apikey = url.searchParams.get("apikey");
+
+      if (apikey === "limited-api-key") {
+        return HttpResponse.json({
+          Information: `We have detected your API key as ${apikey} and our standard API rate limit is 25 requests per day. Please subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantly remove all daily rate limits.`,
+        });
+      }
 
       if (keywords !== "tesco" || apikey !== "test-api-key") {
         return HttpResponse.json({
@@ -179,6 +191,23 @@ describe("getExchangeRates", () => {
       }),
     ).rejects.toThrow("Error message for invalid request");
   });
+
+  test("should throw an error for limited API key", async () => {
+    const client = new AlphaVantageSymbolExchangeClient({
+      apiKey: "limited-api-key",
+    });
+
+    await expect(
+      client.getExchangeRates({
+        from: "IBM",
+        to: "USD",
+        startDate: "2025-04-14",
+        endDate: "2025-04-15",
+      }),
+    ).rejects.toThrow(
+      "We have detected your API key as limited-api-key and our standard API rate limit is 25 requests per day. Please subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantly remove all daily rate limits.",
+    );
+  });
 });
 
 describe("searchSymbol", () => {
@@ -220,6 +249,16 @@ describe("searchSymbol", () => {
 
     await expect(client.searchSymbol({ symbol: "tesco" })).rejects.toThrow(
       "Error message for invalid request",
+    );
+  });
+
+  test("should throw an error for limited API key", async () => {
+    const client = new AlphaVantageSymbolExchangeClient({
+      apiKey: "limited-api-key",
+    });
+
+    await expect(client.searchSymbol({ symbol: "tesco" })).rejects.toThrow(
+      "We have detected your API key as limited-api-key and our standard API rate limit is 25 requests per day. Please subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantly remove all daily rate limits.",
     );
   });
 });

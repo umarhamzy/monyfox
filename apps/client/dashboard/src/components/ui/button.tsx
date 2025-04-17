@@ -42,12 +42,14 @@ function Button({
   size,
   asChild = false,
   isLoading = false,
+  hideChildren = false,
   children,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
     isLoading?: boolean;
+    hideChildren?: boolean;
   }) {
   const Comp = asChild ? Slot : "button";
 
@@ -61,7 +63,7 @@ function Button({
       {...props}
     >
       {isLoading && <Loader2 className="size-4 animate-spin" />}
-      {children}
+      {hideChildren ? null : children}
     </Comp>
   );
 }

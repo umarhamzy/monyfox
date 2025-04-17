@@ -1,6 +1,10 @@
-import { useQueries } from "@tanstack/react-query";
+import { useMutation, useQueries } from "@tanstack/react-query";
 import { ReactNode, useCallback, useMemo } from "react";
-import { FrankfurterSymbolExchangeClient } from "@monyfox/common-symbol-exchange";
+import {
+  AlphaVantageSymbolExchangeClient,
+  FrankfurterSymbolExchangeClient,
+  type SymbolExchangeClient,
+} from "@monyfox/common-symbol-exchange";
 import { useProfile } from "@/hooks/use-profile";
 import { getStartAndEndDate } from "@/utils/transaction";
 import { convertAmount, getConversionMap } from "@/utils/symbol-exchange";
@@ -13,19 +17,30 @@ import {
 } from "./asset-symbol-exchange-rate-context";
 import { maxLocalDate } from "@/utils/datetime";
 
-const client = new FrankfurterSymbolExchangeClient();
-
 export const AssetSymbolExchangeRateProvider = ({
   children,
 }: {
   children: ReactNode;
 }) => {
   const {
-    data: { transactions, assetSymbolExchanges },
+    data: { transactions, assetSymbolExchanges, assetSymbolExchangersMetadata },
   } = useProfile();
   const { startDate, endDate: endDateFromTransactions } = useMemo(
     () => getStartAndEndDate(transactions),
     [transactions],
+  );
+
+  const frankfurterClient = useMemo(
+    () => new FrankfurterSymbolExchangeClient(),
+    [],
+  );
+
+  const alphaVantageClient = useMemo(
+    () =>
+      new AlphaVantageSymbolExchangeClient({
+        apiKey: assetSymbolExchangersMetadata.alphavantage?.apiKey ?? "",
+      }),
+    [assetSymbolExchangersMetadata.alphavantage?.apiKey],
   );
 
   // The end date should be the maximum of:
@@ -44,12 +59,32 @@ export const AssetSymbolExchangeRateProvider = ({
     queries: assetSymbolExchanges.map((e) => ({
       queryKey: ["asset-symbol-exchange-rate", e.id, startDate, endDate],
       queryFn: async () => {
+        let client: SymbolExchangeClient;
+        let from: string;
+        let to: string;
+
+        switch (e.exchanger.type) {
+          case "frankfurter":
+            client = frankfurterClient;
+            from = e.exchanger.base;
+            to = e.exchanger.target;
+            break;
+          case "alphavantage-stock":
+            client = alphaVantageClient;
+            from = e.exchanger.symbol;
+            to = "";
+            break;
+          default:
+            throw new Error(`Unknown exchanger type: ${e.exchanger}`);
+        }
+
         const rates = await client.getExchangeRates({
-          from: e.exchanger.base,
-          to: e.exchanger.target,
+          from,
+          to,
           startDate,
           endDate,
         });
+
         return {
           id: e.id,
           fromAssetSymbolId: e.fromAssetSymbolId,
@@ -96,6 +131,10 @@ export const AssetSymbolExchangeRateProvider = ({
     [conversionMap],
   );
 
+  const searchStocksFn = useMutation({
+    mutationFn: (symbol: string) => alphaVantageClient.searchSymbol({ symbol }),
+  });
+
   const errors = queries.filter((q) => q.error !== null);
   const error =
     errors.length > 0 ? errors.map((q) => q.error).join(", ") : null;
@@ -107,6 +146,7 @@ export const AssetSymbolExchangeRateProvider = ({
         isLoading,
         error,
         convertAmount: convertAmountFn,
+        searchStocks: searchStocksFn,
       }}
     >
       {children}

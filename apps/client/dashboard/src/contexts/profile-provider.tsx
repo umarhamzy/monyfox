@@ -100,64 +100,71 @@ function DataProvider({
     );
   }
 
-  async function createEntityAsync<T>(
-    key: Exclude<keyof Data, "lastUpdated">,
-    entity: T & { id: string },
+  async function updateDataFields<K extends keyof Data>(
+    ...updates: Array<{
+      key: K;
+      value: Data[K];
+    }>
   ) {
+    const newData = { ...data };
+    for (const update of updates) {
+      newData[update.key] = update.value;
+    }
+    newData.lastUpdated = new Date().toISOString();
+
     await saveProfile.mutateAsync({
       id: user.id,
       user: user.name,
       data: {
         encrypted: false,
-        data: {
-          ...data,
-          [key]: [...data[key], entity],
-        },
+        data: newData,
       },
       schemaVersion: "1",
     });
   }
 
-  async function updateEntityAsync<T>(
-    key: Exclude<keyof Data, "lastUpdated">,
-    entity: T & { id: string },
-  ) {
-    await saveProfile.mutateAsync({
-      id: user.id,
-      user: user.name,
-      data: {
-        encrypted: false,
-        data: {
-          ...data,
-          [key]: data[key].map((e) => (e.id === entity.id ? entity : e)),
-        },
-      },
-      schemaVersion: "1",
+  async function createEntitiesAsync<
+    K extends Exclude<
+      keyof Data,
+      "lastUpdated" | "assetSymbolExchangersMetadata"
+    >,
+  >(...creations: Array<{ key: K; entity: Data[K][number] }>) {
+    await updateDataFields(
+      ...creations.map(({ key, entity }) => ({
+        key,
+        value: [...data[key], entity] as Data[K],
+      })),
+    );
+  }
+
+  async function updateEntityAsync<
+    K extends Exclude<
+      keyof Data,
+      "lastUpdated" | "assetSymbolExchangersMetadata"
+    >,
+  >(key: K, entity: Data[K][number]) {
+    await updateDataFields({
+      key,
+      value: data[key].map((e) => (e.id === entity.id ? entity : e)) as Data[K],
     });
   }
 
-  async function deleteEntityAsync(
-    key: Exclude<keyof Data, "lastUpdated">,
-    entityId: string,
-  ) {
-    await saveProfile.mutateAsync({
-      id: user.id,
-      user: user.name,
-      data: {
-        encrypted: false,
-        data: {
-          ...data,
-          [key]: data[key].filter((e) => e.id !== entityId),
-        },
-      },
-      schemaVersion: "1",
+  async function deleteEntityAsync<
+    K extends Exclude<
+      keyof Data,
+      "lastUpdated" | "assetSymbolExchangersMetadata"
+    >,
+  >(key: K, entityId: string) {
+    await updateDataFields({
+      key,
+      value: data[key].filter((e) => e.id !== entityId) as Data[K],
     });
   }
 
   // Accounts
   const createAccount = useMutation({
     mutationFn: (a: Account) =>
-      createEntityAsync("accounts", AccountSchema.parse(a)),
+      createEntitiesAsync({ key: "accounts", entity: AccountSchema.parse(a) }),
   });
 
   const deleteAccount = useMutation({
@@ -173,7 +180,10 @@ function DataProvider({
 
   const createTransaction = useMutation({
     mutationFn: (t: Transaction) =>
-      createEntityAsync("transactions", TransactionSchema.parse(t)),
+      createEntitiesAsync({
+        key: "transactions",
+        entity: TransactionSchema.parse(t),
+      }),
   });
 
   const updateTransaction = useMutation({
@@ -215,25 +225,77 @@ function DataProvider({
     [data.assetSymbols],
   );
 
+  const transactionCountBySymbol = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const transaction of transactions) {
+      const fromSymbol = transaction.from.symbolId;
+      const toSymbol = transaction.to.symbolId;
+
+      if (fromSymbol === toSymbol) {
+        map.set(fromSymbol, (map.get(fromSymbol) ?? 0) + 1);
+      } else {
+        map.set(fromSymbol, (map.get(fromSymbol) ?? 0) + 1);
+        map.set(toSymbol, (map.get(toSymbol) ?? 0) + 1);
+      }
+    }
+    return map;
+  }, [transactions]);
+
+  const getTransactionCountBySymbol = useCallback(
+    (id: string) => transactionCountBySymbol.get(id) ?? 0,
+    [transactionCountBySymbol],
+  );
+
   const createAssetSymbol = useMutation({
     mutationFn: (as: AssetSymbol) =>
-      createEntityAsync("assetSymbols", AssetSymbolSchema.parse(as)),
+      createEntitiesAsync({
+        key: "assetSymbols",
+        entity: AssetSymbolSchema.parse(as),
+      }),
   });
 
   const deleteAssetSymbol = useMutation({
     mutationFn: (id: string) => deleteEntityAsync("assetSymbols", id),
   });
 
+  const createAssetSymbolWithExchange = useMutation({
+    mutationFn: ({
+      assetSymbol,
+      assetSymbolExchange,
+    }: {
+      assetSymbol: AssetSymbol;
+      assetSymbolExchange: AssetSymbolExchange;
+    }) =>
+      createEntitiesAsync(
+        { key: "assetSymbols", entity: AssetSymbolSchema.parse(assetSymbol) },
+        {
+          key: "assetSymbolExchanges",
+          entity: AssetSymbolExchangeSchema.parse(assetSymbolExchange),
+        },
+      ),
+  });
+
   const createAssetSymbolExchange = useMutation({
     mutationFn: (as: AssetSymbolExchange) =>
-      createEntityAsync(
-        "assetSymbolExchanges",
-        AssetSymbolExchangeSchema.parse(as),
-      ),
+      createEntitiesAsync({
+        key: "assetSymbolExchanges",
+        entity: AssetSymbolExchangeSchema.parse(as),
+      }),
   });
 
   const deleteAssetSymbolExchange = useMutation({
     mutationFn: (id: string) => deleteEntityAsync("assetSymbolExchanges", id),
+  });
+
+  const updateAlphaVantageApiKey = useMutation({
+    mutationFn: (key: string | null) =>
+      updateDataFields({
+        key: "assetSymbolExchangersMetadata",
+        value: {
+          ...data.assetSymbolExchangersMetadata,
+          alphavantage: key !== null ? { apiKey: key } : null,
+        },
+      }),
   });
 
   return (
@@ -258,10 +320,15 @@ function DataProvider({
 
         // Symbols
         getAssetSymbol,
+        getTransactionCountBySymbol,
         createAssetSymbol,
         deleteAssetSymbol,
+
+        // Exchanges
+        createAssetSymbolWithExchange,
         createAssetSymbolExchange,
         deleteAssetSymbolExchange,
+        updateAlphaVantageApiKey,
       }}
     >
       {children}

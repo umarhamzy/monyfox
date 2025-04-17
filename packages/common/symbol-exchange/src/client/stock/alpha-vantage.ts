@@ -108,9 +108,14 @@ type SymbolSearchResponse = Array<{
   currency: string;
 }>;
 
-const ErrorSchema = z.object({
-  "Error Message": z.string(),
-});
+const ErrorSchema = z.union([
+  z.object({
+    "Error Message": z.string(),
+  }),
+  z.object({
+    Information: z.string(),
+  }),
+]);
 
 export class AlphaVantageSymbolExchangeClient implements SymbolExchangeClient {
   private readonly baseUrl = "https://www.alphavantage.co";
@@ -127,10 +132,7 @@ export class AlphaVantageSymbolExchangeClient implements SymbolExchangeClient {
     const url = `${this.baseUrl}/query?function=TIME_SERIES_DAILY&symbol=${from}&outputsize=full&apikey=${this.apiKey}`;
     const response = await fetch(url);
     const rawData = await response.json();
-    const error = ErrorSchema.safeParse(rawData);
-    if (error.success) {
-      throw new Error(error.data["Error Message"]);
-    }
+    this.checkError(rawData);
 
     const data = RatesSchema.parse(rawData);
     const rates = data["Time Series (Daily)"];
@@ -150,10 +152,7 @@ export class AlphaVantageSymbolExchangeClient implements SymbolExchangeClient {
     const url = `${this.baseUrl}/query?function=SYMBOL_SEARCH&keywords=${symbol}&apikey=${this.apiKey}`;
     const response = await fetch(url);
     const rawData = await response.json();
-    const error = ErrorSchema.safeParse(rawData);
-    if (error.success) {
-      throw new Error(error.data["Error Message"]);
-    }
+    this.checkError(rawData);
 
     const data = SymbolSearchSchema.parse(rawData);
     return data.bestMatches.map((match) => ({
@@ -166,5 +165,20 @@ export class AlphaVantageSymbolExchangeClient implements SymbolExchangeClient {
       timezone: match["7. timezone"],
       currency: match["8. currency"],
     }));
+  }
+
+  private checkError(rawData: unknown): void {
+    const { success: hasError, data: error } = ErrorSchema.safeParse(rawData);
+    if (!hasError) {
+      return;
+    }
+
+    let errorMessage: string;
+    if ("Error Message" in error) {
+      errorMessage = error["Error Message"];
+    } else {
+      errorMessage = error["Information"];
+    }
+    throw new Error(errorMessage);
   }
 }

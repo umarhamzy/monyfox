@@ -1,11 +1,3 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useProfile } from "@/hooks/use-profile";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -24,7 +16,13 @@ import {
 import { useEffect, useMemo } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { DeleteSymbolButton } from "./common";
 
 export function FiatCurrenciesCard() {
@@ -43,24 +41,9 @@ export function FiatCurrenciesCard() {
 
 function FiatCurrenciesTable() {
   const {
-    data: { assetSymbols, transactions },
+    data: { assetSymbols },
+    getTransactionCountBySymbol,
   } = useProfile();
-
-  const transactionCountBySymbol = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const transaction of transactions) {
-      const fromSymbol = transaction.from.symbolId;
-      const toSymbol = transaction.to.symbolId;
-
-      if (fromSymbol === toSymbol) {
-        map.set(fromSymbol, (map.get(fromSymbol) ?? 0) + 1);
-      } else {
-        map.set(fromSymbol, (map.get(fromSymbol) ?? 0) + 1);
-        map.set(toSymbol, (map.get(toSymbol) ?? 0) + 1);
-      }
-    }
-    return map;
-  }, [transactions]);
 
   const symbols = useMemo(
     () => assetSymbols.filter(({ type }) => type === "fiat"),
@@ -68,36 +51,25 @@ function FiatCurrenciesTable() {
   );
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Code</TableHead>
-          <TableHead>Transactions</TableHead>
-          <TableHead />
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+    <>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {symbols.map((symbol) => (
-          <TableRow key={symbol.code}>
-            <TableCell>{symbol.code}</TableCell>
-            <TableCell>
-              {transactionCountBySymbol.get(symbol.id) ?? 0}
-            </TableCell>
-            <TableCell className="text-right">
-              <DeleteSymbolButton
-                symbolId={symbol.id}
-                transactionCountBySymbol={transactionCountBySymbol}
-              />
-            </TableCell>
-          </TableRow>
+          <Card key={symbol.code}>
+            <CardContent className="flex justify-between">
+              <div>
+                <CardTitle>{symbol.code}</CardTitle>
+                <CardDescription>
+                  {getTransactionCountBySymbol(symbol.id)} transactions
+                </CardDescription>
+              </div>
+              <DeleteSymbolButton symbolId={symbol.id} />
+            </CardContent>
+          </Card>
         ))}
-        <TableRow>
-          <TableCell colSpan={4}>
-            <AddFiatCurrencyButton />
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
+      </div>
+      <div className="mt-4" />
+      <AddFiatCurrencyButton />
+    </>
   );
 }
 
@@ -181,9 +153,24 @@ export function FiatCurrencyExchanges() {
     getAssetSymbol,
   } = useProfile();
 
+  const symbols = useMemo(
+    () => assetSymbols.filter(({ type }) => type === "fiat"),
+    [assetSymbols],
+  );
+
   useFiatCurrencyExchangeUpdate();
 
-  if (assetSymbols.length <= 1) {
+  const fiatExchanges = useMemo(
+    () =>
+      assetSymbolExchanges.filter(
+        (exchange) =>
+          getAssetSymbol(exchange.fromAssetSymbolId).type === "fiat" &&
+          getAssetSymbol(exchange.toAssetSymbolId).type === "fiat",
+      ),
+    [assetSymbolExchanges, getAssetSymbol],
+  );
+
+  if (symbols.length <= 1) {
     return null;
   }
 
@@ -197,7 +184,7 @@ export function FiatCurrencyExchanges() {
           currency.
           <br />
           <div className="flex flex-wrap gap-2 mt-2">
-            {assetSymbolExchanges.map((exchange) => (
+            {fiatExchanges.map((exchange) => (
               <Badge variant="outline" key={exchange.id}>
                 {getAssetSymbol(exchange.fromAssetSymbolId).code}
                 <ArrowRightIcon />
@@ -223,6 +210,7 @@ function useFiatCurrencyExchangeUpdate() {
     [allSymbols],
   );
 
+  // Add missing exchanges for fiat.
   const missingExchanges = useMemo(() => {
     const neededExchanges = new Set<string>();
     for (const from of fiatSymbols) {
@@ -251,20 +239,6 @@ function useFiatCurrencyExchangeUpdate() {
     });
   }, [fiatSymbols, assetSymbolExchanges]);
 
-  const existingSymbolIds = useMemo(
-    () => new Set(fiatSymbols.map((s) => s.id)),
-    [fiatSymbols],
-  );
-  const assetSymbolExchangesWithoutSymbols = useMemo(
-    () =>
-      assetSymbolExchanges.filter(
-        (exchange) =>
-          !existingSymbolIds.has(exchange.fromAssetSymbolId) ||
-          !existingSymbolIds.has(exchange.toAssetSymbolId),
-      ),
-    [assetSymbolExchanges, existingSymbolIds],
-  );
-
   useEffect(() => {
     if (missingExchanges.length > 0) {
       const exchange = missingExchanges[0];
@@ -280,6 +254,21 @@ function useFiatCurrencyExchangeUpdate() {
       });
     }
   }, [missingExchanges, createAssetSymbolExchange]);
+
+  // Remove exchanges that are not needed anymore.
+  const existingSymbolIds = useMemo(
+    () => new Set(allSymbols.map((s) => s.id)),
+    [allSymbols],
+  );
+  const assetSymbolExchangesWithoutSymbols = useMemo(
+    () =>
+      assetSymbolExchanges.filter(
+        (exchange) =>
+          !existingSymbolIds.has(exchange.fromAssetSymbolId) ||
+          !existingSymbolIds.has(exchange.toAssetSymbolId),
+      ),
+    [assetSymbolExchanges, existingSymbolIds],
+  );
 
   useEffect(() => {
     if (assetSymbolExchangesWithoutSymbols.length > 0) {

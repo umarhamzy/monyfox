@@ -375,7 +375,7 @@ function TransactionForm({
                     <SelectContent {...field}>
                       {assetSymbols.map((symbol) => (
                         <SelectItem key={symbol.id} value={symbol.id}>
-                          {symbol.displayName}
+                          {symbol.code}
                         </SelectItem>
                       ))}
                     </SelectContent>

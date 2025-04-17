@@ -11,9 +11,10 @@ const testProfile: Profile = {
     encrypted: false,
     data: {
       accounts: [],
+      transactions: [],
       assetSymbols: [],
       assetSymbolExchanges: [],
-      transactions: [],
+      assetSymbolExchangersMetadata: { alphavantage: null },
       lastUpdated: "",
     },
   },
