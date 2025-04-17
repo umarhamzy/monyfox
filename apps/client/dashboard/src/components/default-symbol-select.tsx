@@ -49,7 +49,7 @@ export function DefaultSymbolSelect() {
             <SelectLabel>{ASSET_SYMBOL_TYPES[type].label}</SelectLabel>
             {symbols.map((symbol) => (
               <SelectItem key={symbol.id} value={symbol.id}>
-                {symbol.displayName}
+                {symbol.code}
               </SelectItem>
             ))}
           </SelectGroup>
