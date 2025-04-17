@@ -3,20 +3,39 @@ import {
   type Account,
   type AssetSymbol,
   type Profile,
+  type AssetSymbolExchange,
 } from "@monyfox/common-data";
 import { ulid } from "ulid";
 import { DayOfWeek, LocalDate, Month } from "@js-joda/core";
 
 export function generateTestProfile(): Profile {
-  const bankAccount: Account = {
+  const bankAccountEur: Account = {
     id: ulid(),
-    name: "My Bank Account",
+    name: "Bank Account",
+    isPersonalAsset: true,
+  };
+
+  const bankAccountUsd: Account = {
+    id: ulid(),
+    name: "Bank Account (US)",
+    isPersonalAsset: true,
+  };
+
+  const savingsAccount: Account = {
+    id: ulid(),
+    name: "Savings Account",
     isPersonalAsset: true,
   };
 
   const investmentAccount: Account = {
     id: ulid(),
-    name: "My Investment Account",
+    name: "Investment Account",
+    isPersonalAsset: true,
+  };
+
+  const creditCardAccount: Account = {
+    id: ulid(),
+    name: "Credit Card",
     isPersonalAsset: true,
   };
 
@@ -27,8 +46,40 @@ export function generateTestProfile(): Profile {
     displayName: "EUR",
   };
 
+  const assetUsd: AssetSymbol = {
+    id: ulid(),
+    type: "fiat",
+    code: "USD",
+    displayName: "USD",
+  };
+
+  const assetIbm: AssetSymbol = {
+    id: ulid(),
+    type: "stock",
+    code: "IBM",
+    displayName: "International Business Machines Corporation",
+  };
+
+  const exchangeEurUsd: AssetSymbolExchange = {
+    id: ulid(),
+    fromAssetSymbolId: assetEur.id,
+    toAssetSymbolId: assetUsd.id,
+    exchanger: { type: "frankfurter", base: "EUR", target: "USD" },
+  };
+
+  const exchangeEurIbm: AssetSymbolExchange = {
+    id: ulid(),
+    fromAssetSymbolId: assetIbm.id,
+    toAssetSymbolId: assetEur.id,
+    exchanger: {
+      type: "alphavantage-stock",
+      symbol: "IBM",
+    },
+  };
+
   const yearsToGenerate = 2;
   const transactions: Transaction[] = [];
+  let creditCardBalance = 0;
   for (
     let currentDate = LocalDate.now().minusYears(yearsToGenerate);
     currentDate.isBefore(LocalDate.now());
@@ -51,7 +102,27 @@ export function generateTestProfile(): Profile {
         to: {
           amount: salaryAmount,
           symbolId: assetEur.id,
-          account: { id: bankAccount.id },
+          account: { id: bankAccountEur.id },
+        },
+      });
+
+      // Income - stock
+      const stockAmount = randomFloat(0.9, 1.1) * 10; // Variance for stock
+      transactions.push({
+        id: ulid(),
+        description: "Vested Stock",
+        transactionDate: currentDate.toString(),
+        accountingDate: currentDate.toString(),
+        transactionCategoryId: null,
+        from: {
+          amount: stockAmount,
+          symbolId: assetIbm.id,
+          account: { name: "My Company" },
+        },
+        to: {
+          amount: stockAmount,
+          symbolId: assetIbm.id,
+          account: { id: investmentAccount.id },
         },
       });
 
@@ -66,7 +137,7 @@ export function generateTestProfile(): Profile {
         from: {
           amount: rentAmount,
           symbolId: assetEur.id,
-          account: { id: bankAccount.id },
+          account: { id: bankAccountEur.id },
         },
         to: {
           amount: rentAmount,
@@ -75,24 +146,64 @@ export function generateTestProfile(): Profile {
         },
       });
 
-      // Transfer - investment
+      // Transfer - savings
       transactions.push({
         id: ulid(),
-        description: "Investment",
+        description: "Savings",
         transactionDate: currentDate.toString(),
         accountingDate: currentDate.toString(),
         transactionCategoryId: null,
         from: {
-          amount: 500,
+          amount: 3000,
           symbolId: assetEur.id,
-          account: { id: bankAccount.id },
+          account: { id: bankAccountEur.id },
         },
         to: {
-          amount: 500,
+          amount: 3000,
           symbolId: assetEur.id,
-          account: { id: investmentAccount.id },
+          account: { id: savingsAccount.id },
         },
       });
+
+      // Transfer - from EU to US
+      transactions.push({
+        id: ulid(),
+        description: "International Transfer",
+        transactionDate: currentDate.toString(),
+        accountingDate: currentDate.toString(),
+        transactionCategoryId: null,
+        from: {
+          amount: 50,
+          symbolId: assetEur.id,
+          account: { id: bankAccountEur.id },
+        },
+        to: {
+          amount: 55,
+          symbolId: assetUsd.id,
+          account: { id: bankAccountUsd.id },
+        },
+      });
+
+      // Transfer - credit card payment
+      const creditCardPaymentAmount = creditCardBalance;
+      transactions.push({
+        id: ulid(),
+        description: "Credit Card Payment",
+        transactionDate: currentDate.toString(),
+        accountingDate: currentDate.toString(),
+        transactionCategoryId: null,
+        from: {
+          amount: creditCardPaymentAmount,
+          symbolId: assetEur.id,
+          account: { id: bankAccountEur.id },
+        },
+        to: {
+          amount: creditCardPaymentAmount,
+          symbolId: assetEur.id,
+          account: { id: creditCardAccount.id },
+        },
+      });
+      creditCardBalance = 0;
     }
 
     if (
@@ -115,7 +226,7 @@ export function generateTestProfile(): Profile {
         to: {
           amount: bonusAmount,
           symbolId: assetEur.id,
-          account: { id: bankAccount.id },
+          account: { id: bankAccountEur.id },
         },
       });
     }
@@ -127,6 +238,7 @@ export function generateTestProfile(): Profile {
     ) {
       // Expense - entertainment
       const entertainmentAmount = randomFloat(0.1, 3) * 100;
+      creditCardBalance += entertainmentAmount;
       transactions.push({
         id: ulid(),
         description: "Entertainment",
@@ -136,7 +248,7 @@ export function generateTestProfile(): Profile {
         from: {
           amount: entertainmentAmount,
           symbolId: assetEur.id,
-          account: { id: bankAccount.id },
+          account: { id: creditCardAccount.id },
         },
         to: {
           amount: entertainmentAmount,
@@ -146,6 +258,9 @@ export function generateTestProfile(): Profile {
       });
     }
 
+    // Expense - coffee
+    const coffeeAmount = 2;
+    creditCardBalance += coffeeAmount;
     transactions.push({
       id: ulid(),
       description: "Coffee",
@@ -153,12 +268,12 @@ export function generateTestProfile(): Profile {
       accountingDate: currentDate.toString(),
       transactionCategoryId: null,
       from: {
-        amount: 2,
+        amount: coffeeAmount,
         symbolId: assetEur.id,
-        account: { id: bankAccount.id },
+        account: { id: creditCardAccount.id },
       },
       to: {
-        amount: 2,
+        amount: coffeeAmount,
         symbolId: assetEur.id,
         account: { name: "Coffee Shop" },
       },
@@ -172,11 +287,17 @@ export function generateTestProfile(): Profile {
     data: {
       encrypted: false,
       data: {
-        accounts: [bankAccount, investmentAccount],
+        accounts: [
+          bankAccountEur,
+          bankAccountUsd,
+          creditCardAccount,
+          savingsAccount,
+          investmentAccount,
+        ],
         transactions,
-        assetSymbols: [assetEur],
-        assetSymbolExchanges: [],
-        assetSymbolExchangersMetadata: { alphavantage: null },
+        assetSymbols: [assetEur, assetUsd, assetIbm],
+        assetSymbolExchanges: [exchangeEurUsd, exchangeEurIbm],
+        assetSymbolExchangersMetadata: { alphavantage: { apiKey: "demo" } },
         lastUpdated: new Date().toISOString(),
       },
     },
