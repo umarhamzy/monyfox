@@ -7,7 +7,7 @@ import {
 } from "@monyfox/common-symbol-exchange";
 import { useProfile } from "@/hooks/use-profile";
 import { getStartAndEndDate } from "@/utils/transaction";
-import { convertAmount, getConversionMap } from "@/utils/symbol-exchange";
+import { SymbolConverter } from "@/utils/symbol-converter";
 import { notEmpty } from "@/utils/array";
 import { LocalDate } from "@js-joda/core";
 import { useStable } from "@/hooks/use-stable";
@@ -97,16 +97,20 @@ export const AssetSymbolExchangeRateProvider = ({
   const stableQueries = useStable(queries);
 
   // fromAssetSymbolId (string) -> toAssetSymbolId (string) -> date (string) -> rate (number)
-  const conversionMap = useMemo(() => {
+  const symbolConverter = useMemo(() => {
     const isLoading = stableQueries.some((q) => q.isLoading);
     if (isLoading) {
       // Do not compute conversion map if data is not ready.
-      return {};
+      return new SymbolConverter({
+        startDate,
+        endDate,
+        results: [],
+      });
     }
 
     // Compute conversion map even if some queries failed.
     const availableData = stableQueries.map((q) => q.data).filter(notEmpty);
-    return getConversionMap({
+    return new SymbolConverter({
       startDate,
       endDate,
       results: availableData,
@@ -120,15 +124,16 @@ export const AssetSymbolExchangeRateProvider = ({
       fromAssetSymbolId,
       toAssetSymbolId,
     }: ConvertAmountsArgs) => {
-      return convertAmount({
-        amount,
-        date,
-        fromAssetSymbolId,
-        toAssetSymbolId,
-        conversionMap,
-      });
+      return (
+        symbolConverter.convertAmount({
+          amount,
+          date,
+          fromAssetSymbolId,
+          toAssetSymbolId,
+        }) ?? amount
+      );
     },
-    [conversionMap],
+    [symbolConverter],
   );
 
   const searchStocksFn = useMutation({
