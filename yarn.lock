@@ -891,6 +891,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.4.7"
     fake-indexeddb: "npm:^6.0.0"
     framer-motion: "npm:^12.7.2"
+    graph-data-structure: "npm:^4.5.0"
     jsdom: "npm:^26.1.0"
     lucide-react: "npm:^0.488.0"
     postcss: "npm:^8.5.3"
@@ -4191,6 +4192,13 @@ __metadata:
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11"
   checksum: 10c0/386d011a553e02bc594ac2ca0bd6d9e4c22d7fa8cfbfc448a6d148c59ea881b092db9dbe3547ae4b88e55f1b01f7c4a2ecc53b310c042793e63aa44cf6c257f2
+  languageName: node
+  linkType: hard
+
+"graph-data-structure@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "graph-data-structure@npm:4.5.0"
+  checksum: 10c0/b209769888820ec8d1d4f20cb8b06aa8e693f8716b54037ae8d4bac354fa33a67a6783cfea9d570ecd0feb0aed21eee9a96c5b7797a5d125c9323b62bea167f3
   languageName: node
   linkType: hard
 
