@@ -894,6 +894,7 @@ __metadata:
     graph-data-structure: "npm:^4.5.0"
     jsdom: "npm:^26.1.0"
     lucide-react: "npm:^0.488.0"
+    msw: "npm:^2.7.4"
     postcss: "npm:^8.5.3"
     react: "npm:^19.1.0"
     react-dom: "npm:^19.1.0"

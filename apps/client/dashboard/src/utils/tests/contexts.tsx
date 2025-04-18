@@ -13,7 +13,15 @@ import { ReactNode, useState } from "react";
 import { getTestRouter } from "./router";
 import { DatabaseContext } from "@/contexts/database-context";
 
-export function TestDatabaseProvider({ children }: { children: ReactNode }) {
+export function TestDatabaseProvider({
+  children,
+  withFiat = true,
+  withStocks = true,
+}: {
+  children: ReactNode;
+  withFiat?: boolean;
+  withStocks?: boolean;
+}) {
   const [profiles, setProfiles] = useState<Profile[]>([
     {
       id: "TEST_PROFILE_ID",
@@ -34,11 +42,37 @@ export function TestDatabaseProvider({ children }: { children: ReactNode }) {
             },
           ],
           assetSymbols: [
-            { id: "EUR", code: "EUR", displayName: "EUR", type: "fiat" },
-            { id: "USD", code: "USD", displayName: "USD", type: "fiat" },
+            ...(withFiat
+              ? [
+                  {
+                    id: "EUR",
+                    code: "EUR",
+                    displayName: "EUR",
+                    type: "fiat" as const,
+                  },
+                  {
+                    id: "USD",
+                    code: "USD",
+                    displayName: "USD",
+                    type: "fiat" as const,
+                  },
+                ]
+              : []),
+            ...(withStocks
+              ? [
+                  {
+                    id: "MWRD",
+                    code: "MWRD",
+                    displayName: "MWRD ETF name",
+                    type: "stock" as const,
+                  },
+                ]
+              : []),
           ],
           assetSymbolExchanges: [],
-          assetSymbolExchangersMetadata: { alphavantage: null },
+          assetSymbolExchangersMetadata: {
+            alphavantage: withStocks ? { apiKey: "TEST_API_KEY" } : null,
+          },
           transactions: [
             {
               id: "TRANSACTION_1",
@@ -130,13 +164,17 @@ export function TestQueryClientProvider({ children }: { children: ReactNode }) {
 export function TestContextProvider({
   children,
   profileId = "TEST_PROFILE_ID",
+  withFiat = true,
+  withStocks = true,
 }: {
   children: ReactNode;
   profileId?: string;
+  withFiat?: boolean;
+  withStocks?: boolean;
 }) {
   const router = getTestRouter(() => (
     <TestQueryClientProvider>
-      <TestDatabaseProvider>
+      <TestDatabaseProvider withFiat={withFiat} withStocks={withStocks}>
         <ProfileProvider profileId={profileId}>
           <AssetSymbolExchangeRateProvider>
             <SettingsProvider>
