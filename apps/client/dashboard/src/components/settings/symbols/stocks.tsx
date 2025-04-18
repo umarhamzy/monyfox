@@ -147,6 +147,7 @@ function AddStockButton() {
             onClick={() => {
               searchStocks.mutate(searchSymbol);
             }}
+            title="Search"
             isLoading={isLoading}
             hideChildren={isLoading}
           >
@@ -211,6 +212,7 @@ function StockSymbolItem({
 
   function handleAddSymbol() {
     if (!hasCurrency || alreadyExists) {
+      // This should never happen because the button is disabled
       return;
     }
 
@@ -269,6 +271,7 @@ function StockSymbolItem({
         </div>
         <Button
           onClick={handleAddSymbol}
+          title={`Add ${stock.code}`}
           disabled={alreadyExists || !hasCurrency}
         >
           {alreadyExists ? <CheckIcon /> : <PlusIcon />}
@@ -297,7 +300,7 @@ function ConfigureAlphaVantageModalButton({
   return (
     <>
       {iconOnly ? (
-        <Button onClick={openModal} variant="outline">
+        <Button onClick={openModal} variant="outline" title="Configure stocks">
           <SettingsIcon />
         </Button>
       ) : (
@@ -343,6 +346,7 @@ function ConfigureAlphaVantageModalButton({
         <div className="flex justify-between gap-2 mt-4">
           <Button
             variant="outline"
+            title="Delete API key"
             onClick={() => {
               setApiKey("");
               updateAlphaVantageApiKey.mutate(null);
