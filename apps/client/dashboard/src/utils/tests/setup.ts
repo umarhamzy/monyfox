@@ -3,6 +3,7 @@ import { setupServer } from "msw/node";
 import { http, HttpResponse } from "msw";
 
 import "@testing-library/jest-dom";
+import "fake-indexeddb/auto";
 
 // https://stackoverflow.com/questions/53271193/typeerror-scrollintoview-is-not-a-function
 window.HTMLElement.prototype.scrollIntoView = function () {};

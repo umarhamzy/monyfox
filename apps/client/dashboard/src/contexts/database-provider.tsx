@@ -4,9 +4,15 @@ import { Spinner } from "@/components/ui/spinner";
 import { type Profile } from "@monyfox/common-data";
 import { toast } from "sonner";
 import { DatabaseIDBImpl } from "@/database/database-idb";
-import { type Database } from "@/database/database";
+import { type ExchangeRateDb, type Database } from "@/database/database";
 import { ErrorPage } from "@/components/error-page";
 import { DatabaseContext } from "./database-context";
+import { notEmpty } from "@/utils/array";
+import { Duration } from "@js-joda/core";
+
+const EXCHANGE_RATE_TTL_MS = Duration.ofDays(28).toMillis();
+const isExchangeRateExpired = (v: ExchangeRateDb) =>
+  Date.now() - Date.parse(v.updatedAt) > EXCHANGE_RATE_TTL_MS;
 
 export const DatabaseProvider = ({ children }: { children: ReactNode }) => {
   const dbQuery = useQuery({ queryKey: ["database"], queryFn: getDatabase });
@@ -16,12 +22,7 @@ export const DatabaseProvider = ({ children }: { children: ReactNode }) => {
   }
 
   if (dbQuery.isError) {
-    return (
-      <ErrorPage
-        title="Database error"
-        message={dbQuery.error?.message || "Unknown error"}
-      />
-    );
+    return <ErrorPage title="Database error" message={dbQuery.error.message} />;
   }
 
   return (
@@ -61,16 +62,31 @@ function DatabaseDataProvider({
     },
   });
 
-  if (profilesQuery.isPending) {
+  const exchangeRatesQuery = useQuery({
+    queryKey: ["exchange-rates"],
+    queryFn: async () => {
+      const all = await db.exchangeRates.getAll();
+      const expiredIds = all.filter(isExchangeRateExpired).map(({ id }) => id);
+      await Promise.all(expiredIds.map((id) => db.exchangeRates.delete(id)));
+      return all.filter(({ id }) => !expiredIds.includes(id));
+    },
+  });
+
+  const saveExchangeRatesAsync = async (exchangeRate: ExchangeRateDb) => {
+    await db.exchangeRates.upsert(exchangeRate);
+  };
+
+  if (profilesQuery.isPending || exchangeRatesQuery.isPending) {
     return <LoadingPage />;
   }
 
-  if (profilesQuery.isError) {
+  if (profilesQuery.isError || exchangeRatesQuery.isError) {
+    const errorMessages = [
+      profilesQuery.error?.message,
+      exchangeRatesQuery.error?.message,
+    ].filter(notEmpty);
     return (
-      <ErrorPage
-        title="Database error"
-        message={profilesQuery.error?.message || "Unknown error"}
-      />
+      <ErrorPage title="Database error" message={errorMessages.join("\n")} />
     );
   }
 
@@ -80,6 +96,8 @@ function DatabaseDataProvider({
         profiles: profilesQuery.data,
         saveProfile: saveProfileMutation,
         deleteProfile: deleteProfileMutation,
+        exchangeRates: exchangeRatesQuery.data,
+        saveExchangeRatesAsync,
       }}
     >
       {children}

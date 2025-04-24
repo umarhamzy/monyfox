@@ -1,6 +1,6 @@
 import { LocalDate } from "@js-joda/core";
 import { Graph, shortestPath } from "graph-data-structure";
-import { type GetExchangeRateResponse } from "@monyfox/common-symbol-exchange/dist/client";
+import { type GetExchangeRateResponse } from "@monyfox/common-symbol-exchange";
 
 type Results = {
   id: string;

@@ -11,17 +11,16 @@ Welcome to MonyFox, your comprehensive open-source solution for managing your fi
 - 💰 **Track Your Money:** Easily record and monitor your income, expenses, savings, investments, and transfers.
 - 📊 **Visualize Your Finances:** Utilize charts and graphs to gain a clear understanding of your financial situation.
 - 💻 **User-Friendly Interface:** Intuitive design for seamless navigation and usage.
-- 💶💵 **Multi-Currency Support:** Manage your finances in multiple currencies with ease.
+- 💶 **Multi-Currency Support:** Manage your finances in multiple currencies with ease.
+- 📈 **Stock Tracking:** Monitor your investments and track stock performance.
 - 🌐 **100% Open Source:** Fully open-source, ensuring transparency and customization options.
 - 🏠 **100% Local:** All data is stored locally on your device, ensuring privacy and security.
 
 ### Upcoming Features
 
 - 💳 **Budgeting Tools:** Set budgets and track your spending to stay on target.
-- 📈 **Stock Tracking:** Monitor your investments and track stock performance.
 - 💾 **Backup and Restore:** Easily backup and restore your financial data.
 - 📂 **Data Import:** Import financial data from various sources for a unified view.
-- 📤 **Data Export:** Export your financial data for backup or analysis.
 - 📱 **Mobile App:** Access MonyFox on the go with a dedicated PWA.
 - 🌐 **Sync Across Devices:** Sync your financial data across multiple devices for seamless access. The data will be encrypted and stored in a secure cloud service.
 
@@ -48,9 +47,9 @@ Welcome to MonyFox, your comprehensive open-source solution for managing your fi
    ```
 
 4. **Run the Application:**
+
    ```bash
-   cd apps/client/dashboard
-   yarn dev
+   yarn dashboard:dev
    ```
 
 ## Contributing
