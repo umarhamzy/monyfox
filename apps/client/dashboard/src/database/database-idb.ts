@@ -1,9 +1,10 @@
 import { type Profile } from "@monyfox/common-data";
-import { DatabaseStore, type Database } from "./database";
+import { DatabaseStore, ExchangeRateDb, type Database } from "./database";
 
 const DB_NAME = "monyfox";
 const DB_STORE_NAMES = {
   profiles: "profiles",
+  exchangeRates: "exchangeRates",
 } as const;
 const DB_VERSION = 1;
 
@@ -21,6 +22,7 @@ export class DatabaseIDBImpl implements Database {
       request.onupgradeneeded = () => {
         const db = request.result;
         db.createObjectStore(DB_STORE_NAMES.profiles, { keyPath: "id" });
+        db.createObjectStore(DB_STORE_NAMES.exchangeRates, { keyPath: "id" });
       };
     });
   }
@@ -28,6 +30,11 @@ export class DatabaseIDBImpl implements Database {
   public readonly profiles = new DatabaseStoreIDBImpl<Profile>(
     () => this.db,
     DB_STORE_NAMES.profiles,
+  );
+
+  public readonly exchangeRates = new DatabaseStoreIDBImpl<ExchangeRateDb>(
+    () => this.db,
+    DB_STORE_NAMES.exchangeRates,
   );
 }
 
@@ -83,6 +90,7 @@ class DatabaseStoreIDBImpl<T> implements DatabaseStore<T> {
       );
     });
   }
+
   delete(id: string): Promise<void> {
     const db = this.getDb();
     return new Promise<void>((resolve, reject) => {

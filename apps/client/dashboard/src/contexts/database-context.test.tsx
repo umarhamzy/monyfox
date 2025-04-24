@@ -27,26 +27,52 @@ function TestProvider({ children }: { children: React.ReactNode }) {
 }
 
 const TestComponent = () => {
-  const { profiles, saveProfile, deleteProfile } = useDatabase();
+  const {
+    profiles,
+    saveProfile,
+    deleteProfile,
+    exchangeRates,
+    saveExchangeRatesAsync,
+  } = useDatabase();
   return (
-    <div>
-      <p>Profiles: {profiles.map((profile) => profile.id).join(", ")}.</p>
-      <button
-        onClick={() =>
-          saveProfile.mutate({
-            id: "NEW_PROFILE_1",
-            user: "NEW_PROFILE_1",
-            data: { encrypted: true, data: "" },
-            schemaVersion: "1",
-          })
-        }
-      >
-        Save Profile
-      </button>
-      <button onClick={() => deleteProfile.mutate("NEW_PROFILE_1")}>
-        Delete Profile
-      </button>
-    </div>
+    <>
+      <div>
+        <p>Profiles: {profiles.map((profile) => profile.id).join(", ")}.</p>
+        <button
+          onClick={() =>
+            saveProfile.mutate({
+              id: "NEW_PROFILE_1",
+              user: "NEW_PROFILE_1",
+              data: { encrypted: true, data: "" },
+              schemaVersion: "1",
+            })
+          }
+        >
+          Save Profile
+        </button>
+        <button onClick={() => deleteProfile.mutate("NEW_PROFILE_1")}>
+          Delete Profile
+        </button>
+      </div>
+      <div>
+        <p>
+          Exchange rates: {exchangeRates.map((rate) => rate.id).join(", ")}.
+        </p>
+        <button
+          onClick={() =>
+            saveExchangeRatesAsync({
+              id: "NEW_RATE_1",
+              updatedAt: new Date().toISOString(),
+              startDate: new Date().toISOString(),
+              endDate: new Date().toISOString(),
+              data: [],
+            })
+          }
+        >
+          Save exchange rate
+        </button>
+      </div>
+    </>
   );
 };
 
@@ -64,51 +90,90 @@ describe("DatabaseProvider", () => {
     expect(getByTitle("Loading...")).toBeDefined();
   });
 
-  test("renders profiles after loading", async () => {
-    const { getByText, queryByTitle } = render(
-      <TestProvider>
-        <TestComponent />
-      </TestProvider>,
-    );
+  describe("profiles", () => {
+    test("renders profiles after loading", async () => {
+      const { getByText, queryByTitle } = render(
+        <TestProvider>
+          <TestComponent />
+        </TestProvider>,
+      );
 
-    await waitFor(() => expect(queryByTitle("Loading...")).toBeNull());
-    await waitFor(() => expect(getByText("Profiles: .")).toBeInTheDocument());
+      await waitFor(() => expect(queryByTitle("Loading...")).toBeNull());
+      await waitFor(() => expect(getByText("Profiles: .")).toBeInTheDocument());
+    });
+
+    test("saves a profile", async () => {
+      const { getByText, queryByTitle } = render(
+        <TestProvider>
+          <TestComponent />
+        </TestProvider>,
+      );
+
+      await waitFor(() => expect(queryByTitle("Loading...")).toBeNull());
+      await waitFor(() => expect(getByText("Profiles: .")).toBeInTheDocument());
+
+      fireEvent.click(getByText("Save Profile"));
+
+      await waitFor(() =>
+        expect(getByText("Profiles: NEW_PROFILE_1.")).toBeInTheDocument(),
+      );
+    });
+
+    test("deletes a profile", async () => {
+      const { getByText, queryByTitle } = render(
+        <TestProvider>
+          <TestComponent />
+        </TestProvider>,
+      );
+
+      await waitFor(() => expect(queryByTitle("Loading...")).toBeNull());
+      fireEvent.click(getByText("Save Profile"));
+
+      await waitFor(() =>
+        expect(getByText("Profiles: NEW_PROFILE_1.")).toBeInTheDocument(),
+      );
+
+      const deleteButton = getByText("Delete Profile");
+      deleteButton.click();
+
+      await waitFor(() => expect(getByText("Profiles: .")).toBeInTheDocument());
+    });
   });
 
-  test("saves a profile", async () => {
-    const { getByText, queryByTitle } = render(
-      <TestProvider>
-        <TestComponent />
-      </TestProvider>,
-    );
+  describe("exchange rates", () => {
+    test("loads exchange rates", async () => {
+      const { getByText, queryByTitle } = render(
+        <TestProvider>
+          <TestComponent />
+        </TestProvider>,
+      );
+      await waitFor(() => expect(queryByTitle("Loading...")).toBeNull());
+      await waitFor(() =>
+        expect(getByText("Exchange rates: .")).toBeInTheDocument(),
+      );
+    });
 
-    await waitFor(() => expect(queryByTitle("Loading...")).toBeNull());
-    await waitFor(() => expect(getByText("Profiles: .")).toBeInTheDocument());
+    test("saves exchange rates", async () => {
+      const { getByText, queryByTitle, rerender } = render(
+        <TestProvider>
+          <TestComponent />
+        </TestProvider>,
+      );
+      await waitFor(() => expect(queryByTitle("Loading...")).toBeNull());
+      await waitFor(() =>
+        expect(getByText("Exchange rates: .")).toBeInTheDocument(),
+      );
+      fireEvent.click(getByText("Save exchange rate"));
+      rerender(
+        <TestProvider>
+          <TestComponent />
+        </TestProvider>,
+      );
+      await waitFor(() =>
+        expect(getByText("Exchange rates: .")).toBeInTheDocument(),
+      );
 
-    fireEvent.click(getByText("Save Profile"));
-
-    await waitFor(() =>
-      expect(getByText("Profiles: NEW_PROFILE_1.")).toBeInTheDocument(),
-    );
-  });
-
-  test("deletes a profile", async () => {
-    const { getByText, queryByTitle } = render(
-      <TestProvider>
-        <TestComponent />
-      </TestProvider>,
-    );
-
-    await waitFor(() => expect(queryByTitle("Loading...")).toBeNull());
-    fireEvent.click(getByText("Save Profile"));
-
-    await waitFor(() =>
-      expect(getByText("Profiles: NEW_PROFILE_1.")).toBeInTheDocument(),
-    );
-
-    const deleteButton = getByText("Delete Profile");
-    deleteButton.click();
-
-    await waitFor(() => expect(getByText("Profiles: .")).toBeInTheDocument());
+      // TODO: find a way to test the exchange rates are saved.
+    });
   });
 });

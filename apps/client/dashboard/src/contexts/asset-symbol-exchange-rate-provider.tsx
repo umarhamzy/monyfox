@@ -3,6 +3,7 @@ import { ReactNode, useCallback, useMemo } from "react";
 import {
   AlphaVantageSymbolExchangeClient,
   FrankfurterSymbolExchangeClient,
+  type GetExchangeRateResponse,
   type SymbolExchangeClient,
 } from "@monyfox/common-symbol-exchange";
 import { useProfile } from "@/hooks/use-profile";
@@ -16,6 +17,7 @@ import {
   ConvertAmountsArgs,
 } from "./asset-symbol-exchange-rate-context";
 import { maxLocalDate } from "@/utils/datetime";
+import { useDatabase } from "@/hooks/use-database";
 
 export const AssetSymbolExchangeRateProvider = ({
   children,
@@ -25,6 +27,10 @@ export const AssetSymbolExchangeRateProvider = ({
   const {
     data: { transactions, assetSymbolExchanges, assetSymbolExchangersMetadata },
   } = useProfile();
+  const {
+    exchangeRates: exchangeRatesCache,
+    saveExchangeRatesAsync: saveExchangeRatesCache,
+  } = useDatabase();
   const { startDate, endDate: endDateFromTransactions } = useMemo(
     () => getStartAndEndDate(transactions),
     [transactions],
@@ -41,6 +47,11 @@ export const AssetSymbolExchangeRateProvider = ({
         apiKey: assetSymbolExchangersMetadata.alphavantage?.apiKey ?? "",
       }),
     [assetSymbolExchangersMetadata.alphavantage?.apiKey],
+  );
+
+  const exchangeRatesCacheById = useMemo(
+    () => new Map(exchangeRatesCache.map((e) => [e.id, e])),
+    [exchangeRatesCache],
   );
 
   // The end date should be the maximum of:
@@ -78,12 +89,41 @@ export const AssetSymbolExchangeRateProvider = ({
             throw new Error(`Unknown exchanger type: ${e.exchanger}`);
         }
 
-        const rates = await client.getExchangeRates({
-          from,
-          to,
-          startDate,
-          endDate,
-        });
+        let rates: GetExchangeRateResponse = [];
+
+        const cached = exchangeRatesCacheById.get(e.id);
+        const hasCache = cached !== undefined;
+        const isRequestedDateRangeCached =
+          hasCache &&
+          cached.startDate === startDate &&
+          cached.endDate === endDate;
+        if (isRequestedDateRangeCached) {
+          rates = cached.data;
+        } else {
+          try {
+            rates = await client.getExchangeRates({
+              from,
+              to,
+              startDate,
+              endDate,
+            });
+            await saveExchangeRatesCache({
+              id: e.id,
+              startDate,
+              endDate,
+              data: rates,
+              updatedAt: new Date().toISOString(),
+            });
+          } catch (error) {
+            if (hasCache) {
+              // If the request fails, fallback to the cache even if the data is stale.
+              rates = cached.data;
+            } else {
+              console.error(error);
+              throw error;
+            }
+          }
+        }
 
         return {
           id: e.id,

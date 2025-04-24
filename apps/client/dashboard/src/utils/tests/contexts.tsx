@@ -12,6 +12,7 @@ import { RouterProvider } from "@tanstack/react-router";
 import { ReactNode, useState } from "react";
 import { getTestRouter } from "./router";
 import { DatabaseContext } from "@/contexts/database-context";
+import { type ExchangeRateDb } from "@/database/database";
 
 export function TestDatabaseProvider({
   children,
@@ -134,12 +135,20 @@ export function TestDatabaseProvider({
     },
   });
 
+  const [exchangeRates] = useState<ExchangeRateDb[]>([]);
+
+  const saveExchangeRatesAsync = async () => {
+    // No-op: calling this function does not change the state.
+  };
+
   return (
     <DatabaseContext.Provider
       value={{
         profiles,
         saveProfile,
         deleteProfile,
+        exchangeRates,
+        saveExchangeRatesAsync,
       }}
     >
       {children}
