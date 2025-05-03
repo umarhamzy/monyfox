@@ -5,9 +5,11 @@ import {
   type Profile,
   type AssetSymbolExchange,
   type TransactionCategory,
+  Data,
 } from "@monyfox/common-data";
 import { ulid } from "ulid";
 import { DayOfWeek, LocalDate, Month } from "@js-joda/core";
+import { isCycleInTransactionCategories } from "./transaction-category";
 
 export function generateTestProfile(): Profile {
   const bankAccountEur: Account = {
@@ -360,4 +362,29 @@ export function generateTestProfile(): Profile {
 
 function randomFloat(min: number, max: number) {
   return Math.random() * (max - min) + min;
+}
+
+export function getDataValidationErrors(data: Data): string[] {
+  const errors: string[] = [];
+
+  // Transaction categories
+  if (isCycleInTransactionCategories(data.transactionCategories)) {
+    errors.push("There are cycles in the transaction categories");
+  }
+
+  const existingTransactionCategoryIds = new Set(
+    data.transactionCategories.map((category) => category.id),
+  );
+  for (const category of data.transactionCategories) {
+    if (
+      category.parentTransactionCategoryId !== null &&
+      !existingTransactionCategoryIds.has(category.parentTransactionCategoryId)
+    ) {
+      errors.push(
+        `Transaction category ${category.name} has a non-existing parent category`,
+      );
+    }
+  }
+
+  return errors;
 }
