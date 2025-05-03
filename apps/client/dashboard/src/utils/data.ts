@@ -4,6 +4,7 @@ import {
   type AssetSymbol,
   type Profile,
   type AssetSymbolExchange,
+  type TransactionCategory,
 } from "@monyfox/common-data";
 import { ulid } from "ulid";
 import { DayOfWeek, LocalDate, Month } from "@js-joda/core";
@@ -77,6 +78,58 @@ export function generateTestProfile(): Profile {
     },
   };
 
+  const categoryFood: TransactionCategory = {
+    id: ulid(),
+    name: "Food",
+    parentTransactionCategoryId: null,
+  };
+
+  const categoryWork: TransactionCategory = {
+    id: ulid(),
+    name: "Work",
+    parentTransactionCategoryId: null,
+  };
+
+  const categorySalary: TransactionCategory = {
+    id: ulid(),
+    name: "Salary",
+    parentTransactionCategoryId: categoryWork.id,
+  };
+
+  const categoryEntertainment: TransactionCategory = {
+    id: ulid(),
+    name: "Entertainment",
+    parentTransactionCategoryId: null,
+  };
+
+  const categoryConcert: TransactionCategory = {
+    id: ulid(),
+    name: "Concert",
+    parentTransactionCategoryId: categoryEntertainment.id,
+  };
+
+  const categoryHouse: TransactionCategory = {
+    id: ulid(),
+    name: "House",
+    parentTransactionCategoryId: null,
+  };
+
+  const categoryRent: TransactionCategory = {
+    id: ulid(),
+    name: "Rent",
+    parentTransactionCategoryId: categoryHouse.id,
+  };
+
+  const transactionCategories = [
+    categoryFood,
+    categoryWork,
+    categorySalary,
+    categoryEntertainment,
+    categoryConcert,
+    categoryHouse,
+    categoryRent,
+  ];
+
   const yearsToGenerate = 2;
   const transactions: Transaction[] = [];
   let creditCardBalance = 0;
@@ -87,13 +140,13 @@ export function generateTestProfile(): Profile {
   ) {
     if (currentDate.dayOfMonth() === 1) {
       // Income - salary
-      const salaryAmount = randomFloat(0.9, 1.1) * 5000; // Variance for salary
+      const salaryAmount = Math.round(randomFloat(0.9, 1.1) * 5000); // Variance for salary
       transactions.push({
         id: ulid(),
         description: "Salary",
         transactionDate: currentDate.toString(),
         accountingDate: currentDate.toString(),
-        transactionCategoryId: null,
+        transactionCategoryId: categorySalary.id,
         from: {
           amount: salaryAmount,
           symbolId: assetEur.id,
@@ -107,7 +160,7 @@ export function generateTestProfile(): Profile {
       });
 
       // Income - stock
-      const stockAmount = randomFloat(0.9, 1.1) * 10; // Variance for stock
+      const stockAmount = Math.round(randomFloat(0.9, 1.1) * 10); // Variance for stock
       transactions.push({
         id: ulid(),
         description: "Vested Stock",
@@ -127,13 +180,13 @@ export function generateTestProfile(): Profile {
       });
 
       // Expense - rent
-      const rentAmount = randomFloat(0.9, 1.1) * 1000; // Variance for bills
+      const rentAmount = Math.round(randomFloat(0.9, 1.1) * 1000); // Variance for bills
       transactions.push({
         id: ulid(),
         description: "Rent",
         transactionDate: currentDate.toString(),
         accountingDate: currentDate.toString(),
-        transactionCategoryId: null,
+        transactionCategoryId: categoryRent.id,
         from: {
           amount: rentAmount,
           symbolId: assetEur.id,
@@ -211,13 +264,13 @@ export function generateTestProfile(): Profile {
       currentDate.dayOfMonth() === 15
     ) {
       // Income - bonus
-      const bonusAmount = randomFloat(0.8, 2.0) * 10000;
+      const bonusAmount = Math.round(randomFloat(0.8, 2.0) * 10000);
       transactions.push({
         id: ulid(),
         description: "Bonus",
         transactionDate: currentDate.toString(),
         accountingDate: currentDate.toString(),
-        transactionCategoryId: null,
+        transactionCategoryId: categorySalary.id,
         from: {
           amount: bonusAmount,
           symbolId: assetEur.id,
@@ -237,14 +290,14 @@ export function generateTestProfile(): Profile {
       Math.random() > 0.5
     ) {
       // Expense - entertainment
-      const entertainmentAmount = randomFloat(0.1, 3) * 100;
+      const entertainmentAmount = Math.round(randomFloat(0.1, 3) * 100);
       creditCardBalance += entertainmentAmount;
       transactions.push({
         id: ulid(),
-        description: "Entertainment",
+        description: "Concert",
         transactionDate: currentDate.toString(),
         accountingDate: currentDate.toString(),
-        transactionCategoryId: null,
+        transactionCategoryId: categoryConcert.id,
         from: {
           amount: entertainmentAmount,
           symbolId: assetEur.id,
@@ -253,7 +306,7 @@ export function generateTestProfile(): Profile {
         to: {
           amount: entertainmentAmount,
           symbolId: assetEur.id,
-          account: { name: "Entertainment Shop" },
+          account: { name: "Concert Shop" },
         },
       });
     }
@@ -266,7 +319,7 @@ export function generateTestProfile(): Profile {
       description: "Coffee",
       transactionDate: currentDate.toString(),
       accountingDate: currentDate.toString(),
-      transactionCategoryId: null,
+      transactionCategoryId: categoryFood.id,
       from: {
         amount: coffeeAmount,
         symbolId: assetEur.id,
@@ -295,6 +348,7 @@ export function generateTestProfile(): Profile {
           investmentAccount,
         ],
         transactions,
+        transactionCategories,
         assetSymbols: [assetEur, assetUsd, assetIbm],
         assetSymbolExchanges: [exchangeEurUsd, exchangeEurIbm],
         assetSymbolExchangersMetadata: { alphavantage: { apiKey: "demo" } },

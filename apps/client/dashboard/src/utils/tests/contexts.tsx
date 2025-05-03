@@ -80,7 +80,7 @@ export function TestDatabaseProvider({
               description: "Income",
               transactionDate: "2024-01-01",
               accountingDate: "2024-01-01",
-              transactionCategoryId: null,
+              transactionCategoryId: "CATEGORY_1",
               from: {
                 account: { name: "Income" },
                 amount: 950,
@@ -108,6 +108,18 @@ export function TestDatabaseProvider({
                 amount: 23,
                 symbolId: "EUR",
               },
+            },
+          ],
+          transactionCategories: [
+            {
+              id: "CATEGORY_1",
+              name: "Category 1",
+              parentTransactionCategoryId: null,
+            },
+            {
+              id: "CATEGORY_1_1",
+              name: "Subcategory 1-1",
+              parentTransactionCategoryId: "CATEGORY_1",
             },
           ],
           lastUpdated: "2024-01-01T00:00:00.000Z",

@@ -6,10 +6,12 @@ import {
   AssetSymbolExchangeSchema,
   AssetSymbolSchema,
 } from "./asset-symbol";
+import { TransactionCategorySchema } from "./transaction-category";
 
 export const DataSchema = z.object({
   accounts: z.array(AccountSchema),
   transactions: z.array(TransactionSchema),
+  transactionCategories: z.array(TransactionCategorySchema),
   assetSymbols: z.array(AssetSymbolSchema),
   assetSymbolExchanges: z.array(AssetSymbolExchangeSchema),
   assetSymbolExchangersMetadata: AssetSymbolExchangersMetadataSchema,

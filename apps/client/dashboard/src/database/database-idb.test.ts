@@ -10,6 +10,7 @@ const testProfile: Profile = {
     data: {
       accounts: [],
       transactions: [],
+      transactionCategories: [],
       assetSymbols: [],
       assetSymbolExchanges: [],
       assetSymbolExchangersMetadata: { alphavantage: null },
