@@ -4,6 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Button } from "./button";
@@ -12,12 +13,14 @@ export function Modal({
   isOpen,
   onClose,
   title,
+  description,
   children,
   footer,
 }: {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  description?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
@@ -26,6 +29,7 @@ export function Modal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         {children}
         {footer && <DialogFooter>{footer}</DialogFooter>}

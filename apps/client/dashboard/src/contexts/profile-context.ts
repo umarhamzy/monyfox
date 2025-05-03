@@ -4,6 +4,7 @@ import type {
   Data,
   Account,
   Transaction,
+  TransactionCategory,
   AssetSymbol,
   AssetSymbolExchange,
 } from "@monyfox/common-data";
@@ -26,6 +27,13 @@ interface ProfileContextProps {
     startDate: LocalDate,
     endDate: LocalDate,
   ) => Transaction[];
+
+  // Transaction categories
+  getTransactionCategory: (categoryId: string) => TransactionCategory;
+  createTransactionCategory: MutationResult<TransactionCategory>;
+  updateTransactionCategory: MutationResult<TransactionCategory>;
+  deleteTransactionCategory: MutationResult<string>;
+  getTransactionCountByCategory: (categoryId: string) => number;
 
   // Symbols
   getAssetSymbol: (assetSymbolId: string) => AssetSymbol;

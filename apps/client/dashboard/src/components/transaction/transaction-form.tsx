@@ -30,6 +30,8 @@ import { useEffect, useState } from "react";
 import { DestructiveAlert } from "@/components/ui/alert";
 import { type Transaction } from "@monyfox/common-data";
 import { getTransactionType, TransactionType } from "@/utils/transaction";
+import { getTransactionCategoriesWithChildren } from "@/utils/transaction-category";
+import { SelectItemTransactionCategoryWithChildren } from "../settings/transaction-categories/category-select-item";
 
 export function AddTransactionFloatingButton() {
   const { isOpen, openModal, closeModal } = useModal();
@@ -142,6 +144,7 @@ const formSchema = z.object({
   toAccountId: z.string(),
   amount: z.coerce.number().nonnegative(),
   symbolId: z.string(),
+  categoryId: z.string(),
 });
 
 function TransactionForm({
@@ -155,7 +158,7 @@ function TransactionForm({
 }) {
   const {
     user,
-    data: { accounts, assetSymbols },
+    data: { accounts, assetSymbols, transactionCategories },
     createTransaction,
     updateTransaction,
   } = useProfile();
@@ -165,7 +168,7 @@ function TransactionForm({
     defaultValues: {
       description: transaction?.description ?? "",
       // TODO: support different amounts.
-      amount: transaction?.from.amount ?? 0,
+      amount: transaction?.from.amount ?? undefined,
       fromAccountId:
         transaction !== null && "id" in transaction.from.account
           ? transaction.from.account.id
@@ -176,8 +179,12 @@ function TransactionForm({
           : "",
       // TODO: support different symbols.
       symbolId: transaction?.from.symbolId ?? defaultAssetSymbol?.id ?? "",
+      categoryId: transaction?.transactionCategoryId ?? "-",
     },
   });
+  const rootCategories = getTransactionCategoriesWithChildren(
+    transactionCategories,
+  );
 
   if (defaultAssetSymbol === undefined) {
     return (
@@ -228,7 +235,8 @@ function TransactionForm({
       {
         id: transaction?.id ?? ulid(),
         description: values.description,
-        transactionCategoryId: null,
+        transactionCategoryId:
+          values.categoryId === "-" ? null : values.categoryId,
         transactionDate: now.toString(),
         accountingDate: now.toString(),
         from: {
@@ -269,6 +277,55 @@ function TransactionForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="flex w-full items-center space-x-2">
+          <div className="flex-grow">
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Amount</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      autoFocus
+                      className="h-24 text-4xl md:text-4xl font-bold"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            control={form.control}
+            name="symbolId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>&nbsp;</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent {...field}>
+                      {assetSymbols.map((symbol) => (
+                        <SelectItem key={symbol.id} value={symbol.id}>
+                          {symbol.code}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <div className="flex gap-4">
           {needFromAccount && (
             <FormField
@@ -329,41 +386,26 @@ function TransactionForm({
             />
           )}
         </div>
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="flex w-full max-w-sm items-center space-x-2">
-          <div className="flex-grow">
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+        <div className="flex gap-4">
           <FormField
             control={form.control}
-            name="symbolId"
+            name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>&nbsp;</FormLabel>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
@@ -373,10 +415,13 @@ function TransactionForm({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent {...field}>
-                      {assetSymbols.map((symbol) => (
-                        <SelectItem key={symbol.id} value={symbol.id}>
-                          {symbol.code}
-                        </SelectItem>
+                      <SelectItem value="-">(None)</SelectItem>
+                      {rootCategories.map((cat) => (
+                        <SelectItemTransactionCategoryWithChildren
+                          key={cat.id}
+                          category={cat}
+                          level={0}
+                        />
                       ))}
                     </SelectContent>
                   </Select>

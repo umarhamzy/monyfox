@@ -50,6 +50,7 @@ export function TransactionsTable() {
   const {
     data: { transactions: reversedTransactions },
     getAccount,
+    getTransactionCategory,
   } = useProfile();
 
   const [rowSelection, setRowSelection] = useState({});
@@ -67,9 +68,13 @@ export function TransactionsTable() {
         ...t,
         fromAccountName: getAccountName(t.from, getAccount),
         toAccountName: getAccountName(t.to, getAccount),
+        transactionCategoryName:
+          t.transactionCategoryId === null
+            ? ""
+            : getTransactionCategory(t.transactionCategoryId).name,
       }))
       .reverse();
-  }, [getAccount, reversedTransactions]);
+  }, [getAccount, getTransactionCategory, reversedTransactions]);
 
   const table = useReactTable({
     data: transactions,
@@ -286,7 +291,11 @@ function getAccountName(
 }
 
 const columns: ColumnDef<
-  Transaction & { fromAccountName: string; toAccountName: string }
+  Transaction & {
+    fromAccountName: string;
+    toAccountName: string;
+    transactionCategoryName: string;
+  }
 >[] = [
   // {
   //   id: "select",
@@ -336,6 +345,11 @@ const columns: ColumnDef<
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => row.original.description,
+  },
+  {
+    accessorKey: "category",
+    header: "Category",
+    cell: ({ row }) => row.original.transactionCategoryName,
   },
   {
     accessorKey: "amount",

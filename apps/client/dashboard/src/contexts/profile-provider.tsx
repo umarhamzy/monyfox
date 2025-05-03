@@ -9,6 +9,8 @@ import {
   DataSchema,
   type Transaction,
   TransactionSchema,
+  type TransactionCategory,
+  TransactionCategorySchema,
 } from "@monyfox/common-data";
 import { ReactNode, useCallback, useMemo } from "react";
 import { LocalDate } from "@js-joda/core";
@@ -16,6 +18,7 @@ import { useMutation, UseMutationResult } from "@tanstack/react-query";
 import { ErrorPage } from "@/components/error-page";
 import { ProfileContext } from "./profile-context";
 import { useDatabase } from "@/hooks/use-database";
+import { isCycleInTransactionCategories } from "@/utils/transaction-category";
 
 export type MutationResult<T> = UseMutationResult<void, Error, T, unknown>;
 
@@ -33,8 +36,13 @@ export const ProfileProvider = ({
     [profileId, profiles],
   );
 
-  const validationResult = useMemo(
+  const schemaValidationResult = useMemo(
     () => DataSchema.safeParse(profile?.data.data),
+    [profile],
+  );
+
+  const dataValidationErrors = useMemo(
+    () => getDataValidationErrors(profile?.data.data),
     [profile],
   );
 
@@ -61,13 +69,23 @@ export const ProfileProvider = ({
     name: profile.user,
   };
 
-  if (validationResult.error) {
-    console.error("Invalid profile data", validationResult.error);
+  if (schemaValidationResult.error) {
+    console.error("Invalid profile schema", schemaValidationResult.error);
+    return (
+      <ErrorPage
+        title="Invalid profile schema"
+        message="The profile you are trying to access has invalid data. Please check the
+        console logs in your browser for more details."
+      />
+    );
+  }
+
+  if (dataValidationErrors.length > 0) {
+    console.error("Invalid profile data", dataValidationErrors);
     return (
       <ErrorPage
         title="Invalid profile data"
-        message="The profile you are trying to access has invalid data. Please check the
-        console logs in your browser for more details."
+        message={dataValidationErrors.join(". ") + "."}
       />
     );
   }
@@ -111,6 +129,11 @@ function DataProvider({
       newData[update.key] = update.value;
     }
     newData.lastUpdated = new Date().toISOString();
+
+    const errors = getDataValidationErrors(newData);
+    if (errors.length > 0) {
+      throw new Error(errors.join(". ") + ".");
+    }
 
     await saveProfile.mutateAsync({
       id: user.id,
@@ -206,6 +229,57 @@ function DataProvider({
       });
     },
     [transactions],
+  );
+
+  // Transaction categories
+  const getTransactionCategory = useCallback(
+    (id: string): TransactionCategory => {
+      const category = data.transactionCategories.find((c) => c.id === id);
+      if (!category) {
+        return {
+          id: "N/A",
+          name: "N/A",
+          parentTransactionCategoryId: null,
+        };
+      }
+      return category;
+    },
+    [data.transactionCategories],
+  );
+
+  const createTransactionCategory = useMutation({
+    mutationFn: (tc: TransactionCategory) =>
+      createEntitiesAsync({
+        key: "transactionCategories",
+        entity: TransactionCategorySchema.parse(tc),
+      }),
+  });
+
+  const updateTransactionCategory = useMutation({
+    mutationFn: (tc: TransactionCategory) =>
+      updateEntityAsync(
+        "transactionCategories",
+        TransactionCategorySchema.parse(tc),
+      ),
+  });
+
+  const deleteTransactionCategory = useMutation({
+    mutationFn: (id: string) => deleteEntityAsync("transactionCategories", id),
+  });
+
+  const transactionCountByCategory = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const transaction of transactions) {
+      const category = transaction.transactionCategoryId ?? "-";
+      const count = map.get(category) ?? 0;
+      map.set(category, count + 1);
+    }
+    return map;
+  }, [transactions]);
+
+  const getTransactionCountByCategory = useCallback(
+    (id: string) => transactionCountByCategory.get(id) ?? 0,
+    [transactionCountByCategory],
   );
 
   // Asset symbols
@@ -318,6 +392,13 @@ function DataProvider({
         deleteTransaction,
         getTransactionsBetweenDates,
 
+        // Transaction categories
+        getTransactionCategory,
+        createTransactionCategory,
+        updateTransactionCategory,
+        deleteTransactionCategory,
+        getTransactionCountByCategory,
+
         // Symbols
         getAssetSymbol,
         getTransactionCountBySymbol,
@@ -334,4 +415,34 @@ function DataProvider({
       {children}
     </ProfileContext.Provider>
   );
+}
+
+function getDataValidationErrors(data: Data | string | undefined): string[] {
+  if (data === undefined || typeof data === "string") {
+    // We don't care about the message since we don't use this result in this case.
+    return ["Data is encrypted or undefined"];
+  }
+
+  const errors: string[] = [];
+
+  // Transaction categories
+  if (isCycleInTransactionCategories(data.transactionCategories)) {
+    errors.push("There are cycles in the transaction categories");
+  }
+
+  const existingTransactionCategoryIds = new Set(
+    data.transactionCategories.map((category) => category.id),
+  );
+  for (const category of data.transactionCategories) {
+    if (
+      category.parentTransactionCategoryId !== null &&
+      !existingTransactionCategoryIds.has(category.parentTransactionCategoryId)
+    ) {
+      errors.push(
+        `Transaction category ${category.name} has a non-existing parent category`,
+      );
+    }
+  }
+
+  return errors;
 }

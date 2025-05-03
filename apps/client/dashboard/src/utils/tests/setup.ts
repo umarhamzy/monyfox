@@ -4,6 +4,8 @@ import { http, HttpResponse } from "msw";
 
 import "@testing-library/jest-dom";
 import "fake-indexeddb/auto";
+import { beforeEach } from "node:test";
+import { toast } from "sonner";
 
 // https://stackoverflow.com/questions/53271193/typeerror-scrollintoview-is-not-a-function
 window.HTMLElement.prototype.scrollIntoView = function () {};
@@ -112,5 +114,8 @@ const restHandlers = [
 
 const server = setupServer(...restHandlers);
 beforeAll(() => server.listen());
+beforeEach(() => {
+  toast.getHistory().forEach((t) => toast.dismiss(t.id));
+});
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
