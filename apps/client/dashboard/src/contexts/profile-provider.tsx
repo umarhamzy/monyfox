@@ -18,7 +18,7 @@ import { useMutation, UseMutationResult } from "@tanstack/react-query";
 import { ErrorPage } from "@/components/error-page";
 import { ProfileContext } from "./profile-context";
 import { useDatabase } from "@/hooks/use-database";
-import { isCycleInTransactionCategories } from "@/utils/transaction-category";
+import { getDataValidationErrors } from "@/utils/data";
 
 export type MutationResult<T> = UseMutationResult<void, Error, T, unknown>;
 
@@ -42,8 +42,11 @@ export const ProfileProvider = ({
   );
 
   const dataValidationErrors = useMemo(
-    () => getDataValidationErrors(profile?.data.data),
-    [profile],
+    () =>
+      schemaValidationResult.success && profile?.data.encrypted === false
+        ? getDataValidationErrors(profile?.data.data)
+        : ["No data"],
+    [schemaValidationResult, profile],
   );
 
   if (profile === undefined) {
@@ -415,34 +418,4 @@ function DataProvider({
       {children}
     </ProfileContext.Provider>
   );
-}
-
-function getDataValidationErrors(data: Data | string | undefined): string[] {
-  if (data === undefined || typeof data === "string") {
-    // We don't care about the message since we don't use this result in this case.
-    return ["Data is encrypted or undefined"];
-  }
-
-  const errors: string[] = [];
-
-  // Transaction categories
-  if (isCycleInTransactionCategories(data.transactionCategories)) {
-    errors.push("There are cycles in the transaction categories");
-  }
-
-  const existingTransactionCategoryIds = new Set(
-    data.transactionCategories.map((category) => category.id),
-  );
-  for (const category of data.transactionCategories) {
-    if (
-      category.parentTransactionCategoryId !== null &&
-      !existingTransactionCategoryIds.has(category.parentTransactionCategoryId)
-    ) {
-      errors.push(
-        `Transaction category ${category.name} has a non-existing parent category`,
-      );
-    }
-  }
-
-  return errors;
 }
