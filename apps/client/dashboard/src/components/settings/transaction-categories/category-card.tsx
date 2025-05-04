@@ -6,26 +6,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ConfirmationModal, useModal } from "@/components/ui/modal";
+import { useModal } from "@/components/ui/modal";
 import { useProfile } from "@/hooks/use-profile";
-import { TrashIcon, PencilIcon } from "lucide-react";
-import { toast } from "sonner";
+import { PencilIcon } from "lucide-react";
 import { type TransactionCategoryWithChildren } from "@/utils/transaction-category";
 import { TransactionCategoryFormModal } from "./category-form-modal";
-import { MutationResult } from "@/contexts/profile-provider";
 
 export function TransactionCategoryCard({
   category,
 }: {
   category: TransactionCategoryWithChildren;
 }) {
-  const { deleteTransactionCategory, getTransactionCountByCategory } =
-    useProfile();
-  const {
-    isOpen: isDeleteOpen,
-    openModal: openDeleteModal,
-    closeModal: closeDeleteModal,
-  } = useModal();
+  const { getTransactionCountByCategory } = useProfile();
   const {
     isOpen: isEditOpen,
     openModal: openEditModal,
@@ -51,26 +43,12 @@ export function TransactionCategoryCard({
             >
               <PencilIcon />
             </Button>
-            <Button
-              size="icon"
-              onClick={openDeleteModal}
-              variant="outline"
-              title="Delete"
-            >
-              <TrashIcon />
-            </Button>
             <TransactionCategoryFormModal
               isOpen={isEditOpen}
               onClose={closeEditModal}
               category={category}
             />
           </div>
-          <DeleteConfirmationModal
-            isDeleteOpen={isDeleteOpen}
-            closeDeleteModal={closeDeleteModal}
-            deleteTransactionCategory={deleteTransactionCategory}
-            category={category}
-          />
         </div>
       </CardHeader>
       {category.children.length > 0 && (
@@ -81,48 +59,5 @@ export function TransactionCategoryCard({
         </CardContent>
       )}
     </Card>
-  );
-}
-function DeleteConfirmationModal({
-  isDeleteOpen,
-  closeDeleteModal,
-  deleteTransactionCategory,
-  category,
-}: {
-  isDeleteOpen: boolean;
-  closeDeleteModal: () => void;
-  deleteTransactionCategory: MutationResult<string>;
-  category: TransactionCategoryWithChildren;
-}) {
-  return (
-    <ConfirmationModal
-      isOpen={isDeleteOpen}
-      onClose={closeDeleteModal}
-      title="Delete transaction category"
-      onConfirm={() => {
-        deleteTransactionCategory.mutate(category.id, {
-          onSuccess: () => {
-            toast.success("Category deleted");
-            closeDeleteModal();
-          },
-          onError: (e) => {
-            toast.error("Error deleting category", {
-              description: e.message,
-            });
-          },
-        });
-        closeDeleteModal();
-      }}
-      confirmText="Delete"
-      cancelText="Cancel"
-      actionButtonVariant="destructive"
-      isLoading={deleteTransactionCategory.isPending}
-    >
-      <span>
-        Are you sure you want to delete this transaction category? All the
-        transactions associated with this category will <b>NOT</b> be deleted
-        and will remain uncategorized.
-      </span>
-    </ConfirmationModal>
   );
 }

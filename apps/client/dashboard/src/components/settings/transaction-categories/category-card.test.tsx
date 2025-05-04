@@ -33,15 +33,3 @@ test("opens Edit Transaction Category modal", () => {
   fireEvent.click(r.getByTitle("Edit"));
   expect(r.queryByText("Edit the category.")).toBeInTheDocument();
 });
-
-test("opens Delete Transaction Category modal", () => {
-  const r = render(
-    <TestContextProvider>
-      <TransactionCategoryCard category={mockCategory} />
-    </TestContextProvider>,
-  );
-
-  fireEvent.click(r.getByTitle("Delete"));
-
-  expect(r.getByText("Delete transaction category")).toBeInTheDocument();
-});

@@ -111,16 +111,6 @@ function DataProvider({
 }) {
   const { saveProfile } = useDatabase();
 
-  function getAccount(accountId: string): Account {
-    return (
-      data.accounts.find((account) => account.id === accountId) ?? {
-        id: accountId,
-        name: "Unknown account",
-        isPersonalAsset: false,
-      }
-    );
-  }
-
   async function updateDataFields<K extends keyof Data>(
     ...updates: Array<{
       key: K;
@@ -188,9 +178,24 @@ function DataProvider({
   }
 
   // Accounts
+  const getAccount = useCallback(
+    (accountId: string): Account =>
+      data.accounts.find((account) => account.id === accountId) ?? {
+        id: accountId,
+        name: "Unknown account",
+        isPersonalAsset: false,
+      },
+    [data.accounts],
+  );
+
   const createAccount = useMutation({
     mutationFn: (a: Account) =>
       createEntitiesAsync({ key: "accounts", entity: AccountSchema.parse(a) }),
+  });
+
+  const updateAccount = useMutation({
+    mutationFn: (a: Account) =>
+      updateEntityAsync("accounts", AccountSchema.parse(a)),
   });
 
   const deleteAccount = useMutation({
@@ -232,6 +237,30 @@ function DataProvider({
       });
     },
     [transactions],
+  );
+
+  const transactionCountByAccount = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const transaction of transactions) {
+      const fromAccountId =
+        "id" in transaction.from.account ? transaction.from.account.id : null;
+      const toAccountId =
+        "id" in transaction.to.account ? transaction.to.account.id : null;
+
+      if (fromAccountId !== null) {
+        map.set(fromAccountId, (map.get(fromAccountId) ?? 0) + 1);
+      }
+
+      if (toAccountId !== null && toAccountId !== fromAccountId) {
+        map.set(toAccountId, (map.get(toAccountId) ?? 0) + 1);
+      }
+    }
+    return map;
+  }, [transactions]);
+
+  const getTransactionCountByAccount = useCallback(
+    (id: string) => transactionCountByAccount.get(id) ?? 0,
+    [transactionCountByAccount],
   );
 
   // Transaction categories
@@ -375,6 +404,57 @@ function DataProvider({
       }),
   });
 
+  const balanceByAccountAndSymbol = useMemo(() => {
+    const balanceByAccountAndSymbol = new Map<string, Map<string, number>>();
+    for (const transaction of transactions) {
+      const fromAccount = transaction.from.account;
+      const isFromPersonalAsset =
+        "id" in fromAccount && getAccount(fromAccount.id).isPersonalAsset;
+      if (isFromPersonalAsset) {
+        const accountId = fromAccount.id;
+        const symbolId = transaction.from.symbolId;
+        const amount = transaction.from.amount;
+        const balanceBySymbol =
+          balanceByAccountAndSymbol.get(accountId) || new Map();
+        balanceBySymbol.set(
+          symbolId,
+          (balanceBySymbol.get(symbolId) || 0) - amount,
+        );
+        balanceByAccountAndSymbol.set(accountId, balanceBySymbol);
+      }
+
+      const toAccount = transaction.to.account;
+      const isToPersonalAsset =
+        "id" in toAccount && getAccount(toAccount.id).isPersonalAsset;
+      if (isToPersonalAsset) {
+        const accountId = toAccount.id;
+        const symbolId = transaction.to.symbolId;
+        const amount = transaction.to.amount;
+        const balanceBySymbol =
+          balanceByAccountAndSymbol.get(accountId) || new Map();
+        balanceBySymbol.set(
+          symbolId,
+          (balanceBySymbol.get(symbolId) || 0) + amount,
+        );
+        balanceByAccountAndSymbol.set(accountId, balanceBySymbol);
+      }
+    }
+    return balanceByAccountAndSymbol;
+  }, [transactions, getAccount]);
+
+  const getBalanceByAccount = (
+    accountId: string,
+  ): Array<{ symbolId: string; balance: number }> => {
+    const balanceBySymbol = balanceByAccountAndSymbol.get(accountId);
+    if (!balanceBySymbol) {
+      return [];
+    }
+    return Array.from(balanceBySymbol.entries()).map(([symbolId, balance]) => ({
+      symbolId,
+      balance,
+    }));
+  };
+
   return (
     <ProfileContext.Provider
       value={{
@@ -387,7 +467,10 @@ function DataProvider({
         // Accounts
         getAccount,
         createAccount,
+        updateAccount,
         deleteAccount,
+        getTransactionCountByAccount,
+        getBalanceByAccount,
 
         // Transactions
         createTransaction,

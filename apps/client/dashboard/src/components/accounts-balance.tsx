@@ -9,62 +9,40 @@ import { LocalDate } from "@js-joda/core";
 export function AccountsBalance() {
   const { defaultSymbolId } = useSettings();
   const {
-    data: { transactions },
+    data: { accounts },
     getAccount,
     getAssetSymbol,
+    getBalanceByAccount,
   } = useProfile();
   const { convertAmount } = useAssetSymbolExchangeRate();
 
   const assetSymbol = getAssetSymbol(defaultSymbolId);
   const today = LocalDate.now().toString();
 
-  const balances = useMemo(() => {
-    const balanceByAccount = new Map<string, number>();
-    for (const transaction of transactions) {
-      const fromAccount = transaction.from.account;
-      const isFromPersonalAsset =
-        "id" in fromAccount && getAccount(fromAccount.id).isPersonalAsset;
-      if (isFromPersonalAsset) {
-        const accountId = fromAccount.id;
-        const amount = convertAmount({
-          amount: transaction.from.amount,
-          date: today,
-          fromAssetSymbolId: transaction.from.symbolId,
-          toAssetSymbolId: defaultSymbolId,
-        });
-        balanceByAccount.set(
-          accountId,
-          (balanceByAccount.get(accountId) || 0) - amount,
-        );
-      }
-
-      const toAccount = transaction.to.account;
-      const isToPersonalAsset =
-        "id" in toAccount && getAccount(toAccount.id).isPersonalAsset;
-      if (isToPersonalAsset) {
-        const accountId = toAccount.id;
-        const amount = convertAmount({
-          amount: transaction.to.amount,
-          date: today,
-          fromAssetSymbolId: transaction.to.symbolId,
-          toAssetSymbolId: defaultSymbolId,
-        });
-        balanceByAccount.set(
-          accountId,
-          (balanceByAccount.get(accountId) || 0) + amount,
-        );
-      }
-    }
-
-    return Array.from(balanceByAccount.entries())
-      .map(([accountId, balance]) => ({
-        accountId,
-        balance,
-      }))
-      .sort((a, b) => {
-        return b.balance - a.balance;
-      });
-  }, [getAccount, defaultSymbolId, convertAmount, transactions, today]);
+  const balances = useMemo(
+    () =>
+      accounts
+        .filter((a) => a.isPersonalAsset)
+        .map((account) => ({
+          accountId: account.id,
+          balance: getBalanceByAccount(account.id).reduce(
+            (acc, { symbolId, balance }) => {
+              return (
+                acc +
+                convertAmount({
+                  amount: balance,
+                  date: today,
+                  fromAssetSymbolId: symbolId,
+                  toAssetSymbolId: defaultSymbolId,
+                })
+              );
+            },
+            0,
+          ),
+        }))
+        .sort((a, b) => b.balance - a.balance),
+    [accounts, getBalanceByAccount, convertAmount, today, defaultSymbolId],
+  );
 
   const totalBalance = useMemo(() => {
     return balances.reduce((acc, { balance }) => acc + balance, 0);

@@ -121,14 +121,18 @@ describe("delete transaction category", async () => {
     const toastError = vi.spyOn(toast, "error");
 
     const r = render(
-      <TestContextProvider>
+      <TestContextProvider withTransactions={false}>
         <TransactionCategoriesList />
       </TestContextProvider>,
     );
 
-    const deleteButton = r.getAllByTitle("Delete");
-    expect(deleteButton).toHaveLength(2);
-    fireEvent.click(deleteButton[1]);
+    const editButton = r.getAllByTitle("Edit");
+    expect(editButton).toHaveLength(2);
+    fireEvent.click(editButton[1]);
+    expect(r.getByText("Edit the category.")).toBeInTheDocument();
+
+    const deleteButton = r.getByTitle("Delete");
+    fireEvent.click(deleteButton);
 
     expect(r.getByText("Delete transaction category")).toBeInTheDocument();
     fireEvent.click(r.getByText("Delete"));
@@ -146,14 +150,18 @@ describe("delete transaction category", async () => {
     const toastError = vi.spyOn(toast, "error");
 
     const r = render(
-      <TestContextProvider>
+      <TestContextProvider withTransactions={false}>
         <TransactionCategoriesList />
       </TestContextProvider>,
     );
 
-    const deleteButton = r.getAllByTitle("Delete");
-    expect(deleteButton).toHaveLength(2);
-    fireEvent.click(deleteButton[0]);
+    const editButton = r.getAllByTitle("Edit");
+    expect(editButton).toHaveLength(2);
+    fireEvent.click(editButton[0]);
+    expect(r.getByText("Edit the category.")).toBeInTheDocument();
+
+    const deleteButton = r.getByTitle("Delete");
+    fireEvent.click(deleteButton);
 
     expect(r.getByText("Delete transaction category")).toBeInTheDocument();
     fireEvent.click(r.getByText("Delete"));
@@ -166,6 +174,38 @@ describe("delete transaction category", async () => {
     expect(toastError).toHaveBeenCalledWith("Error deleting category", {
       description:
         "Transaction category Subcategory 1-1 has a non-existing parent category.",
+    });
+  });
+
+  test("error - category with transactions", async () => {
+    const toastSuccess = vi.spyOn(toast, "success");
+    const toastError = vi.spyOn(toast, "error");
+
+    const r = render(
+      <TestContextProvider>
+        <TransactionCategoriesList />
+      </TestContextProvider>,
+    );
+
+    const editButton = r.getAllByTitle("Edit");
+    expect(editButton).toHaveLength(2);
+    fireEvent.click(editButton[0]);
+    expect(r.getByText("Edit the category.")).toBeInTheDocument();
+
+    const deleteButton = r.getByTitle("Delete");
+    fireEvent.click(deleteButton);
+
+    expect(r.getByText("Delete transaction category")).toBeInTheDocument();
+    fireEvent.click(r.getByText("Delete"));
+
+    await waitFor(() => {
+      expect(r.queryByText("Category 2")).toBeNull();
+    });
+
+    expect(toastSuccess).not.toHaveBeenCalled();
+    expect(toastError).toHaveBeenCalledWith("Error deleting category", {
+      description:
+        "Transaction category Subcategory 1-1 has a non-existing parent category. Transaction has a non-existing category.",
     });
   });
 });
