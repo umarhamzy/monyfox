@@ -2,6 +2,7 @@
 
 import {
   ArrowLeftRightIcon,
+  ChartPieIcon,
   LayoutDashboardIcon,
   LibraryBigIcon,
 } from "lucide-react";
@@ -36,6 +37,18 @@ export function NavMain() {
               >
                 <LayoutDashboardIcon />
                 <span>Dashboard</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip="Accounts" asChild>
+              <Link
+                to="/p/$profileId/charts"
+                params={{ profileId }}
+                onClick={onSidebarLinkClick}
+              >
+                <ChartPieIcon />
+                <span>Charts</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

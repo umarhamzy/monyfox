@@ -121,6 +121,78 @@ export function getIncomeExpenseByMonthData({
   return chartData;
 }
 
+export function getIncomeExpenseByCategoryData({
+  transactions,
+  getAccount,
+  convertAmount,
+  defaultSymbolId,
+}: {
+  transactions: Transaction[];
+  getAccount: (accountId: string) => Account;
+  convertAmount: (args: {
+    amount: number;
+    date: string;
+    fromAssetSymbolId: string;
+    toAssetSymbolId: string;
+  }) => number;
+  defaultSymbolId: string;
+}) {
+  const stateByCategoryId = new Map<
+    string | null,
+    { income: number; expense: number }
+  >();
+
+  for (const transaction of transactions) {
+    const transactionType = getTransactionType(transaction, getAccount);
+
+    const isIncome = transactionType === TransactionType.Income;
+    const isExpense = transactionType === TransactionType.Expense;
+
+    if (!isIncome && !isExpense) {
+      continue;
+    }
+
+    const transactionCategoryId = transaction.transactionCategoryId;
+
+    if (!stateByCategoryId.has(transactionCategoryId)) {
+      stateByCategoryId.set(transactionCategoryId, { income: 0, expense: 0 });
+    }
+
+    const state = stateByCategoryId.get(transactionCategoryId)!;
+    if (isIncome) {
+      state.income += convertAmount({
+        amount: transaction.to.amount,
+        date: transaction.accountingDate,
+        fromAssetSymbolId: transaction.to.symbolId,
+        toAssetSymbolId: defaultSymbolId,
+      });
+    }
+    if (isExpense) {
+      state.expense += convertAmount({
+        amount: transaction.from.amount,
+        date: transaction.accountingDate,
+        fromAssetSymbolId: transaction.from.symbolId,
+        toAssetSymbolId: defaultSymbolId,
+      });
+    }
+    stateByCategoryId.set(transactionCategoryId, state);
+  }
+
+  const chartData: {
+    categoryId: string;
+    income: number;
+    expense: number;
+  }[] = [];
+  for (const [categoryId, state] of stateByCategoryId) {
+    chartData.push({
+      categoryId: categoryId ?? "-",
+      income: state.income,
+      expense: state.expense,
+    });
+  }
+  return chartData;
+}
+
 export function getBalancesByMonth({
   transactions,
   startDate,

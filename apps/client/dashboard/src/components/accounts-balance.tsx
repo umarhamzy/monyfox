@@ -2,13 +2,6 @@ import { useProfile } from "@/hooks/use-profile";
 import { formatCurrency } from "@/utils/currency";
 import { useMemo } from "react";
 import { Table, TableBody, TableCell, TableRow } from "./ui/table";
-import { Progress } from "./ui/progress";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
 import { useSettings } from "@/hooks/use-settings";
 import { useAssetSymbolExchangeRate } from "@/hooks/use-asset-symbol-exchange-rate";
 import { LocalDate } from "@js-joda/core";
@@ -86,20 +79,7 @@ export function AccountsBalance() {
               {getAccount(accountId).name}
             </TableCell>
             <TableCell className="text-right">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div>
-                      {formatCurrency(balance, assetSymbol)}
-                      <br />
-                      <Progress value={(balance / totalBalance) * 100} />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {Math.round((balance / totalBalance) * 100)}%
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              {formatCurrency(balance, assetSymbol)}
             </TableCell>
           </TableRow>
         ))}

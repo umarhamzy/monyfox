@@ -18,6 +18,7 @@ import { Route as PProfileIdProfileImport } from './routes/p/$profileId/_profile
 import { Route as PProfileIdProfileIndexImport } from './routes/p/$profileId/_profile/index'
 import { Route as PProfileIdProfileTransactionsIndexImport } from './routes/p/$profileId/_profile/transactions/index'
 import { Route as PProfileIdProfileSettingsIndexImport } from './routes/p/$profileId/_profile/settings/index'
+import { Route as PProfileIdProfileChartsIndexImport } from './routes/p/$profileId/_profile/charts/index'
 import { Route as PProfileIdProfileAccountsIndexImport } from './routes/p/$profileId/_profile/accounts/index'
 import { Route as PProfileIdProfileSettingsTransactionCategoriesImport } from './routes/p/$profileId/_profile/settings/transaction-categories'
 import { Route as PProfileIdProfileSettingsSymbolsImport } from './routes/p/$profileId/_profile/settings/symbols'
@@ -62,6 +63,13 @@ const PProfileIdProfileSettingsIndexRoute =
   PProfileIdProfileSettingsIndexImport.update({
     id: '/settings/',
     path: '/settings/',
+    getParentRoute: () => PProfileIdProfileRoute,
+  } as any)
+
+const PProfileIdProfileChartsIndexRoute =
+  PProfileIdProfileChartsIndexImport.update({
+    id: '/charts/',
+    path: '/charts/',
     getParentRoute: () => PProfileIdProfileRoute,
   } as any)
 
@@ -139,6 +147,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PProfileIdProfileAccountsIndexImport
       parentRoute: typeof PProfileIdProfileImport
     }
+    '/p/$profileId/_profile/charts/': {
+      id: '/p/$profileId/_profile/charts/'
+      path: '/charts'
+      fullPath: '/p/$profileId/charts'
+      preLoaderRoute: typeof PProfileIdProfileChartsIndexImport
+      parentRoute: typeof PProfileIdProfileImport
+    }
     '/p/$profileId/_profile/settings/': {
       id: '/p/$profileId/_profile/settings/'
       path: '/settings'
@@ -163,6 +178,7 @@ interface PProfileIdProfileRouteChildren {
   PProfileIdProfileSettingsSymbolsRoute: typeof PProfileIdProfileSettingsSymbolsRoute
   PProfileIdProfileSettingsTransactionCategoriesRoute: typeof PProfileIdProfileSettingsTransactionCategoriesRoute
   PProfileIdProfileAccountsIndexRoute: typeof PProfileIdProfileAccountsIndexRoute
+  PProfileIdProfileChartsIndexRoute: typeof PProfileIdProfileChartsIndexRoute
   PProfileIdProfileSettingsIndexRoute: typeof PProfileIdProfileSettingsIndexRoute
   PProfileIdProfileTransactionsIndexRoute: typeof PProfileIdProfileTransactionsIndexRoute
 }
@@ -173,6 +189,7 @@ const PProfileIdProfileRouteChildren: PProfileIdProfileRouteChildren = {
   PProfileIdProfileSettingsTransactionCategoriesRoute:
     PProfileIdProfileSettingsTransactionCategoriesRoute,
   PProfileIdProfileAccountsIndexRoute: PProfileIdProfileAccountsIndexRoute,
+  PProfileIdProfileChartsIndexRoute: PProfileIdProfileChartsIndexRoute,
   PProfileIdProfileSettingsIndexRoute: PProfileIdProfileSettingsIndexRoute,
   PProfileIdProfileTransactionsIndexRoute:
     PProfileIdProfileTransactionsIndexRoute,
@@ -200,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/p/$profileId/settings/symbols': typeof PProfileIdProfileSettingsSymbolsRoute
   '/p/$profileId/settings/transaction-categories': typeof PProfileIdProfileSettingsTransactionCategoriesRoute
   '/p/$profileId/accounts': typeof PProfileIdProfileAccountsIndexRoute
+  '/p/$profileId/charts': typeof PProfileIdProfileChartsIndexRoute
   '/p/$profileId/settings': typeof PProfileIdProfileSettingsIndexRoute
   '/p/$profileId/transactions': typeof PProfileIdProfileTransactionsIndexRoute
 }
@@ -210,6 +228,7 @@ export interface FileRoutesByTo {
   '/p/$profileId/settings/symbols': typeof PProfileIdProfileSettingsSymbolsRoute
   '/p/$profileId/settings/transaction-categories': typeof PProfileIdProfileSettingsTransactionCategoriesRoute
   '/p/$profileId/accounts': typeof PProfileIdProfileAccountsIndexRoute
+  '/p/$profileId/charts': typeof PProfileIdProfileChartsIndexRoute
   '/p/$profileId/settings': typeof PProfileIdProfileSettingsIndexRoute
   '/p/$profileId/transactions': typeof PProfileIdProfileTransactionsIndexRoute
 }
@@ -223,6 +242,7 @@ export interface FileRoutesById {
   '/p/$profileId/_profile/settings/symbols': typeof PProfileIdProfileSettingsSymbolsRoute
   '/p/$profileId/_profile/settings/transaction-categories': typeof PProfileIdProfileSettingsTransactionCategoriesRoute
   '/p/$profileId/_profile/accounts/': typeof PProfileIdProfileAccountsIndexRoute
+  '/p/$profileId/_profile/charts/': typeof PProfileIdProfileChartsIndexRoute
   '/p/$profileId/_profile/settings/': typeof PProfileIdProfileSettingsIndexRoute
   '/p/$profileId/_profile/transactions/': typeof PProfileIdProfileTransactionsIndexRoute
 }
@@ -236,6 +256,7 @@ export interface FileRouteTypes {
     | '/p/$profileId/settings/symbols'
     | '/p/$profileId/settings/transaction-categories'
     | '/p/$profileId/accounts'
+    | '/p/$profileId/charts'
     | '/p/$profileId/settings'
     | '/p/$profileId/transactions'
   fileRoutesByTo: FileRoutesByTo
@@ -245,6 +266,7 @@ export interface FileRouteTypes {
     | '/p/$profileId/settings/symbols'
     | '/p/$profileId/settings/transaction-categories'
     | '/p/$profileId/accounts'
+    | '/p/$profileId/charts'
     | '/p/$profileId/settings'
     | '/p/$profileId/transactions'
   id:
@@ -256,6 +278,7 @@ export interface FileRouteTypes {
     | '/p/$profileId/_profile/settings/symbols'
     | '/p/$profileId/_profile/settings/transaction-categories'
     | '/p/$profileId/_profile/accounts/'
+    | '/p/$profileId/_profile/charts/'
     | '/p/$profileId/_profile/settings/'
     | '/p/$profileId/_profile/transactions/'
   fileRoutesById: FileRoutesById
@@ -302,6 +325,7 @@ export const routeTree = rootRoute
         "/p/$profileId/_profile/settings/symbols",
         "/p/$profileId/_profile/settings/transaction-categories",
         "/p/$profileId/_profile/accounts/",
+        "/p/$profileId/_profile/charts/",
         "/p/$profileId/_profile/settings/",
         "/p/$profileId/_profile/transactions/"
       ]
@@ -320,6 +344,10 @@ export const routeTree = rootRoute
     },
     "/p/$profileId/_profile/accounts/": {
       "filePath": "p/$profileId/_profile/accounts/index.tsx",
+      "parent": "/p/$profileId/_profile"
+    },
+    "/p/$profileId/_profile/charts/": {
+      "filePath": "p/$profileId/_profile/charts/index.tsx",
       "parent": "/p/$profileId/_profile"
     },
     "/p/$profileId/_profile/settings/": {

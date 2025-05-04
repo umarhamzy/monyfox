@@ -1,17 +1,9 @@
 import { renderHook, act } from "@testing-library/react";
-import {
-  describe,
-  test,
-  expect,
-  beforeEach,
-  beforeAll,
-  afterAll,
-} from "vitest";
+import { describe, test, expect, beforeEach, beforeAll } from "vitest";
 import { useLocalStorage } from "./use-local-storage";
 import { z } from "zod";
 import { MemoryStorage } from "../utils/tests/memory-storage";
 
-const originalLocalStorage = window.localStorage;
 const memoryStorage = new MemoryStorage();
 
 beforeAll(() => {
@@ -21,21 +13,14 @@ beforeAll(() => {
   });
 });
 
-afterAll(() => {
-  Object.defineProperty(window, "localStorage", {
-    value: originalLocalStorage,
-    writable: true,
-  });
+beforeEach(() => {
+  memoryStorage.clear();
 });
 
 describe("useLocalStorage", () => {
   const key = "testKey";
   const defaultValue = { name: "John Doe" };
   const schema = z.object({ name: z.string() });
-
-  beforeEach(() => {
-    memoryStorage.clear();
-  });
 
   test("should initialize with default value if no value in storage", () => {
     const { result } = renderHook(() =>

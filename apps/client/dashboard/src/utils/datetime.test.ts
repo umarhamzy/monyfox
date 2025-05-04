@@ -1,5 +1,5 @@
 import { LocalDate } from "@js-joda/core";
-import { maxLocalDate } from "./datetime";
+import { maxLocalDate, yearMonthToLocalMonthYear } from "./datetime";
 import { describe, expect, test } from "vitest";
 
 describe("maxLocalDate", () => {
@@ -34,5 +34,32 @@ describe("maxLocalDate", () => {
 
     const result = maxLocalDate(date1, date2);
     expect(result).toEqual(date1);
+  });
+});
+
+describe("yearMonthToLocalMonthYear", () => {
+  // TODO: set the locale to a fixed value and check the exact string
+  test("returns correct month and year for January", () => {
+    const startDate = LocalDate.of(2023, 1, 1);
+    const result = yearMonthToLocalMonthYear("2023-01", startDate);
+    expect(result).toContain("2023"); // May 2023
+  });
+
+  test("returns correct month for other months", () => {
+    const startDate = LocalDate.of(2023, 1, 1);
+    const result = yearMonthToLocalMonthYear("2023-05", startDate);
+    expect(result).not.toContain("2023"); // May
+  });
+
+  test("returns correct month and year for start date", () => {
+    const startDate = LocalDate.of(2023, 1, 1);
+    const result = yearMonthToLocalMonthYear("2023-01", startDate);
+    expect(result).toContain("2023"); // Jan 2023
+  });
+
+  test("returns correct month for non-start date", () => {
+    const startDate = LocalDate.of(2023, 1, 1);
+    const result = yearMonthToLocalMonthYear("2023-05", startDate);
+    expect(result).not.toContain("2023"); // May
   });
 });

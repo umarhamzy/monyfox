@@ -7,13 +7,6 @@ import {
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { describe, expect, test } from "vitest";
 
-class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-window.ResizeObserver = ResizeObserver;
-
 const mockData = [
   { name: "Page A", uv: 400, pv: 2400, amt: 2400 },
   { name: "Page B", uv: 300, pv: 1398, amt: 2210 },
