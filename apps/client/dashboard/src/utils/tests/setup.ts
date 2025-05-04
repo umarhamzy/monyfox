@@ -24,6 +24,12 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 
+window.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 const restHandlers = [
   http.get("https://www.alphavantage.co/query", ({ request }) => {
     const url = new URL(request.url);

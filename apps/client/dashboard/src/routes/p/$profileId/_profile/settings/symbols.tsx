@@ -3,10 +3,6 @@ import { SettingsSymbolsPage } from "@/components/settings/symbols/page";
 
 export const Route = createFileRoute("/p/$profileId/_profile/settings/symbols")(
   {
-    component: RouteComponent,
+    component: SettingsSymbolsPage,
   },
 );
-
-function RouteComponent() {
-  return <SettingsSymbolsPage />;
-}
