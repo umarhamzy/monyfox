@@ -36,7 +36,12 @@ export function AccountCard({ account }: { account: Account }) {
             <CardDescription>{transactionsCount} transactions</CardDescription>
           </div>
           <div className="flex gap-2">
-            <Button size="icon" onClick={openEditModal} variant="outline">
+            <Button
+              size="icon"
+              onClick={openEditModal}
+              variant="outline"
+              title="Edit"
+            >
               <PencilIcon />
             </Button>
           </div>

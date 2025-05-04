@@ -125,11 +125,11 @@ function DeleteButton({ account }: { account: Account }) {
         onConfirm={() => {
           deleteAccount.mutate(account.id, {
             onSuccess: () => {
-              toast.success("Account deleted successfully");
+              toast.success("Account deleted");
               closeModal();
             },
             onError: (e) => {
-              toast.error("Failed to delete account", {
+              toast.error("Error deleting account", {
                 description: e.message,
               });
             },
