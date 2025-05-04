@@ -17,7 +17,12 @@ interface ProfileContextProps {
   // Accounts
   getAccount: (accountId: string) => Account;
   createAccount: MutationResult<Account>;
+  updateAccount: MutationResult<Account>;
   deleteAccount: MutationResult<string>;
+  getTransactionCountByAccount: (accountId: string) => number;
+  getBalanceByAccount: (
+    accountId: string,
+  ) => Array<{ symbolId: string; balance: number }>;
 
   // Transactions
   createTransaction: MutationResult<Transaction>;

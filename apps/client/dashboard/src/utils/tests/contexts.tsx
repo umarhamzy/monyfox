@@ -19,6 +19,7 @@ export function TestDatabaseProvider({
   withEncryptedData = false,
   withInvalidSchema = false,
   withInvalidData = false,
+  withTransactions = true,
   withFiat = true,
   withStocks = true,
 }: {
@@ -26,6 +27,7 @@ export function TestDatabaseProvider({
   withEncryptedData?: boolean;
   withInvalidSchema?: boolean;
   withInvalidData?: boolean;
+  withTransactions?: boolean;
   withFiat?: boolean;
   withStocks?: boolean;
 }) {
@@ -85,42 +87,44 @@ export function TestDatabaseProvider({
               assetSymbolExchangersMetadata: {
                 alphavantage: withStocks ? { apiKey: "TEST_API_KEY" } : null,
               },
-              transactions: [
-                {
-                  id: "TRANSACTION_1",
-                  description: "Income",
-                  transactionDate: "2024-01-01",
-                  accountingDate: "2024-01-01",
-                  transactionCategoryId: "CATEGORY_1",
-                  from: {
-                    account: { name: "Income" },
-                    amount: 950,
-                    symbolId: "EUR",
-                  },
-                  to: {
-                    account: { id: "ACCOUNT_1" },
-                    amount: 950,
-                    symbolId: "EUR",
-                  },
-                },
-                {
-                  id: "TRANSACTION_1",
-                  description: "Expense",
-                  transactionDate: "2024-01-01",
-                  accountingDate: "2024-01-01",
-                  transactionCategoryId: null,
-                  from: {
-                    account: { id: "ACCOUNT_1" },
-                    amount: 23,
-                    symbolId: "EUR",
-                  },
-                  to: {
-                    account: { name: "Expense" },
-                    amount: 23,
-                    symbolId: "EUR",
-                  },
-                },
-              ],
+              transactions: withTransactions
+                ? [
+                    {
+                      id: "TRANSACTION_1",
+                      description: "Income",
+                      transactionDate: "2024-01-01",
+                      accountingDate: "2024-01-01",
+                      transactionCategoryId: "CATEGORY_1",
+                      from: {
+                        account: { name: "Income" },
+                        amount: 950,
+                        symbolId: "EUR",
+                      },
+                      to: {
+                        account: { id: "ACCOUNT_1" },
+                        amount: 950,
+                        symbolId: "EUR",
+                      },
+                    },
+                    {
+                      id: "TRANSACTION_1",
+                      description: "Expense",
+                      transactionDate: "2024-01-01",
+                      accountingDate: "2024-01-01",
+                      transactionCategoryId: null,
+                      from: {
+                        account: { id: "ACCOUNT_1" },
+                        amount: 23,
+                        symbolId: "EUR",
+                      },
+                      to: {
+                        account: { name: "Expense" },
+                        amount: 23,
+                        symbolId: "EUR",
+                      },
+                    },
+                  ]
+                : [],
               transactionCategories: withInvalidSchema
                 ? // @ts-expect-error - Invalid schema
                   (null as TransactionCategory[])
@@ -204,6 +208,7 @@ export function TestContextProvider({
   withEncryptedData = false,
   withInvalidSchema = false,
   withInvalidData = false,
+  withTransactions = true,
   withFiat = true,
   withStocks = true,
 }: {
@@ -212,6 +217,7 @@ export function TestContextProvider({
   withEncryptedData?: boolean;
   withInvalidSchema?: boolean;
   withInvalidData?: boolean;
+  withTransactions?: boolean;
   withFiat?: boolean;
   withStocks?: boolean;
 }) {
@@ -221,6 +227,7 @@ export function TestContextProvider({
         withEncryptedData={withEncryptedData}
         withInvalidSchema={withInvalidSchema}
         withInvalidData={withInvalidData}
+        withTransactions={withTransactions}
         withFiat={withFiat}
         withStocks={withStocks}
       >

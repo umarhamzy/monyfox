@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Modal } from "@/components/ui/modal";
+import { ConfirmationModal, Modal, useModal } from "@/components/ui/modal";
 import { useProfile } from "@/hooks/use-profile";
 import { type TransactionCategory } from "@monyfox/common-data";
 import { toast } from "sonner";
@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/form";
 import { getTransactionCategoriesWithChildren } from "@/utils/transaction-category";
 import { SelectItemTransactionCategoryWithChildren } from "./category-select-item";
+import { DestructiveAlert } from "@/components/ui/alert";
+import { TrashIcon } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -91,20 +93,23 @@ export function TransactionCategoryFormModal({
         category !== null ? "Edit the category." : "Create a new category."
       }
       footer={
-        <div className="flex justify-end gap-2">
-          <Button onClick={onClose} variant="ghost">
-            Cancel
-          </Button>
-          <Button
-            onClick={form.handleSubmit(onSave)}
-            variant="default"
-            isLoading={
-              createTransactionCategory.isPending ||
-              updateTransactionCategory.isPending
-            }
-          >
-            {category !== null ? "Save" : "Create"}
-          </Button>
+        <div className="flex justify-between w-full">
+          <div>{category !== null && <DeleteButton category={category} />}</div>
+          <div className="flex gap-2">
+            <Button onClick={onClose} variant="ghost">
+              Cancel
+            </Button>
+            <Button
+              onClick={form.handleSubmit(onSave)}
+              variant="default"
+              isLoading={
+                createTransactionCategory.isPending ||
+                updateTransactionCategory.isPending
+              }
+            >
+              {category !== null ? "Save" : "Create"}
+            </Button>
+          </div>
         </div>
       }
     >
@@ -156,5 +161,52 @@ export function TransactionCategoryFormModal({
         </form>
       </Form>
     </Modal>
+  );
+}
+
+function DeleteButton({ category }: { category: TransactionCategory }) {
+  const { deleteTransactionCategory, getTransactionCountByCategory } =
+    useProfile();
+  const { isOpen, openModal, closeModal } = useModal();
+
+  return (
+    <>
+      <Button size="icon" onClick={openModal} variant="outline" title="Delete">
+        <TrashIcon />
+      </Button>
+      <ConfirmationModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        title="Delete transaction category"
+        onConfirm={() => {
+          deleteTransactionCategory.mutate(category.id, {
+            onSuccess: () => {
+              toast.success("Category deleted");
+              closeModal();
+            },
+            onError: (e) => {
+              toast.error("Error deleting category", {
+                description: e.message,
+              });
+            },
+          });
+        }}
+        confirmText="Delete"
+        cancelText="Cancel"
+        actionButtonVariant="destructive"
+        isLoading={deleteTransactionCategory.isPending}
+      >
+        <div>
+          {getTransactionCountByCategory(category.id) > 0 ? (
+            <DestructiveAlert title="This category has transactions">
+              You can't delete a category with transactions. Please delete all
+              transactions associated with this category first.
+            </DestructiveAlert>
+          ) : (
+            "Are you sure you want to delete this category?"
+          )}
+        </div>
+      </ConfirmationModal>
+    </>
   );
 }

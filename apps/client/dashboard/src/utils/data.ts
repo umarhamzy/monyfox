@@ -386,5 +386,29 @@ export function getDataValidationErrors(data: Data): string[] {
     }
   }
 
+  // Transactions
+  const existingAccountIds = new Set(
+    data.accounts.map((account) => account.id),
+  );
+  for (const transaction of data.transactions) {
+    if (
+      ("id" in transaction.from.account &&
+        !existingAccountIds.has(transaction.from.account.id)) ||
+      ("id" in transaction.to.account &&
+        !existingAccountIds.has(transaction.to.account.id))
+    ) {
+      errors.push("Transaction has a non-existing account");
+      break;
+    }
+
+    if (
+      transaction.transactionCategoryId !== null &&
+      !existingTransactionCategoryIds.has(transaction.transactionCategoryId)
+    ) {
+      errors.push("Transaction has a non-existing category");
+      break;
+    }
+  }
+
   return errors;
 }

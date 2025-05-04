@@ -18,7 +18,7 @@ describe("generateTestProfile", () => {
 });
 
 describe("getDataValidationErrors", () => {
-  test("should return an error for cycles in transaction categories", () => {
+  test("error for cycles in transaction categories", () => {
     const data: Data = {
       accounts: [],
       transactions: [],
@@ -33,10 +33,10 @@ describe("getDataValidationErrors", () => {
     };
 
     const errors = getDataValidationErrors(data);
-    expect(errors).toContain("There are cycles in the transaction categories");
+    expect(errors).toEqual(["There are cycles in the transaction categories"]);
   });
 
-  test("should return an error for non-existing parent category", () => {
+  test("error for category non-existing parent category", () => {
     const data: Data = {
       accounts: [],
       transactions: [],
@@ -50,15 +50,25 @@ describe("getDataValidationErrors", () => {
     };
 
     const errors = getDataValidationErrors(data);
-    expect(errors).toContain(
+    expect(errors).toEqual([
       "Transaction category Category 1 has a non-existing parent category",
-    );
+    ]);
   });
 
-  test("should return no errors for valid data", () => {
+  test("error for transaction non-existing account", () => {
     const data: Data = {
-      accounts: [],
-      transactions: [],
+      accounts: [{ id: "1", name: "Account 1", isPersonalAsset: true }],
+      transactions: [
+        {
+          id: "1",
+          description: "Transaction 1",
+          from: { account: { id: "1" }, amount: 100, symbolId: "EUR" },
+          to: { account: { id: "2" }, amount: 100, symbolId: "EUR" },
+          transactionCategoryId: "1",
+          accountingDate: "2025-01-01",
+          transactionDate: "2025-01-01",
+        },
+      ],
       transactionCategories: [
         { id: "1", name: "Category 1", parentTransactionCategoryId: null },
         { id: "2", name: "Category 2", parentTransactionCategoryId: "1" },
@@ -70,6 +80,67 @@ describe("getDataValidationErrors", () => {
     };
 
     const errors = getDataValidationErrors(data);
-    expect(errors).toHaveLength(0);
+    expect(errors).toEqual(["Transaction has a non-existing account"]);
+  });
+
+  test("error for transaction non-existing category", () => {
+    const data: Data = {
+      accounts: [
+        { id: "1", name: "Account 1", isPersonalAsset: true },
+        { id: "2", name: "Account 2", isPersonalAsset: true },
+      ],
+      transactions: [
+        {
+          id: "1",
+          description: "Transaction 1",
+          from: { account: { id: "1" }, amount: 100, symbolId: "EUR" },
+          to: { account: { id: "2" }, amount: 100, symbolId: "EUR" },
+          transactionCategoryId: "1",
+          accountingDate: "2025-01-01",
+          transactionDate: "2025-01-01",
+        },
+      ],
+      transactionCategories: [
+        { id: "2", name: "Category 2", parentTransactionCategoryId: null },
+      ],
+      assetSymbols: [],
+      assetSymbolExchanges: [],
+      assetSymbolExchangersMetadata: { alphavantage: null },
+      lastUpdated: new Date().toISOString(),
+    };
+
+    const errors = getDataValidationErrors(data);
+    expect(errors).toEqual(["Transaction has a non-existing category"]);
+  });
+
+  test("no errors for valid data", () => {
+    const data: Data = {
+      accounts: [
+        { id: "1", name: "Account 1", isPersonalAsset: true },
+        { id: "2", name: "Account 2", isPersonalAsset: true },
+      ],
+      transactions: [
+        {
+          id: "1",
+          description: "Transaction 1",
+          from: { account: { id: "1" }, amount: 100, symbolId: "EUR" },
+          to: { account: { id: "2" }, amount: 100, symbolId: "EUR" },
+          transactionCategoryId: "1",
+          accountingDate: "2025-01-01",
+          transactionDate: "2025-01-01",
+        },
+      ],
+      transactionCategories: [
+        { id: "1", name: "Category 1", parentTransactionCategoryId: null },
+        { id: "2", name: "Category 2", parentTransactionCategoryId: "1" },
+      ],
+      assetSymbols: [],
+      assetSymbolExchanges: [],
+      assetSymbolExchangersMetadata: { alphavantage: null },
+      lastUpdated: new Date().toISOString(),
+    };
+
+    const errors = getDataValidationErrors(data);
+    expect(errors).toEqual([]);
   });
 });

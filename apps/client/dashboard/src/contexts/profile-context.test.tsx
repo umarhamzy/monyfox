@@ -89,7 +89,7 @@ function ProfileDataForTest() {
           })
         }
       >
-        Create Account
+        Create account
       </button>
     </div>
   );
