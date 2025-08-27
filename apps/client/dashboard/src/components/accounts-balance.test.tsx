@@ -29,7 +29,7 @@ describe("AccountsBalance", () => {
       </TestContextProvider>,
     );
 
-    const total = getAllByText("927,00 €");
+    const total = getAllByText(/1877,00\s€/);
     expect(total.length).toBe(2);
   });
 });

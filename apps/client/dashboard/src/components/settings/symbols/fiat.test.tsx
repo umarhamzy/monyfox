@@ -12,9 +12,10 @@ describe("create symbol", async () => {
       </TestContextProvider>,
     );
 
-    expect(getAllByTitle("Delete").length).toBe(2);
+    expect(getAllByTitle("Delete").length).toBe(3);
     expect(getByText("EUR")).toBeInTheDocument();
     expect(getByText("USD")).toBeInTheDocument();
+    expect(getByText("CHF")).toBeInTheDocument();
     expect(queryByText("CAD")).toBeNull();
 
     fireEvent.click(getByText("Add a new currency"));
@@ -22,10 +23,10 @@ describe("create symbol", async () => {
     fireEvent.click(getByText("CAD - Canadian Dollar"));
     fireEvent.click(getByText("Add"));
 
-    await waitFor(() => expect(getAllByTitle("Delete").length).toBe(3));
+    await waitFor(() => expect(getAllByTitle("Delete").length).toBe(4));
     getByText("CAD");
 
-    fireEvent.click(getAllByTitle("Delete")[2]);
+    fireEvent.click(getAllByTitle("Delete")[3]);
     await waitFor(() => expect(queryByText("CAD")).toBeNull());
   });
 
@@ -36,9 +37,10 @@ describe("create symbol", async () => {
       </TestContextProvider>,
     );
 
-    await waitFor(() => expect(getAllByTitle("Delete").length).toBe(2));
+    await waitFor(() => expect(getAllByTitle("Delete").length).toBe(3));
     expect(getByText("EUR")).toBeInTheDocument();
     expect(getByText("USD")).toBeInTheDocument();
+    expect(getByText("CHF")).toBeInTheDocument();
     expect(queryByText("CAD")).toBeNull();
 
     fireEvent.click(getByText("Add"));
@@ -46,7 +48,7 @@ describe("create symbol", async () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
     expect(queryByText("CAD")).toBeNull();
 
-    expect(getAllByTitle("Delete").length).toBe(2);
+    expect(getAllByTitle("Delete").length).toBe(3);
   });
 });
 
@@ -60,13 +62,18 @@ describe("delete symbol", async () => {
 
     expect(getByText("EUR")).toBeInTheDocument();
     expect(getByText("USD")).toBeInTheDocument();
+    expect(getByText("CHF")).toBeInTheDocument();
 
-    fireEvent.click(getAllByTitle("Delete")[1]);
-    await waitFor(() => expect(queryByText("USD")).toBeNull());
+    fireEvent.click(getAllByTitle("Delete")[2]);
+    await waitFor(() => {
+      expect(getByText("EUR")).toBeInTheDocument();
+      expect(getByText("USD")).toBeInTheDocument();
+      expect(queryByText("CHF")).toBeNull();
+    });
   });
 
   test("failure - symbol with transactions", async () => {
-    const { getByText, getAllByTitle, queryByText } = render(
+    const { getByText, getAllByTitle } = render(
       <TestContextProvider>
         <FiatCurrenciesCard />
       </TestContextProvider>,
@@ -74,10 +81,13 @@ describe("delete symbol", async () => {
 
     expect(getByText("EUR")).toBeInTheDocument();
     expect(getByText("USD")).toBeInTheDocument();
+    expect(getByText("CHF")).toBeInTheDocument();
 
     fireEvent.click(getAllByTitle("Delete")[0]);
     await new Promise((resolve) => setTimeout(resolve, 100));
-    expect(queryByText("EUR")).toBeInTheDocument();
+    expect(getByText("EUR")).toBeInTheDocument();
+    expect(getByText("USD")).toBeInTheDocument();
+    expect(getByText("CHF")).toBeInTheDocument();
   });
 });
 
@@ -95,9 +105,12 @@ describe("FiatCurrencyExchanges", () => {
     // Initially, the exchange should not be present.
     expect(queryByText("EUR")).toBeNull();
     expect(queryByText("USD")).toBeNull();
+    expect(queryByText("CHF")).toBeNull();
 
     // Wait for the exchange to be created with useEffect.
     await waitFor(() => getByText(/EUR.*USD/));
+    await waitFor(() => getByText(/EUR.*CHF/));
+    await waitFor(() => getByText(/USD.*CHF/));
   });
 
   test("delete exchanges when a currency is deleted", async () => {
@@ -109,9 +122,13 @@ describe("FiatCurrencyExchanges", () => {
     );
 
     await waitFor(() => getByText(/EUR.*USD/));
+    await waitFor(() => getByText(/EUR.*CHF/));
+    await waitFor(() => getByText(/USD.*CHF/));
 
     fireEvent.click(getByText("Delete EUR"));
     await waitFor(() => expect(queryByText(/EUR.*USD/)).toBeNull());
+    await waitFor(() => expect(queryByText(/EUR.*CHF/)).toBeNull());
+    await waitFor(() => getByText(/USD.*CHF/));
   });
 });
 

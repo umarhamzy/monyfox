@@ -70,6 +70,12 @@ export function TestDatabaseProvider({
                         displayName: "USD",
                         type: "fiat" as const,
                       },
+                      {
+                        id: "CHF",
+                        code: "CHF",
+                        displayName: "CHF",
+                        type: "fiat" as const,
+                      },
                     ]
                   : []),
                 ...(withStocks
@@ -107,7 +113,7 @@ export function TestDatabaseProvider({
                       },
                     },
                     {
-                      id: "TRANSACTION_1",
+                      id: "TRANSACTION_2",
                       description: "Expense",
                       transactionDate: "2024-01-01",
                       accountingDate: "2024-01-01",
@@ -121,6 +127,23 @@ export function TestDatabaseProvider({
                         account: { name: "Expense" },
                         amount: 23,
                         symbolId: "EUR",
+                      },
+                    },
+                    {
+                      id: "TRANSACTION_3",
+                      description: "Income USD",
+                      transactionDate: "2024-01-01",
+                      accountingDate: "2024-01-01",
+                      transactionCategoryId: "CATEGORY_1",
+                      from: {
+                        account: { name: "Income" },
+                        amount: 950,
+                        symbolId: "USD",
+                      },
+                      to: {
+                        account: { id: "ACCOUNT_1" },
+                        amount: 950,
+                        symbolId: "USD",
                       },
                     },
                   ]

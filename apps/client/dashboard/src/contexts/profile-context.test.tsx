@@ -13,7 +13,9 @@ describe("ProfileProvider", () => {
     );
 
     expect(result.getByText("Accounts:Account 1,Account 2.")).toBeDefined();
-    expect(result.getByText("Transactions:Income,Expense.")).toBeDefined();
+    expect(
+      result.getByText("Transactions:Income,Expense,Income USD."),
+    ).toBeDefined();
   });
 
   test("undefined profile", async () => {

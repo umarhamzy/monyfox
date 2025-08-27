@@ -64,30 +64,50 @@ function AccountBalanceTable({ account }: { account: Account }) {
   const { defaultSymbolId } = useSettings();
   const { getBalanceByAccount, getAssetSymbol } = useProfile();
   const { convertAmount } = useAssetSymbolExchangeRate();
-  const balances = getBalanceByAccount(account.id);
+  const balances = getBalanceByAccount(account.id).map(
+    ({ symbolId, balance }) => ({
+      originalBalance: balance,
+      originalSymbol: getAssetSymbol(symbolId),
+      convertedBalance: convertAmount({
+        amount: balance,
+        date: today,
+        fromAssetSymbolId: symbolId,
+        toAssetSymbolId: defaultSymbolId,
+      }),
+    }),
+  );
+  const convertedSymbol = getAssetSymbol(defaultSymbolId);
+  const convertedTotal = balances.reduce(
+    (acc, { convertedBalance }) => acc + convertedBalance,
+    0,
+  );
 
   return (
     <Table>
       <TableBody>
-        {balances.map(({ symbolId, balance }) => (
-          <TableRow key={symbolId}>
-            <TableCell>{getAssetSymbol(symbolId).code}</TableCell>
-            <TableCell className="text-right">
-              {formatCurrency(balance, getAssetSymbol(symbolId))}
-            </TableCell>
+        {balances.map(
+          ({ originalBalance, originalSymbol, convertedBalance }) => (
+            <TableRow key={`${account.id}-${originalSymbol.code}`}>
+              <TableCell>{originalSymbol.code}</TableCell>
+              <TableCell className="text-right">
+                {originalSymbol.id !== convertedSymbol.id &&
+                  formatCurrency(originalBalance, originalSymbol)}
+              </TableCell>
+              <TableCell className="text-right w-[100px]">
+                {formatCurrency(convertedBalance, convertedSymbol)}
+              </TableCell>
+            </TableRow>
+          ),
+        )}
+        {balances.length > 1 && (
+          <TableRow className="font-bold">
+            <TableCell>Total</TableCell>
+            <TableCell className="text-right" />
             <TableCell className="text-right w-[100px]">
-              {formatCurrency(
-                convertAmount({
-                  amount: balance,
-                  date: today,
-                  fromAssetSymbolId: symbolId,
-                  toAssetSymbolId: defaultSymbolId,
-                }),
-                getAssetSymbol(defaultSymbolId),
-              )}
+              {formatCurrency(convertedTotal, convertedSymbol)}
             </TableCell>
           </TableRow>
-        ))}
+        )}
       </TableBody>
     </Table>
   );

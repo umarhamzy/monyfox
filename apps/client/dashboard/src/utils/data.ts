@@ -12,15 +12,9 @@ import { DayOfWeek, LocalDate, Month } from "@js-joda/core";
 import { isCycleInTransactionCategories } from "./transaction-category";
 
 export function generateTestProfile(): Profile {
-  const bankAccountEur: Account = {
+  const bankAccount: Account = {
     id: ulid(),
     name: "Bank Account",
-    isPersonalAsset: true,
-  };
-
-  const bankAccountUsd: Account = {
-    id: ulid(),
-    name: "Bank Account (US)",
     isPersonalAsset: true,
   };
 
@@ -141,23 +135,43 @@ export function generateTestProfile(): Profile {
     currentDate = currentDate.plusDays(1)
   ) {
     if (currentDate.dayOfMonth() === 1) {
-      // Income - salary
-      const salaryAmount = Math.round(randomFloat(0.9, 1.1) * 5000); // Variance for salary
+      // Income - salary 1st job
+      const salaryEurAmount = Math.round(randomFloat(0.9, 1.1) * 5000); // Variance for salary
       transactions.push({
         id: ulid(),
-        description: "Salary",
+        description: "Salary Company 1",
         transactionDate: currentDate.toString(),
         accountingDate: currentDate.toString(),
         transactionCategoryId: categorySalary.id,
         from: {
-          amount: salaryAmount,
+          amount: salaryEurAmount,
           symbolId: assetEur.id,
-          account: { name: "My Company" },
+          account: { name: "My Company 1" },
         },
         to: {
-          amount: salaryAmount,
+          amount: salaryEurAmount,
           symbolId: assetEur.id,
-          account: { id: bankAccountEur.id },
+          account: { id: bankAccount.id },
+        },
+      });
+
+      // Income - salary 2nd job
+      const salaryUsdAmount = Math.round(randomFloat(0.9, 1.1) * 5000); // Variance for salary
+      transactions.push({
+        id: ulid(),
+        description: "Salary Company 2",
+        transactionDate: currentDate.toString(),
+        accountingDate: currentDate.toString(),
+        transactionCategoryId: categorySalary.id,
+        from: {
+          amount: salaryUsdAmount,
+          symbolId: assetUsd.id,
+          account: { name: "My Company 2" },
+        },
+        to: {
+          amount: salaryUsdAmount,
+          symbolId: assetUsd.id,
+          account: { id: bankAccount.id },
         },
       });
 
@@ -192,7 +206,7 @@ export function generateTestProfile(): Profile {
         from: {
           amount: rentAmount,
           symbolId: assetEur.id,
-          account: { id: bankAccountEur.id },
+          account: { id: bankAccount.id },
         },
         to: {
           amount: rentAmount,
@@ -211,31 +225,12 @@ export function generateTestProfile(): Profile {
         from: {
           amount: 3000,
           symbolId: assetEur.id,
-          account: { id: bankAccountEur.id },
+          account: { id: bankAccount.id },
         },
         to: {
           amount: 3000,
           symbolId: assetEur.id,
           account: { id: savingsAccount.id },
-        },
-      });
-
-      // Transfer - from EU to US
-      transactions.push({
-        id: ulid(),
-        description: "International Transfer",
-        transactionDate: currentDate.toString(),
-        accountingDate: currentDate.toString(),
-        transactionCategoryId: null,
-        from: {
-          amount: 50,
-          symbolId: assetEur.id,
-          account: { id: bankAccountEur.id },
-        },
-        to: {
-          amount: 55,
-          symbolId: assetUsd.id,
-          account: { id: bankAccountUsd.id },
         },
       });
 
@@ -250,7 +245,7 @@ export function generateTestProfile(): Profile {
         from: {
           amount: creditCardPaymentAmount,
           symbolId: assetEur.id,
-          account: { id: bankAccountEur.id },
+          account: { id: bankAccount.id },
         },
         to: {
           amount: creditCardPaymentAmount,
@@ -281,7 +276,7 @@ export function generateTestProfile(): Profile {
         to: {
           amount: bonusAmount,
           symbolId: assetEur.id,
-          account: { id: bankAccountEur.id },
+          account: { id: bankAccount.id },
         },
       });
     }
@@ -343,8 +338,7 @@ export function generateTestProfile(): Profile {
       encrypted: false,
       data: {
         accounts: [
-          bankAccountEur,
-          bankAccountUsd,
+          bankAccount,
           creditCardAccount,
           savingsAccount,
           investmentAccount,
