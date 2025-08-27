@@ -145,6 +145,7 @@ const formSchema = z.object({
   amount: z.coerce.number().nonnegative(),
   symbolId: z.string(),
   categoryId: z.string(),
+  date: z.string().date(),
 });
 
 function TransactionForm({
@@ -180,6 +181,7 @@ function TransactionForm({
       // TODO: support different symbols.
       symbolId: transaction?.from.symbolId ?? defaultAssetSymbol?.id ?? "",
       categoryId: transaction?.transactionCategoryId ?? "-",
+      date: transaction?.accountingDate ?? LocalDate.now().toString(),
     },
   });
   const rootCategories = getTransactionCategoriesWithChildren(
@@ -228,8 +230,6 @@ function TransactionForm({
       return;
     }
 
-    const now = LocalDate.now();
-
     const fn = transaction !== null ? updateTransaction : createTransaction;
     fn.mutate(
       {
@@ -237,8 +237,8 @@ function TransactionForm({
         description: values.description,
         transactionCategoryId:
           values.categoryId === "-" ? null : values.categoryId,
-        transactionDate: now.toString(),
-        accountingDate: now.toString(),
+        transactionDate: values.date,
+        accountingDate: values.date,
         from: {
           amount: values.amount,
           symbolId: values.symbolId,
@@ -425,6 +425,21 @@ function TransactionForm({
                       ))}
                     </SelectContent>
                   </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="flex gap-4">
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

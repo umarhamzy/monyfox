@@ -250,6 +250,9 @@ describe("TransactionForm", () => {
     fireEvent.change(getByLabelText("Description"), {
       target: { value: "Test description" },
     });
+    fireEvent.change(getByLabelText("Date"), {
+      target: { value: "2025-01-01" },
+    });
     fireEvent.change(getByLabelText("Amount"), { target: { value: "100" } });
     fireEvent.click(getByText("Select an account"));
     await waitFor(() => expect(getAllByText("Account 1").length).toBe(2));
