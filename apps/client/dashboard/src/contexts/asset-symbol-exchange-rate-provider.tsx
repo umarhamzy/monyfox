@@ -134,7 +134,10 @@ export const AssetSymbolExchangeRateProvider = ({
       },
     })),
   });
-  const stableQueries = useStable(queries);
+  const stableQueries = useStable(
+    // Only stabilize what we use better performance.
+    queries.map((q) => ({ data: q.data, isLoading: q.isLoading })),
+  );
 
   // fromAssetSymbolId (string) -> toAssetSymbolId (string) -> date (string) -> rate (number)
   const symbolConverter = useMemo(() => {
