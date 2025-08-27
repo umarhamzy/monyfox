@@ -6,6 +6,7 @@ export default defineProject({
     globals: true,
     environment: "jsdom",
     setupFiles: [resolve(__dirname, "./src/utils/tests/setup.ts")],
+    unstubEnvs: true,
   },
   resolve: {
     alias: {
