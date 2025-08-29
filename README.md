@@ -58,7 +58,7 @@ We welcome contributions from the community!
 
 ## License
 
-MonyFox is licensed under the EUPL-1.2 License. See the [LICENSE](LICENSE.md) file for more details.
+MonyFox is licensed under the CC BY-NC-SA 4.0 License. See the [LICENSE](LICENSE.md) file for more details.
 
 ## Contact
 
