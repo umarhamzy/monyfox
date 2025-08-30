@@ -51,6 +51,22 @@ export function SettingsPage() {
           </Link>
         </CardFooter>
       </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Backup</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <p>
+            Backup your data to a file. This is useful if you want to restore
+            your data later.
+          </p>
+        </CardContent>
+        <CardFooter>
+          <Link to="/p/$profileId/settings/backup" params={{ profileId }}>
+            <Button>Manage backup</Button>
+          </Link>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

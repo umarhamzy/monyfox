@@ -7,12 +7,14 @@ import type {
   TransactionCategory,
   AssetSymbol,
   AssetSymbolExchange,
+  Profile,
 } from "@monyfox/common-data";
 import { MutationResult } from "./profile-provider";
 
 interface ProfileContextProps {
   user: { id: string; name: string };
   data: Data;
+  rawProfile: Profile;
 
   // Accounts
   getAccount: (accountId: string) => Account;

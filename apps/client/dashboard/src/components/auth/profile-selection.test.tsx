@@ -88,4 +88,21 @@ describe("ProfileSelection", () => {
     fireEvent.click(getByText("Create a test profile"));
     await findByText("Test Profile");
   });
+
+  test("import profile", async () => {
+    const { getByText, queryByText } = render(
+      <ProfileSelectionTestContextProvider>
+        <ProfileSelection />
+      </ProfileSelectionTestContextProvider>,
+    );
+
+    expect(queryByText("Import a backup file")).toBeNull();
+
+    // Open modal
+    fireEvent.click(getByText("Import"));
+
+    await waitFor(() =>
+      expect(queryByText("Import a backup file")).not.toBeNull(),
+    );
+  });
 });
