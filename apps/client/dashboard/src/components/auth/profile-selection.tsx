@@ -12,6 +12,7 @@ import { generateTestProfile } from "@/utils/data";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useDatabase } from "@/hooks/use-database";
 import { toast } from "sonner";
+import { ImportProfileForm } from "./import-profile-form";
 
 export function ProfileSelection({
   className,
@@ -34,7 +35,7 @@ export function ProfileSelection({
           {profiles.map((profile) => (
             <ProfileCard key={profile.id} profile={profile} />
           ))}
-          <CreateProfile />
+          <ManageProfiles />
         </CardContent>
       </Card>
     </div>
@@ -93,14 +94,17 @@ function ProfileCard({ profile }: { profile: Profile }) {
   );
 }
 
-function CreateProfile() {
+function ManageProfiles() {
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <div className="flex flex-col items-center">
       <Button onClick={openModal}>Create profile</Button>
       <CreateProfileModal isOpen={isOpen} onClose={closeModal} />
       <hr className="my-4 w-full" />
-      <CreateTestProfileButton />
+      <div className="flex justify-center gap-2">
+        <ImportProfileButton />
+        <CreateTestProfileButton />
+      </div>
     </div>
   );
 }
@@ -206,5 +210,37 @@ function CreateTestProfileButton() {
     >
       Create a test profile
     </Button>
+  );
+}
+
+function ImportProfileButton() {
+  const { isOpen, openModal, closeModal } = useModal();
+
+  return (
+    <>
+      <Button onClick={openModal} variant="secondary">
+        Import
+      </Button>
+      <ImportProfileModal isOpen={isOpen} onClose={closeModal} />
+    </>
+  );
+}
+
+export function ImportProfileModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Import"
+      description="Import a backup file"
+    >
+      <ImportProfileForm onClose={onClose} />
+    </Modal>
   );
 }
