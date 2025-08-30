@@ -5,10 +5,14 @@ import { http, HttpResponse } from "msw";
 import "@testing-library/jest-dom";
 import "fake-indexeddb/auto";
 import { beforeEach } from "node:test";
+import { Blob as BlobPolyfill } from "node:buffer";
 import { toast } from "sonner";
 
 // https://stackoverflow.com/questions/53271193/typeerror-scrollintoview-is-not-a-function
 window.HTMLElement.prototype.scrollIntoView = function () {};
+
+// @ts-expect-error - https://stackoverflow.com/a/77691022
+global.Blob = BlobPolyfill;
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,

@@ -11,6 +11,7 @@ import {
   TransactionSchema,
   type TransactionCategory,
   TransactionCategorySchema,
+  type Profile,
 } from "@monyfox/common-data";
 import { ReactNode, useCallback, useMemo } from "react";
 import { LocalDate } from "@js-joda/core";
@@ -94,7 +95,7 @@ export const ProfileProvider = ({
   }
 
   return (
-    <DataProvider user={user} data={profile.data.data}>
+    <DataProvider user={user} data={profile.data.data} rawProfile={profile}>
       {children}
     </DataProvider>
   );
@@ -103,10 +104,12 @@ export const ProfileProvider = ({
 function DataProvider({
   user,
   data,
+  rawProfile,
   children,
 }: {
   user: { id: string; name: string };
   data: Data;
+  rawProfile: Profile;
   children: React.ReactNode;
 }) {
   const { saveProfile } = useDatabase();
@@ -463,6 +466,7 @@ function DataProvider({
           ...data,
           transactions,
         },
+        rawProfile,
 
         // Accounts
         getAccount,

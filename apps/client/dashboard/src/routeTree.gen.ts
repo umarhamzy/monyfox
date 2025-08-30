@@ -22,6 +22,7 @@ import { Route as PProfileIdProfileChartsIndexImport } from './routes/p/$profile
 import { Route as PProfileIdProfileAccountsIndexImport } from './routes/p/$profileId/_profile/accounts/index'
 import { Route as PProfileIdProfileSettingsTransactionCategoriesImport } from './routes/p/$profileId/_profile/settings/transaction-categories'
 import { Route as PProfileIdProfileSettingsSymbolsImport } from './routes/p/$profileId/_profile/settings/symbols'
+import { Route as PProfileIdProfileSettingsBackupImport } from './routes/p/$profileId/_profile/settings/backup'
 
 // Create Virtual Routes
 
@@ -94,6 +95,13 @@ const PProfileIdProfileSettingsSymbolsRoute =
     getParentRoute: () => PProfileIdProfileRoute,
   } as any)
 
+const PProfileIdProfileSettingsBackupRoute =
+  PProfileIdProfileSettingsBackupImport.update({
+    id: '/settings/backup',
+    path: '/settings/backup',
+    getParentRoute: () => PProfileIdProfileRoute,
+  } as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -124,6 +132,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/p/$profileId/'
       preLoaderRoute: typeof PProfileIdProfileIndexImport
+      parentRoute: typeof PProfileIdProfileImport
+    }
+    '/p/$profileId/_profile/settings/backup': {
+      id: '/p/$profileId/_profile/settings/backup'
+      path: '/settings/backup'
+      fullPath: '/p/$profileId/settings/backup'
+      preLoaderRoute: typeof PProfileIdProfileSettingsBackupImport
       parentRoute: typeof PProfileIdProfileImport
     }
     '/p/$profileId/_profile/settings/symbols': {
@@ -175,6 +190,7 @@ declare module '@tanstack/react-router' {
 
 interface PProfileIdProfileRouteChildren {
   PProfileIdProfileIndexRoute: typeof PProfileIdProfileIndexRoute
+  PProfileIdProfileSettingsBackupRoute: typeof PProfileIdProfileSettingsBackupRoute
   PProfileIdProfileSettingsSymbolsRoute: typeof PProfileIdProfileSettingsSymbolsRoute
   PProfileIdProfileSettingsTransactionCategoriesRoute: typeof PProfileIdProfileSettingsTransactionCategoriesRoute
   PProfileIdProfileAccountsIndexRoute: typeof PProfileIdProfileAccountsIndexRoute
@@ -185,6 +201,7 @@ interface PProfileIdProfileRouteChildren {
 
 const PProfileIdProfileRouteChildren: PProfileIdProfileRouteChildren = {
   PProfileIdProfileIndexRoute: PProfileIdProfileIndexRoute,
+  PProfileIdProfileSettingsBackupRoute: PProfileIdProfileSettingsBackupRoute,
   PProfileIdProfileSettingsSymbolsRoute: PProfileIdProfileSettingsSymbolsRoute,
   PProfileIdProfileSettingsTransactionCategoriesRoute:
     PProfileIdProfileSettingsTransactionCategoriesRoute,
@@ -214,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/p/$profileId': typeof PProfileIdProfileRouteWithChildren
   '/p/$profileId/': typeof PProfileIdProfileIndexRoute
+  '/p/$profileId/settings/backup': typeof PProfileIdProfileSettingsBackupRoute
   '/p/$profileId/settings/symbols': typeof PProfileIdProfileSettingsSymbolsRoute
   '/p/$profileId/settings/transaction-categories': typeof PProfileIdProfileSettingsTransactionCategoriesRoute
   '/p/$profileId/accounts': typeof PProfileIdProfileAccountsIndexRoute
@@ -225,6 +243,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/p/$profileId': typeof PProfileIdProfileIndexRoute
+  '/p/$profileId/settings/backup': typeof PProfileIdProfileSettingsBackupRoute
   '/p/$profileId/settings/symbols': typeof PProfileIdProfileSettingsSymbolsRoute
   '/p/$profileId/settings/transaction-categories': typeof PProfileIdProfileSettingsTransactionCategoriesRoute
   '/p/$profileId/accounts': typeof PProfileIdProfileAccountsIndexRoute
@@ -239,6 +258,7 @@ export interface FileRoutesById {
   '/p/$profileId': typeof PProfileIdRouteWithChildren
   '/p/$profileId/_profile': typeof PProfileIdProfileRouteWithChildren
   '/p/$profileId/_profile/': typeof PProfileIdProfileIndexRoute
+  '/p/$profileId/_profile/settings/backup': typeof PProfileIdProfileSettingsBackupRoute
   '/p/$profileId/_profile/settings/symbols': typeof PProfileIdProfileSettingsSymbolsRoute
   '/p/$profileId/_profile/settings/transaction-categories': typeof PProfileIdProfileSettingsTransactionCategoriesRoute
   '/p/$profileId/_profile/accounts/': typeof PProfileIdProfileAccountsIndexRoute
@@ -253,6 +273,7 @@ export interface FileRouteTypes {
     | '/'
     | '/p/$profileId'
     | '/p/$profileId/'
+    | '/p/$profileId/settings/backup'
     | '/p/$profileId/settings/symbols'
     | '/p/$profileId/settings/transaction-categories'
     | '/p/$profileId/accounts'
@@ -263,6 +284,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/p/$profileId'
+    | '/p/$profileId/settings/backup'
     | '/p/$profileId/settings/symbols'
     | '/p/$profileId/settings/transaction-categories'
     | '/p/$profileId/accounts'
@@ -275,6 +297,7 @@ export interface FileRouteTypes {
     | '/p/$profileId'
     | '/p/$profileId/_profile'
     | '/p/$profileId/_profile/'
+    | '/p/$profileId/_profile/settings/backup'
     | '/p/$profileId/_profile/settings/symbols'
     | '/p/$profileId/_profile/settings/transaction-categories'
     | '/p/$profileId/_profile/accounts/'
@@ -322,6 +345,7 @@ export const routeTree = rootRoute
       "parent": "/p/$profileId",
       "children": [
         "/p/$profileId/_profile/",
+        "/p/$profileId/_profile/settings/backup",
         "/p/$profileId/_profile/settings/symbols",
         "/p/$profileId/_profile/settings/transaction-categories",
         "/p/$profileId/_profile/accounts/",
@@ -332,6 +356,10 @@ export const routeTree = rootRoute
     },
     "/p/$profileId/_profile/": {
       "filePath": "p/$profileId/_profile/index.tsx",
+      "parent": "/p/$profileId/_profile"
+    },
+    "/p/$profileId/_profile/settings/backup": {
+      "filePath": "p/$profileId/_profile/settings/backup.tsx",
       "parent": "/p/$profileId/_profile"
     },
     "/p/$profileId/_profile/settings/symbols": {
