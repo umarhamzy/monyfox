@@ -142,7 +142,10 @@ const formSchema = z.object({
   description: z.string(),
   fromAccountId: z.string(),
   toAccountId: z.string(),
-  amount: z.coerce.number().nonnegative(),
+  // The input is a string, but we need to use number as a number() generic
+  // because of https://github.com/react-hook-form/resolvers/issues/799
+  // Ideally, we wouldn't specify it at all and leave it unknown
+  amount: z.coerce.number<number>().nonnegative(),
   symbolId: z.string(),
   categoryId: z.string(),
   date: z.string().date(),
