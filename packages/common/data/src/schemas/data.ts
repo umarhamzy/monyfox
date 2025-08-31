@@ -16,7 +16,7 @@ export const DataSchema = z.object({
   assetSymbolExchanges: z.array(AssetSymbolExchangeSchema),
   assetSymbolExchangersMetadata: AssetSymbolExchangersMetadataSchema,
 
-  lastUpdated: z.string().datetime(),
+  lastUpdated: z.iso.datetime(),
 });
 
 export const RawDataSchema = z.discriminatedUnion("encrypted", [

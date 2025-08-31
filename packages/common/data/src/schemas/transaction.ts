@@ -17,8 +17,8 @@ export const TransactionSchema = z.object({
   id: z.string(),
   description: z.string(),
   transactionCategoryId: z.string().nullable(),
-  transactionDate: z.string().date(),
-  accountingDate: z.string().date(),
+  transactionDate: z.iso.date(),
+  accountingDate: z.iso.date(),
   from: AccountDataSchema,
   to: AccountDataSchema,
 });

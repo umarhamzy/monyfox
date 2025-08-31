@@ -71,7 +71,7 @@ const RatesSchema = z.object({
     "5. Time Zone": z.string(),
   }),
   "Time Series (Daily)": z.record(
-    z.object({
+    z.string(), z.object({
       "1. open": z.string(),
       "2. high": z.string(),
       "3. low": z.string(),

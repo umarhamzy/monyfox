@@ -827,7 +827,7 @@ __metadata:
   dependencies:
     typescript: "npm:^5.8.3"
     vitest: "npm:^3.1.1"
-    zod: "npm:^3.24.2"
+    zod: "npm:^4.1.5"
   languageName: unknown
   linkType: soft
 
@@ -838,7 +838,7 @@ __metadata:
     msw: "npm:^2.7.4"
     typescript: "npm:^5.8.3"
     vitest: "npm:^3.1.1"
-    zod: "npm:^3.24.2"
+    zod: "npm:^4.1.5"
   languageName: unknown
   linkType: soft
 
@@ -849,7 +849,7 @@ __metadata:
     msw: "npm:^2.7.4"
     typescript: "npm:^5.8.3"
     vitest: "npm:^3.1.1"
-    zod: "npm:^3.24.2"
+    zod: "npm:^4.1.5"
   languageName: unknown
   linkType: soft
 
@@ -921,7 +921,7 @@ __metadata:
     ulid: "npm:^3.0.0"
     vite: "npm:^6.2.6"
     vitest: "npm:^3.1.1"
-    zod: "npm:^3.24.2"
+    zod: "npm:^4.1.5"
   languageName: unknown
   linkType: soft
 
@@ -7488,5 +7488,12 @@ __metadata:
   version: 3.24.2
   resolution: "zod@npm:3.24.2"
   checksum: 10c0/c638c7220150847f13ad90635b3e7d0321b36cce36f3fc6050ed960689594c949c326dfe2c6fa87c14b126ee5d370ccdebd6efb304f41ef5557a4aaca2824565
+  languageName: node
+  linkType: hard
+
+"zod@npm:^4.1.5":
+  version: 4.1.5
+  resolution: "zod@npm:4.1.5"
+  checksum: 10c0/7826fb931bc71d4d0fff2fbb72f1a1cf30a6672cf9dbe6933a216bbb60242ef1c3bdfbcd3c5b27e806235a35efaad7a4a9897ff4d3621452f9ea278bce6fd42a
   languageName: node
   linkType: hard
