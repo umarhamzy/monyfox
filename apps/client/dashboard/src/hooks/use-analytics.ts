@@ -3,7 +3,10 @@ import { useLocalStorage } from "./use-local-storage";
 import { getAnalyticsConfig } from "@/utils/analytics";
 
 export function useAnalytics() {
-  const config = getAnalyticsConfig();
+  const config = getAnalyticsConfig({
+    domain: import.meta.env.VITE_PLAUSIBLE_DOMAIN,
+    scriptUrl: import.meta.env.VITE_PLAUSIBLE_SCRIPT,
+  });
 
   // https://plausible.io/docs/excluding-localstorage
   const [plausibleIgnore, setPlausibleIgnore] = useLocalStorage(

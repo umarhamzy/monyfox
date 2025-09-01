@@ -18,7 +18,6 @@
     "@monyfox/common-data": "workspace:*",
     "@monyfox/common-symbol": "workspace:*",
     "@monyfox/common-symbol-exchange": "workspace:*",
-    "@plausible-analytics/tracker": "^0.4.0",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-dialog": "^1.1.15",

@@ -1,43 +1,159 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
-import { init } from "@plausible-analytics/tracker/plausible.js";
-import { initializeAnalytics } from "./analytics";
+import { describe, test, expect, beforeEach } from "vitest";
+import { analyticsPlugin } from "./analytics";
+import z from "zod";
+import fs from "fs";
+import path from "path";
 
-vi.mock("@plausible-analytics/tracker/plausible.js", () => {
-  return {
-    init: vi.fn(),
-  };
-});
+describe("analyticsPlugin", () => {
+  const mockDomain = "example.com";
+  const scriptEndpoint = "https://plausible.example.com/js/script.js";
 
-describe("initializeAnalytics", () => {
+  let indexHtml: string;
   beforeEach(() => {
-    vi.resetModules();
-    vi.clearAllMocks();
+    indexHtml = fs.readFileSync(
+      path.join(__dirname, "../../index.html"),
+      "utf8",
+    );
   });
 
-  test("should initialize plausible analytics with the correct domain", () => {
-    const mockDomain = "https://example.com";
-    vi.stubEnv("VITE_PLAUSIBLE_DOMAIN", mockDomain);
+  test("analytics script should be enabled", () => {
+    indexHtml = indexHtml.replace("%VITE_PLAUSIBLE_DOMAIN%", mockDomain);
+    indexHtml = indexHtml.replace("%VITE_PLAUSIBLE_SCRIPT%", scriptEndpoint);
 
-    initializeAnalytics();
+    const plugin = z
+      .object({
+        name: z.string(),
+        transformIndexHtml: z.function({
+          input: [z.string()],
+          output: z.string(),
+        }),
+      })
+      .parse(analyticsPlugin());
 
-    expect(init).toHaveBeenCalledWith({
-      domain: mockDomain,
-    });
+    expect(plugin.name).toEqual("analytics");
+    expect(plugin.transformIndexHtml(indexHtml)).toMatchInlineSnapshot(`
+      "<!doctype html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <link rel="icon" type="image/png" href="/monyfox-logo.png" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>MonyFox</title>
+          <script
+            id="analytics"
+            defer
+            data-domain="example.com"
+            src="https://plausible.example.com/js/script.js"
+          ></script>
+        </head>
+        <body>
+          <div id="root"></div>
+          <script type="module" src="/src/main.tsx"></script>
+        </body>
+      </html>
+      "
+    `);
   });
 
-  test("should not initialize plausible analytics if the domain is invalid", () => {
-    vi.stubEnv("VITE_PLAUSIBLE_DOMAIN", "invalid-url");
+  test("analytics script should not be enabled with missing domain", () => {
+    indexHtml = indexHtml.replace("%VITE_PLAUSIBLE_DOMAIN%", "");
+    indexHtml = indexHtml.replace("%VITE_PLAUSIBLE_SCRIPT%", scriptEndpoint);
 
-    initializeAnalytics();
+    const plugin = z
+      .object({
+        name: z.string(),
+        transformIndexHtml: z.function({
+          input: [z.string()],
+          output: z.string(),
+        }),
+      })
+      .parse(analyticsPlugin());
 
-    expect(init).not.toHaveBeenCalled();
+    expect(plugin.name).toEqual("analytics");
+    expect(plugin.transformIndexHtml(indexHtml)).toMatchInlineSnapshot(`
+      "<!doctype html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <link rel="icon" type="image/png" href="/monyfox-logo.png" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>MonyFox</title>
+          
+        </head>
+        <body>
+          <div id="root"></div>
+          <script type="module" src="/src/main.tsx"></script>
+        </body>
+      </html>
+      "
+    `);
   });
 
-  test("should not initialize plausible analytics if the env variable is undefined", () => {
-    vi.stubEnv("VITE_PLAUSIBLE_DOMAIN", undefined);
+  test("analytics script should not be enabled with missing script", () => {
+    indexHtml = indexHtml.replace("%VITE_PLAUSIBLE_DOMAIN%", mockDomain);
+    indexHtml = indexHtml.replace("%VITE_PLAUSIBLE_SCRIPT%", "");
 
-    initializeAnalytics();
+    const plugin = z
+      .object({
+        name: z.string(),
+        transformIndexHtml: z.function({
+          input: [z.string()],
+          output: z.string(),
+        }),
+      })
+      .parse(analyticsPlugin());
 
-    expect(init).not.toHaveBeenCalled();
+    expect(plugin.name).toEqual("analytics");
+    expect(plugin.transformIndexHtml(indexHtml)).toMatchInlineSnapshot(`
+      "<!doctype html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <link rel="icon" type="image/png" href="/monyfox-logo.png" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>MonyFox</title>
+          
+        </head>
+        <body>
+          <div id="root"></div>
+          <script type="module" src="/src/main.tsx"></script>
+        </body>
+      </html>
+      "
+    `);
+  });
+
+  test("analytics script should not be enabled with invalid script url", () => {
+    indexHtml = indexHtml.replace("%VITE_PLAUSIBLE_DOMAIN%", mockDomain);
+    indexHtml = indexHtml.replace("%VITE_PLAUSIBLE_SCRIPT%", "not-a-url");
+
+    const plugin = z
+      .object({
+        name: z.string(),
+        transformIndexHtml: z.function({
+          input: [z.string()],
+          output: z.string(),
+        }),
+      })
+      .parse(analyticsPlugin());
+
+    expect(plugin.name).toEqual("analytics");
+    expect(plugin.transformIndexHtml(indexHtml)).toMatchInlineSnapshot(`
+      "<!doctype html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <link rel="icon" type="image/png" href="/monyfox-logo.png" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>MonyFox</title>
+          
+        </head>
+        <body>
+          <div id="root"></div>
+          <script type="module" src="/src/main.tsx"></script>
+        </body>
+      </html>
+      "
+    `);
   });
 });
