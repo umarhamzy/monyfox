@@ -20,6 +20,7 @@ Welcome to MonyFox, your comprehensive open-source solution for managing your fi
 ### Upcoming Features
 
 - 💳 **Budgeting Tools:** Set budgets and track your spending to stay on target.
+- 📜 **Debt Management:** Track your debts and payoff plans.
 - 📂 **Data Import:** Import financial data from various sources for a unified view.
 - 📱 **Mobile App:** Access MonyFox on the go with a dedicated PWA.
 - 🌐 **Sync Across Devices:** Sync your financial data across multiple devices for seamless access. The data will be encrypted and stored in a secure cloud service.
