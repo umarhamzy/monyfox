@@ -26,18 +26,7 @@ export function NavSecondary(
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Accounts" asChild>
-              <Link
-                to="/p/$profileId/settings"
-                params={{ profileId }}
-                onClick={onSidebarLinkClick}
-              >
-                <SettingsIcon />
-                <span>Settings</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {/* Settings moved to NavUser component */}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

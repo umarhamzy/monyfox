@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOutIcon, MoreVerticalIcon } from "lucide-react";
+import { LogOutIcon, MoreVerticalIcon, SettingsIcon } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/sidebar";
 import { useProfile } from "@/hooks/use-profile";
 import { Link } from "@tanstack/react-router";
+import { ThemeToggleSimple } from "@/components/theme-toggle-simple";
+import { Button } from "@/components/ui/button";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
@@ -26,18 +28,19 @@ export function NavUser() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-              </div>
-              <MoreVerticalIcon className="ml-auto size-4" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
+        <div className="flex items-center gap-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex-1"
+              >
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">{user.name}</span>
+                </div>
+                <MoreVerticalIcon className="ml-auto size-4" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
@@ -60,6 +63,19 @@ export function NavUser() {
             </Link>
           </DropdownMenuContent>
         </DropdownMenu>
+        <Link to="/p/$profileId/settings" params={{ profileId: user.id }}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-9 px-0"
+            title="Settings"
+          >
+            <SettingsIcon className="h-4 w-4" />
+            <span className="sr-only">Settings</span>
+          </Button>
+        </Link>
+        <ThemeToggleSimple />
+        </div>
       </SidebarMenuItem>
     </SidebarMenu>
   );

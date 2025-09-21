@@ -3,7 +3,6 @@
 import * as React from "react";
 
 import { NavMain } from "./nav-main";
-import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
 import {
   Sidebar,
@@ -36,7 +35,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
-        <NavSecondary className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
