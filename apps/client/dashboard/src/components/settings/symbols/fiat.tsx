@@ -24,6 +24,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DeleteSymbolButton } from "./common";
+import type { AssetSymbol, AssetSymbolExchange } from "@monyfox/common-data";
 
 export function FiatCurrenciesCard() {
   return (
@@ -46,14 +47,14 @@ function FiatCurrenciesTable() {
   } = useProfile();
 
   const symbols = useMemo(
-    () => assetSymbols.filter(({ type }) => type === "fiat"),
+    () => assetSymbols.filter(({ type }: { type: string }) => type === "fiat"),
     [assetSymbols],
   );
 
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {symbols.map((symbol) => (
+        {symbols.map((symbol: AssetSymbol) => (
           <Card key={symbol.code}>
             <CardContent className="flex justify-between">
               <div>
@@ -82,12 +83,12 @@ function AddFiatCurrencyButton() {
 
   const existingCurrencies = new Set(
     assetSymbols
-      .filter((symbol) => symbol.type === "fiat")
-      .map((symbol) => symbol.code),
+      .filter((symbol: AssetSymbol) => symbol.type === "fiat")
+      .map((symbol: AssetSymbol) => symbol.code),
   );
   const remainingCurrencies =
     currenciesQuery.data?.filter(
-      (currency) => !existingCurrencies.has(currency.code),
+      (currency: { code: string }) => !existingCurrencies.has(currency.code),
     ) ?? [];
 
   const [selectedCurrency, setSelectedCurrency] = useState<string | undefined>(
@@ -206,7 +207,7 @@ function useFiatCurrencyExchangeUpdate() {
   } = useProfile();
 
   const fiatSymbols = useMemo(
-    () => allSymbols.filter((s) => s.type === "fiat"),
+    () => allSymbols.filter((s: AssetSymbol) => s.type === "fiat"),
     [allSymbols],
   );
 
@@ -230,11 +231,11 @@ function useFiatCurrencyExchangeUpdate() {
       );
     }
 
-    return Array.from(neededExchanges).map((exchange) => {
+    return Array.from(neededExchanges).map((exchange: string) => {
       const [fromId, toId] = exchange.split("-");
       return {
-        from: fiatSymbols.find((s) => s.id === fromId)!,
-        to: fiatSymbols.find((s) => s.id === toId)!,
+        from: fiatSymbols.find((s: AssetSymbol) => s.id === fromId)!,
+        to: fiatSymbols.find((s: AssetSymbol) => s.id === toId)!,
       };
     });
   }, [fiatSymbols, assetSymbolExchanges]);
@@ -257,13 +258,13 @@ function useFiatCurrencyExchangeUpdate() {
 
   // Remove exchanges that are not needed anymore.
   const existingSymbolIds = useMemo(
-    () => new Set(allSymbols.map((s) => s.id)),
+    () => new Set(allSymbols.map((s: AssetSymbol) => s.id)),
     [allSymbols],
   );
   const assetSymbolExchangesWithoutSymbols = useMemo(
     () =>
       assetSymbolExchanges.filter(
-        (exchange) =>
+        (exchange: AssetSymbolExchange) =>
           !existingSymbolIds.has(exchange.fromAssetSymbolId) ||
           !existingSymbolIds.has(exchange.toAssetSymbolId),
       ),

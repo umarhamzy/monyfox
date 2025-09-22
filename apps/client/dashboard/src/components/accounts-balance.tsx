@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableRow } from "./ui/table";
 import { useSettings } from "@/hooks/use-settings";
 import { useAssetSymbolExchangeRate } from "@/hooks/use-asset-symbol-exchange-rate";
 import { LocalDate } from "@js-joda/core";
+import type { Account } from "@monyfox/common-data";
 
 export function AccountsBalance() {
   const { defaultSymbolId } = useSettings();
@@ -22,11 +23,11 @@ export function AccountsBalance() {
   const balances = useMemo(
     () =>
       accounts
-        .filter((a) => a.isPersonalAsset)
-        .map((account) => ({
+        .filter((a: Account) => a.isPersonalAsset)
+        .map((account: Account) => ({
           accountId: account.id,
           balance: getBalanceByAccount(account.id).reduce(
-            (acc, { symbolId, balance }) => {
+            (acc: number, { symbolId, balance }: { symbolId: string; balance: number }) => {
               return (
                 acc +
                 convertAmount({
@@ -40,18 +41,18 @@ export function AccountsBalance() {
             0,
           ),
         }))
-        .sort((a, b) => b.balance - a.balance),
+        .sort((a: { accountId: string; balance: number }, b: { accountId: string; balance: number }) => b.balance - a.balance),
     [accounts, getBalanceByAccount, convertAmount, today, defaultSymbolId],
   );
 
   const totalBalance = useMemo(() => {
-    return balances.reduce((acc, { balance }) => acc + balance, 0);
+    return balances.reduce((acc: number, { balance }: { balance: number }) => acc + balance, 0);
   }, [balances]);
 
   return (
     <Table>
       <TableBody>
-        {balances.map(({ accountId, balance }) => (
+        {balances.map(({ accountId, balance }: { accountId: string; balance: number }) => (
           <TableRow key={accountId}>
             <TableCell className="text-truncate">
               {getAccount(accountId).name}

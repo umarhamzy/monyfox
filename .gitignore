@@ -15,3 +15,4 @@ node_modules
 .pnp.*
 
 coverage
+vercelerror.txt

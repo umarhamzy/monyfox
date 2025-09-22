@@ -7,6 +7,7 @@ import { AccountCard } from "./account-card";
 import { LayoutListIcon, LayoutGridIcon } from "lucide-react";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { Account } from "@monyfox/common-data";
 
 export function AccountsList() {
   const [parent] = useAutoAnimate();
@@ -40,7 +41,7 @@ export function AccountsList() {
 
       {viewMode === "list" ? (
         <div ref={parent} className="flex flex-col gap-4">
-          {data.accounts.map((account) => (
+          {data.accounts.map((account: Account) => (
             <AccountCard key={account.id} account={account} />
           ))}
         </div>
@@ -49,7 +50,7 @@ export function AccountsList() {
           ref={parent}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
         >
-          {data.accounts.map((account) => (
+          {data.accounts.map((account: Account) => (
             <AccountCard key={account.id} account={account} />
           ))}
         </div>

@@ -12,6 +12,7 @@
   "scripts": {
     "dashboard:dev": "yarn workspace @monyfox/dashboard dev",
     "dashboard:build": "yarn workspaces foreach -Rt --from @monyfox/dashboard run build",
+    "dashboard:build-with-deps": "yarn workspaces foreach -R --from @monyfox/common-data,@monyfox/common-symbol,@monyfox/common-symbol-exchange run build && yarn workspace @monyfox/dashboard build",
     "build": "yarn workspaces foreach -At run build",
     "lint": "yarn workspaces foreach -A run lint",
     "test": "yarn workspaces foreach -A run test",

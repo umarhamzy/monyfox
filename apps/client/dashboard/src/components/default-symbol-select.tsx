@@ -21,7 +21,7 @@ export function DefaultSymbolSelect() {
   const currenciesByType = useMemo(() => {
     const result = new Map<keyof typeof ASSET_SYMBOL_TYPES, AssetSymbol[]>();
 
-    assetSymbols.forEach((symbol) => {
+    assetSymbols.forEach((symbol: AssetSymbol) => {
       const curr = result.get(symbol.type);
       if (curr) {
         curr.push(symbol);
@@ -30,9 +30,9 @@ export function DefaultSymbolSelect() {
       }
     });
 
-    return Array.from(result.entries()).map(([type, symbols]) => ({
+    return Array.from(result.entries()).map(([type, symbols]: [keyof typeof ASSET_SYMBOL_TYPES, AssetSymbol[]]) => ({
       type,
-      symbols: symbols.sort((a, b) =>
+      symbols: symbols.sort((a: AssetSymbol, b: AssetSymbol) =>
         a.displayName.localeCompare(b.displayName),
       ),
     }));
@@ -44,10 +44,10 @@ export function DefaultSymbolSelect() {
         <SelectValue placeholder="Default" />
       </SelectTrigger>
       <SelectContent className="h-96 overflow-y-auto">
-        {currenciesByType.map(({ type, symbols }) => (
+        {currenciesByType.map(({ type, symbols }: { type: keyof typeof ASSET_SYMBOL_TYPES; symbols: AssetSymbol[] }) => (
           <SelectGroup key={type}>
             <SelectLabel>{ASSET_SYMBOL_TYPES[type].label}</SelectLabel>
-            {symbols.map((symbol) => (
+            {symbols.map((symbol: AssetSymbol) => (
               <SelectItem key={symbol.id} value={symbol.id}>
                 {symbol.code}
               </SelectItem>
