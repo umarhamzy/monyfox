@@ -207,7 +207,7 @@ function DataProvider({
 
   // Transactions
   const transactions = useMemo(() => {
-    return data.transactions.sort((a, b) =>
+    return data.transactions.sort((a: Transaction, b: Transaction) =>
       a.accountingDate.localeCompare(b.accountingDate),
     );
   }, [data.transactions]);

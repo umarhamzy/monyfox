@@ -28,7 +28,7 @@ import { LocalDate } from "@js-joda/core";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { DestructiveAlert } from "@/components/ui/alert";
-import { type Transaction } from "@monyfox/common-data";
+import { type Transaction, type Account, type AssetSymbol } from "@monyfox/common-data";
 import { getTransactionType, TransactionType } from "@/utils/transaction";
 import { getTransactionCategoriesWithChildren } from "@/utils/transaction-category";
 import { SelectItemTransactionCategoryWithChildren } from "../settings/transaction-categories/category-select-item";
@@ -280,33 +280,26 @@ function TransactionForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="flex w-full items-center space-x-2">
-          <div className="flex-grow">
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      autoFocus
-                      className="h-24 text-4xl md:text-4xl font-bold"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+        <div className="flex gap-4">
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Amount</FormLabel>
+                <FormControl>
+                  <Input type="number" step="0.01" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="symbolId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>&nbsp;</FormLabel>
+                <FormLabel>Symbol</FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
@@ -316,7 +309,7 @@ function TransactionForm({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent {...field}>
-                      {assetSymbols.map((symbol) => (
+                      {assetSymbols.map((symbol: AssetSymbol) => (
                         <SelectItem key={symbol.id} value={symbol.id}>
                           {symbol.code}
                         </SelectItem>
@@ -346,7 +339,7 @@ function TransactionForm({
                         <SelectValue placeholder="Select an account" />
                       </SelectTrigger>
                       <SelectContent {...field}>
-                        {accounts.map((account) => (
+                        {accounts.map((account: Account) => (
                           <SelectItem key={account.id} value={account.id}>
                             {account.name}
                           </SelectItem>
@@ -375,7 +368,7 @@ function TransactionForm({
                         <SelectValue placeholder="Select an account" />
                       </SelectTrigger>
                       <SelectContent {...field}>
-                        {accounts.map((account) => (
+                        {accounts.map((account: Account) => (
                           <SelectItem key={account.id} value={account.id}>
                             {account.name}
                           </SelectItem>

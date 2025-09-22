@@ -11,6 +11,7 @@ import {
 import { useSettings } from "@/hooks/use-settings";
 import { useMemo } from "react";
 import { ASSET_SYMBOL_TYPES, type AssetSymbol } from "@monyfox/common-data";
+import type { Key } from "react";
 
 export function DefaultSymbolSelect() {
   const { defaultSymbolId, setDefaultSymbolId } = useSettings();
@@ -45,7 +46,7 @@ export function DefaultSymbolSelect() {
       </SelectTrigger>
       <SelectContent className="h-96 overflow-y-auto">
         {currenciesByType.map(({ type, symbols }: { type: keyof typeof ASSET_SYMBOL_TYPES; symbols: AssetSymbol[] }) => (
-          <SelectGroup key={type}>
+          <SelectGroup key={type as Key}>
             <SelectLabel>{ASSET_SYMBOL_TYPES[type].label}</SelectLabel>
             {symbols.map((symbol: AssetSymbol) => (
               <SelectItem key={symbol.id} value={symbol.id}>

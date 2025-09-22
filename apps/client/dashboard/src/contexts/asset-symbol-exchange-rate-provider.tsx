@@ -18,6 +18,7 @@ import {
 } from "./asset-symbol-exchange-rate-context";
 import { maxLocalDate } from "@/utils/datetime";
 import { useDatabase } from "@/hooks/use-database";
+import type { AssetSymbolExchange } from "@monyfox/common-data";
 
 export const AssetSymbolExchangeRateProvider = ({
   children,
@@ -67,7 +68,7 @@ export const AssetSymbolExchangeRateProvider = ({
   );
 
   const queries = useQueries({
-    queries: assetSymbolExchanges.map((e) => ({
+    queries: assetSymbolExchanges.map((e: AssetSymbolExchange) => ({
       queryKey: ["asset-symbol-exchange-rate", e.id, startDate, endDate],
       queryFn: async () => {
         let client: SymbolExchangeClient;
@@ -114,7 +115,7 @@ export const AssetSymbolExchangeRateProvider = ({
               data: rates,
               updatedAt: new Date().toISOString(),
             });
-          } catch (error) {
+          } catch (error: unknown) {
             if (hasCache) {
               // If the request fails, fallback to the cache even if the data is stale.
               rates = cached.data;
@@ -156,7 +157,12 @@ export const AssetSymbolExchangeRateProvider = ({
     return new SymbolConverter({
       startDate,
       endDate,
-      results: availableData,
+      results: availableData as {
+        id: string;
+        fromAssetSymbolId: string;
+        toAssetSymbolId: string;
+        rates: GetExchangeRateResponse;
+      }[],
     });
   }, [stableQueries, startDate, endDate]);
 

@@ -49,7 +49,7 @@ function StocksList() {
   } = useProfile();
 
   const symbols = useMemo(
-    () => assetSymbols.filter(({ type }) => type === "stock"),
+    () => assetSymbols.filter(({ type }: { type: string }) => type === "stock"),
     [assetSymbols],
   );
 
@@ -118,14 +118,14 @@ function AddStockButton() {
     () =>
       new Set(
         assetSymbols
-          .filter((s) => s.type === "stock")
-          .map((stock) => stock.code),
+          .filter((s: AssetSymbol) => s.type === "stock")
+          .map((stock: AssetSymbol) => stock.code),
       ),
     [assetSymbols],
   );
 
   const currencyByCode = useMemo(
-    () => new Map(assetSymbols.map((s) => [s.code, s])),
+    () => new Map(assetSymbols.map((s: AssetSymbol) => [s.code, s])),
     [assetSymbols],
   );
 
@@ -167,7 +167,7 @@ function AddStockButton() {
               </DestructiveAlert>
             )}
             <div className="flex flex-col gap-4">
-              {searchStocks.data?.map((stock) => (
+              {searchStocks.data?.map((stock: SearchStocksResult[number]) => (
                 <StockSymbolItem
                   key={stock.code}
                   stock={stock}
