@@ -15,7 +15,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Link } from "@tanstack/react-router";
+import { Link, useMatchRoute } from "@tanstack/react-router";
 import { useProfile } from "@/hooks/use-profile";
 
 export function NavMain() {
@@ -23,13 +23,39 @@ export function NavMain() {
     user: { id: profileId },
   } = useProfile();
   const { onSidebarLinkClick } = useSidebar();
+  const matchRoute = useMatchRoute();
+
+  const isActiveDashboard = !!matchRoute({
+    to: "/p/$profileId",
+    params: { profileId },
+    fuzzy: false,
+  });
+  const isActiveCharts = !!matchRoute({
+    to: "/p/$profileId/charts",
+    params: { profileId },
+    fuzzy: false,
+  });
+  const isActiveAccounts = !!matchRoute({
+    to: "/p/$profileId/accounts",
+    params: { profileId },
+    fuzzy: false,
+  });
+  const isActiveTransactions = !!matchRoute({
+    to: "/p/$profileId/transactions",
+    params: { profileId },
+    fuzzy: false,
+  });
 
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Dashboard" asChild>
+            <SidebarMenuButton
+              tooltip="Dashboard"
+              asChild
+              isActive={isActiveDashboard}
+            >
               <Link
                 to="/p/$profileId"
                 params={{ profileId }}
@@ -41,7 +67,11 @@ export function NavMain() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Accounts" asChild>
+            <SidebarMenuButton
+              tooltip="Charts"
+              asChild
+              isActive={isActiveCharts}
+            >
               <Link
                 to="/p/$profileId/charts"
                 params={{ profileId }}
@@ -53,7 +83,11 @@ export function NavMain() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Accounts" asChild>
+            <SidebarMenuButton
+              tooltip="Accounts"
+              asChild
+              isActive={isActiveAccounts}
+            >
               <Link
                 to="/p/$profileId/accounts"
                 params={{ profileId }}
@@ -65,7 +99,11 @@ export function NavMain() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Transactions" asChild>
+            <SidebarMenuButton
+              tooltip="Transactions"
+              asChild
+              isActive={isActiveTransactions}
+            >
               <Link
                 to="/p/$profileId/transactions"
                 params={{ profileId }}
