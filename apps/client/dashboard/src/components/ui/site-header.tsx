@@ -9,24 +9,50 @@ export function SiteHeader() {
     data: { assetSymbols },
     user: { id: profileId },
   } = useProfile();
-  
+
   const matchRoute = useMatchRoute();
-  
+
   // Determine the active page title
   const getPageTitle = () => {
-    if (matchRoute({ to: "/p/$profileId", params: { profileId }, fuzzy: false })) {
+    if (
+      matchRoute({ to: "/p/$profileId", params: { profileId }, fuzzy: false })
+    ) {
       return "Dashboard";
     }
-    if (matchRoute({ to: "/p/$profileId/charts", params: { profileId }, fuzzy: false })) {
+    if (
+      matchRoute({
+        to: "/p/$profileId/charts",
+        params: { profileId },
+        fuzzy: false,
+      })
+    ) {
       return "Charts";
     }
-    if (matchRoute({ to: "/p/$profileId/accounts", params: { profileId }, fuzzy: false })) {
+    if (
+      matchRoute({
+        to: "/p/$profileId/accounts",
+        params: { profileId },
+        fuzzy: false,
+      })
+    ) {
       return "Accounts";
     }
-    if (matchRoute({ to: "/p/$profileId/transactions", params: { profileId }, fuzzy: false })) {
+    if (
+      matchRoute({
+        to: "/p/$profileId/transactions",
+        params: { profileId },
+        fuzzy: false,
+      })
+    ) {
       return "Transactions";
     }
-    if (matchRoute({ to: "/p/$profileId/settings", params: { profileId }, fuzzy: false })) {
+    if (
+      matchRoute({
+        to: "/p/$profileId/settings",
+        params: { profileId },
+        fuzzy: false,
+      })
+    ) {
       return "Settings";
     }
     return "Dashboard"; // default
