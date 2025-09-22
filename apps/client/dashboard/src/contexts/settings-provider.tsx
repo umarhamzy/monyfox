@@ -1,7 +1,8 @@
-import { DestructiveAlert } from "@/components/ui/alert";
+import { createContext, ReactNode, useEffect } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useProfile } from "@/hooks/use-profile";
-import { useEffect } from "react";
+import { DestructiveAlert } from "@/components/ui/alert";
+import type { AssetSymbol } from "@monyfox/common-data";
 import { z } from "zod";
 import { SettingsContext } from "./settings-context";
 
@@ -27,7 +28,7 @@ export const SettingsProvider = ({
     if (
       defaultSymbolId !== null &&
       defaultSymbolId !== fallbackSymbolId &&
-      !assetSymbols.find((symbol) => symbol.id === defaultSymbolId)
+      !assetSymbols.find((symbol: AssetSymbol) => symbol.id === defaultSymbolId)
     ) {
       setDefaultSymbolId(fallbackSymbolId);
     }

@@ -155,7 +155,7 @@ export function FiatCurrencyExchanges() {
   } = useProfile();
 
   const symbols = useMemo(
-    () => assetSymbols.filter(({ type }) => type === "fiat"),
+    () => assetSymbols.filter(({ type }: { type: string }) => type === "fiat"),
     [assetSymbols],
   );
 
@@ -164,7 +164,7 @@ export function FiatCurrencyExchanges() {
   const fiatExchanges = useMemo(
     () =>
       assetSymbolExchanges.filter(
-        (exchange) =>
+        (exchange: AssetSymbolExchange) =>
           getAssetSymbol(exchange.fromAssetSymbolId).type === "fiat" &&
           getAssetSymbol(exchange.toAssetSymbolId).type === "fiat",
       ),
@@ -185,7 +185,7 @@ export function FiatCurrencyExchanges() {
           currency.
           <br />
           <div className="flex flex-wrap gap-2 mt-2">
-            {fiatExchanges.map((exchange) => (
+            {fiatExchanges.map((exchange: AssetSymbolExchange) => (
               <Badge variant="outline" key={exchange.id}>
                 {getAssetSymbol(exchange.fromAssetSymbolId).code}
                 <ArrowRightIcon />

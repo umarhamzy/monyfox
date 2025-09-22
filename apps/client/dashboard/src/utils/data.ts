@@ -367,7 +367,7 @@ export function getDataValidationErrors(data: Data): string[] {
   }
 
   const existingTransactionCategoryIds = new Set(
-    data.transactionCategories.map((category) => category.id),
+    data.transactionCategories.map((category: TransactionCategory) => category.id),
   );
   for (const category of data.transactionCategories) {
     if (
@@ -382,7 +382,7 @@ export function getDataValidationErrors(data: Data): string[] {
 
   // Transactions
   const existingAccountIds = new Set(
-    data.accounts.map((account) => account.id),
+    data.accounts.map((account: Account) => account.id),
   );
   for (const transaction of data.transactions) {
     if (

@@ -116,7 +116,7 @@ function AddStockButton() {
 
   const stocksCodes = useMemo(
     () =>
-      new Set(
+      new Set<string>(
         assetSymbols
           .filter((s: AssetSymbol) => s.type === "stock")
           .map((stock: AssetSymbol) => stock.code),
@@ -125,7 +125,7 @@ function AddStockButton() {
   );
 
   const currencyByCode = useMemo(
-    () => new Map(assetSymbols.map((s: AssetSymbol) => [s.code, s])),
+    () => new Map<string, AssetSymbol>(assetSymbols.map((s: AssetSymbol) => [s.code, s])),
     [assetSymbols],
   );
 

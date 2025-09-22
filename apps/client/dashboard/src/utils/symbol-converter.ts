@@ -190,7 +190,7 @@ function getCompleteRateHistory({
 }) {
   const map = new Map<LocalDateString, number>();
 
-  const rateByDate = new Map(rates.map((r) => [r.date, r.rate]));
+  const rateByDate = new Map(rates.map((r: { date: string; rate: number }) => [r.date, r.rate]));
 
   // Fill in the gaps with the last known rate.
   let lastRate = rates[0]?.rate;

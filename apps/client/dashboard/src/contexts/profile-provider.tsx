@@ -418,7 +418,7 @@ function DataProvider({
         const symbolId = transaction.from.symbolId;
         const amount = transaction.from.amount;
         const balanceBySymbol =
-          balanceByAccountAndSymbol.get(accountId) || new Map();
+          balanceByAccountAndSymbol.get(accountId) || new Map<string, number>();
         balanceBySymbol.set(
           symbolId,
           (balanceBySymbol.get(symbolId) || 0) - amount,
@@ -434,7 +434,7 @@ function DataProvider({
         const symbolId = transaction.to.symbolId;
         const amount = transaction.to.amount;
         const balanceBySymbol =
-          balanceByAccountAndSymbol.get(accountId) || new Map();
+          balanceByAccountAndSymbol.get(accountId) || new Map<string, number>();
         balanceBySymbol.set(
           symbolId,
           (balanceBySymbol.get(symbolId) || 0) + amount,
