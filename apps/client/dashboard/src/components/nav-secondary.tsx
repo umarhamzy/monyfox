@@ -25,9 +25,7 @@ export function NavSecondary(
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
-        <SidebarMenu>
-          {/* Settings moved to NavUser component */}
-        </SidebarMenu>
+        <SidebarMenu>{/* Settings moved to NavUser component */}</SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
   );

@@ -38,7 +38,7 @@ export function AddTransactionFloatingButton() {
   return (
     <>
       <Button
-        className="fixed bottom-4 right-4 z-10"
+        className="fixed bottom-7 right-7 z-10 rounded-full size-16"
         size="lg"
         onClick={openModal}
       >

@@ -11,7 +11,7 @@ export function DashboardPage() {
   const { isLoading, error } = useAssetSymbolExchangeRate();
 
   return (
-    <div className="flex flex-wrap -mx-2 gap-y-4 pb-12">
+    <div className="flex flex-wrap -mx-2 gap-y-4 pb-12 outline-white">
       {isLoading && (
         <div className="w-full px-2 flex justify-center gap-2">
           <Spinner size="small" />
